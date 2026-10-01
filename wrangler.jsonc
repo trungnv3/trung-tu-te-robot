@@ -1,8 +1,19 @@
 {
-  "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "trung-tu-te-robot",
-  "compatibility_date": "2026-09-25",
-  "assets": {
-    "directory": "./public"
-  }
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "trung-tu-te-robot",
+	"main": "./src/index.js",
+	"compatibility_date": "2026-09-25",
+	"assets": {
+		"directory": "./public",
+		"binding": "ASSETS",
+		"run_worker_first": [ "/api/*", "/robot/*" ]
+	},
+	"d1_databases": [
+		{
+			"binding": "trung_tu_te_robot_db",
+			"database_name": "trung-tu-te-robot-db",
+			"database_id": "99f8a221-2a23-4780-8772-80a3806345aa",
+			"remote": true
+		}
+	]
 }

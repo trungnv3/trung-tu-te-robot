@@ -41,140 +41,404 @@ if (
     });
   });
 }
-// PRODUCT GALLERY - LOAD FROM gallery.json
-// Dùng chung cho các trang model có gallery.json
-const galleryThumbs = document.querySelector("#product-gallery-thumbs");
-const galleryMainImage = document.querySelector("#product-main-image");
+// ============================================================
+// PRODUCT GALLERY - GOOGLE DRIVE
+// ============================================================
+
+const galleryThumbs =
+  document.querySelector("#product-gallery-thumbs");
+
+const galleryMainImage =
+  document.querySelector("#product-main-image");
 
 if (galleryThumbs && galleryMainImage) {
-  fetch("images/gallery.json")
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Không thể đọc gallery.json");
-      }
 
-      return response.json();
-    })
-    .then((images) => {
-      if (!Array.isArray(images) || images.length === 0) {
-        throw new Error("gallery.json không có ảnh");
-      }
+  const pathParts =
+    window.location.pathname
+      .split("/")
+      .filter(Boolean);
 
-      // Tên model lấy từ alt của ảnh chính
-      const modelName =
-        galleryMainImage.alt || "Robot lau nhà";
+  // Cấu trúc:
+  // /robot/dreame/x50/
+  // /robot/dreame/x40/
+  const dreameIndex =
+    pathParts.indexOf("dreame");
 
-      // Ảnh đầu tiên làm ảnh lớn
-      galleryMainImage.src = `images/${images[0]}`;
-      galleryMainImage.alt = modelName;
+  const currentModel =
+    dreameIndex !== -1
+      ? pathParts[dreameIndex + 1]
+      : null;
 
-      // Tạo thumbnail cho tất cả ảnh
-      images.forEach((imageName, index) => {
-        const img = document.createElement("img");
+  // Chỉ chạy trên trang model Dreame
+  if (currentModel) {
 
-        img.src = `images/${imageName}`;
-        img.alt = `${modelName} - hình ${index + 1}`;
-        img.loading = "lazy";
+    fetch("/api/robots")
+      .then((response) => {
 
-        if (index === 0) {
-          img.classList.add("active");
+        if (!response.ok) {
+          throw new Error(
+            "Không thể đọc API robot"
+          );
         }
 
-        img.addEventListener("click", () => {
-          galleryMainImage.src = `images/${imageName}`;
-          galleryMainImage.alt = img.alt;
+        return response.json();
+      })
 
-          galleryThumbs
-            .querySelectorAll("img")
-            .forEach((thumb) => {
-              thumb.classList.remove("active");
-            });
+      .then((data) => {
 
-          img.classList.add("active");
-        });
+        if (!data.ok) {
+          throw new Error(
+            data.error || "API robot báo lỗi"
+          );
+        }
 
-        galleryThumbs.appendChild(img);
+        /*
+         * Tìm model tương ứng.
+         *
+         * models.json:
+         * x50 → Dreame X50 Ultra
+         * x40 → Dreame X40 Ultra
+         *
+         * Google Drive:
+         * ROBOT / Dreame / X50 Ultra
+         * ROBOT / Dreame / X40 Ultra
+         */
+
+        const robot =
+          data.robots.find(
+            (item) =>
+              item.brand === "Dreame" &&
+              item.model
+                .toLowerCase()
+                .replace(/\s+/g, "")
+                .includes(
+                  currentModel
+                    .toLowerCase()
+                )
+          );
+
+        if (!robot) {
+          throw new Error(
+            `Không tìm thấy dữ liệu Google Drive cho model: ${currentModel}`
+          );
+        }
+
+        if (
+          !Array.isArray(robot.images) ||
+          robot.images.length === 0
+        ) {
+          throw new Error(
+            `Model ${robot.model} chưa có ảnh trên Google Drive`
+          );
+        }
+
+        galleryThumbs.innerHTML = "";
+
+        const modelName =
+          galleryMainImage.alt ||
+          robot.model;
+
+        robot.images.forEach(
+          (image, index) => {
+
+            const imageUrl =
+              `/api/image/${image.id}`;
+
+            // Ảnh đầu tiên
+            // làm ảnh lớn
+            if (index === 0) {
+
+              galleryMainImage.src =
+                imageUrl;
+
+              galleryMainImage.alt =
+                modelName;
+            }
+
+            // Tạo thumbnail
+            const img =
+              document.createElement("img");
+
+            img.src = imageUrl;
+
+            img.alt =
+              `${modelName} - hình ${index + 1}`;
+
+            img.loading = "lazy";
+
+            if (index === 0) {
+              img.classList.add("active");
+            }
+
+            img.addEventListener(
+              "click",
+              () => {
+
+                galleryMainImage.src =
+                  imageUrl;
+
+                galleryMainImage.alt =
+                  img.alt;
+
+                galleryThumbs
+                  .querySelectorAll("img")
+                  .forEach((thumb) => {
+                    thumb.classList.remove(
+                      "active"
+                    );
+                  });
+
+                img.classList.add("active");
+              }
+            );
+
+            galleryThumbs.appendChild(img);
+          }
+        );
+      })
+
+      .catch((error) => {
+
+        console.error(
+          "Product Gallery:",
+          error
+        );
+
       });
-    })
-    .catch((error) => {
-      console.error("Product Gallery:", error);
-    });
+  }
 }
 // ============================================================
-// DREAME MODELS - TỰ ĐỘNG TẠO DANH SÁCH MODEL
+// ROBOT MODELS - TỰ ĐỘNG TẠO DANH SÁCH TỪ D1
 // ============================================================
 
-const dreameModelsList = document.querySelector("#dreame-models-list");
+const dreameModelsList =
+  document.querySelector("#dreame-models-list");
 
 if (dreameModelsList) {
-  const modelsUrl = dreameModelsList.dataset.modelsUrl;
-  const isModelPage =
-    dreameModelsList.classList.contains("article-models-grid");
 
-  // Nếu đang ở trang model, lấy tên thư mục hiện tại
-  const pathParts = window.location.pathname
-    .split("/")
-    .filter(Boolean);
-
-  const currentModel = isModelPage
-    ? pathParts[pathParts.length - 1]
-    : null;
-
-  fetch(modelsUrl)
+  fetch("/api/robots")
     .then((response) => {
+
       if (!response.ok) {
-        throw new Error("Không thể đọc models.json");
+        throw new Error(
+          "Không thể đọc API robot"
+        );
       }
 
       return response.json();
+
     })
-    .then((models) => {
-      if (!Array.isArray(models)) {
-        throw new Error("models.json không đúng định dạng");
+
+    .then((data) => {
+
+      if (
+        !data.ok ||
+        !Array.isArray(data.robots)
+      ) {
+        throw new Error(
+          data.error ||
+          "API robot không đúng định dạng"
+        );
       }
+
+      const robots =
+        data.robots;
 
       dreameModelsList.innerHTML = "";
 
-      models.forEach((model) => {
-        const link = document.createElement("a");
+      robots.forEach((robot) => {
 
-        // Trang Dreame và trang model dùng đường dẫn khác nhau
-        link.href = isModelPage
-          ? `../${model.folder}/index.html`
-          : `${model.folder}/index.html`;
+        const link =
+          document.createElement("a");
 
-        if (isModelPage) {
-          link.className = "article-model-card";
+        link.href =
+          "/robot/template/index.html?slug=" +
+          encodeURIComponent(
+            robot.slug
+          );
 
-          const name = document.createElement("strong");
-          name.textContent = model.name;
+        link.className =
+          "article-model-card";
 
-          const status = document.createElement("span");
+        /*
+         * Tìm ảnh chính.
+         * Nếu chưa có ảnh chính thì lấy ảnh đầu tiên.
+         */
 
-          if (model.folder === currentModel) {
-            status.textContent = "Đang xem";
-            link.setAttribute("aria-current", "page");
-          } else {
-            status.textContent = "Xem thông tin →";
-          }
+        const primaryImage =
+          Array.isArray(robot.images)
+            ? (
+                robot.images.find(
+                  (image) =>
+                    image.primary === true
+                ) ||
+                robot.images[0]
+              )
+            : null;
 
-          link.appendChild(name);
-          link.appendChild(status);
+        /*
+         * Khung ảnh
+         */
+
+        const imageBox =
+          document.createElement("div");
+
+        imageBox.className =
+          "article-model-card-image";
+
+        if (
+          primaryImage &&
+          primaryImage.url
+        ) {
+
+          const image =
+            document.createElement("img");
+
+          image.src =
+            primaryImage.url;
+
+          image.alt =
+            robot.model ||
+            "Robot lau nhà";
+
+          image.loading =
+            "lazy";
+
+          imageBox.appendChild(
+            image
+          );
+
         } else {
-          const name = document.createElement("b");
-          name.textContent = model.name;
 
-          const description = document.createElement("span");
-          description.textContent = "Thông tin & trải nghiệm →";
+          imageBox.classList.add(
+            "no-image"
+          );
 
-          link.appendChild(name);
-          link.appendChild(description);
+          imageBox.textContent =
+            "Chưa có hình ảnh";
+
         }
 
-        dreameModelsList.appendChild(link);
+        /*
+         * Nội dung card
+         */
+
+        const content =
+          document.createElement("div");
+
+        content.className =
+          "article-model-card-content";
+
+        /*
+         * Thương hiệu
+         */
+
+        const brand =
+          document.createElement("span");
+
+        brand.className =
+          "article-model-card-brand";
+
+        brand.textContent =
+          robot.brand ||
+          "";
+
+        /*
+         * Tên model
+         */
+
+        const name =
+          document.createElement("strong");
+
+        name.className =
+          "article-model-card-name";
+
+        name.textContent =
+          robot.model ||
+          "Robot lau nhà";
+
+        /*
+         * Năm sản xuất
+         */
+
+        const year =
+          document.createElement("span");
+
+        year.className =
+          "article-model-card-year";
+
+        if (
+          robot.year !== null &&
+          robot.year !== undefined &&
+          robot.year !== ""
+        ) {
+
+          year.textContent =
+            "Năm " +
+            robot.year;
+
+        } else {
+
+          year.textContent =
+            "Đang cập nhật";
+
+        }
+
+        /*
+         * Link chi tiết
+         */
+
+        const detail =
+          document.createElement("span");
+
+        detail.className =
+          "article-model-card-link";
+
+        detail.textContent =
+          "Xem chi tiết →";
+
+        content.appendChild(
+          brand
+        );
+
+        content.appendChild(
+          name
+        );
+
+        content.appendChild(
+          year
+        );
+
+        content.appendChild(
+          detail
+        );
+
+        link.appendChild(
+          imageBox
+        );
+
+        link.appendChild(
+          content
+        );
+
+        dreameModelsList.appendChild(
+          link
+        );
+
       });
+
     })
+
     .catch((error) => {
-      console.error("Dreame Models:", error);
+
+      console.error(
+        "Robot Models:",
+        error
+      );
+
+      dreameModelsList.innerHTML =
+        "<span>Không thể tải danh sách Robot.</span>";
+
     });
+
 }

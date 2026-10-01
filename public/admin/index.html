@@ -1,0 +1,795 @@
+<!DOCTYPE html> <html lang="vi"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Admin · Trung Tử Tế</title> <link rel="stylesheet" href="admin.css"> </head> <body> <div class="admin-layout"> <!-- SIDEBAR --> <aside class="sidebar">
+<div class="brand">
+
+  <img
+    src="../logo.webp"
+    alt="Trung Tử Tế">
+
+  <div>
+    <strong>TRUNG TỬ TẾ</strong>
+    <span>QUẢN TRỊ WEBSITE</span>
+  </div>
+
+</div>
+
+
+<nav class="admin-nav">
+
+  <a
+    href="#dashboard"
+    class="active"
+    data-section="dashboard">
+
+    <span>⌂</span>
+    Tổng quan
+
+  </a>
+
+
+  <a
+    href="#robots"
+    data-section="robots">
+
+    <span>🤖</span>
+    Robot
+
+  </a>
+
+
+  <a
+    href="#">
+
+    <span>📝</span>
+    Chia sẻ
+
+  </a>
+
+
+  <a
+    href="#">
+
+    <span>🖼</span>
+    Hình ảnh
+
+  </a>
+
+
+  <a
+    href="#">
+
+    <span>⚙</span>
+    Cấu hình
+
+  </a>
+
+</nav>
+
+
+<div class="sidebar-bottom">
+
+  <a
+    href="/"
+    target="_blank">
+
+    ↗ Xem website
+
+  </a>
+
+</div>
+</aside> <!-- MAIN --> <main class="admin-main">
+<!-- DASHBOARD -->
+
+<section
+  id="dashboard-section"
+  class="admin-section active-section">
+
+  <header class="admin-header">
+
+    <div>
+
+      <p class="eyebrow">
+        QUẢN TRỊ WEBSITE
+      </p>
+
+      <h1>
+        Tổng quan
+      </h1>
+
+    </div>
+
+
+    <a
+      class="view-site"
+      href="/"
+      target="_blank">
+
+      Xem website ↗
+
+    </a>
+
+  </header>
+
+
+  <!-- STATS -->
+
+  <section class="stats">
+
+    <div class="stat-card">
+
+      <span class="stat-icon">
+        🤖
+      </span>
+
+      <div>
+
+        <span class="stat-label">
+          Robot
+        </span>
+
+        <strong>
+          2
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <span class="stat-icon">
+        📝
+      </span>
+
+      <div>
+
+        <span class="stat-label">
+          Bài chia sẻ
+        </span>
+
+        <strong>
+          1
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <span class="stat-icon">
+        🖼
+      </span>
+
+      <div>
+
+        <span class="stat-label">
+          Hình ảnh
+        </span>
+
+        <strong>
+          12
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <span class="stat-icon">
+        ●
+      </span>
+
+      <div>
+
+        <span class="stat-label">
+          Website
+        </span>
+
+        <strong class="online">
+          Hoạt động
+        </strong>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- QUICK ACTIONS -->
+
+  <section class="panel">
+
+    <div class="panel-header">
+
+      <div>
+
+        <p class="eyebrow">
+          QUẢN LÝ NỘI DUNG
+        </p>
+
+        <h2>
+          Thao tác nhanh
+        </h2>
+
+      </div>
+
+    </div>
+
+
+    <div class="quick-actions">
+
+      <a href="#robots" data-section="robots">
+
+        <span>🤖</span>
+
+        <strong>
+          Quản lý Robot
+        </strong>
+
+        <small>
+          Xem các model robot đang có
+        </small>
+
+      </a>
+
+
+      <a href="#">
+
+        <span>📝</span>
+
+        <strong>
+          Quản lý bài chia sẻ
+        </strong>
+
+        <small>
+          Tạo và chỉnh sửa nội dung
+        </small>
+
+      </a>
+
+
+      <a href="#">
+
+        <span>🖼</span>
+
+        <strong>
+          Hình ảnh Google Drive
+        </strong>
+
+        <small>
+          Quản lý hình ảnh sản phẩm
+        </small>
+
+      </a>
+
+
+      <a href="#">
+
+        <span>⚙</span>
+
+        <strong>
+          Cấu hình website
+        </strong>
+
+        <small>
+          Thông tin liên hệ và website
+        </small>
+
+      </a>
+
+    </div>
+
+  </section>
+
+
+  <!-- STATUS -->
+
+  <section class="panel">
+
+    <div class="panel-header">
+
+      <div>
+
+        <p class="eyebrow">
+          HỆ THỐNG
+        </p>
+
+        <h2>
+          Trạng thái
+        </h2>
+
+      </div>
+
+    </div>
+
+
+    <div class="status-list">
+
+      <div class="status-item">
+
+        <span class="status-dot"></span>
+
+        <div>
+
+          <strong>
+            Website
+          </strong>
+
+          <small>
+            Cloudflare Worker
+          </small>
+
+        </div>
+
+        <span class="status-ok">
+          Hoạt động
+        </span>
+
+      </div>
+
+
+      <div class="status-item">
+
+        <span class="status-dot"></span>
+
+        <div>
+
+          <strong>
+            Google Drive
+          </strong>
+
+          <small>
+            Kho hình ảnh
+          </small>
+
+        </div>
+
+        <span class="status-ok">
+          Kết nối
+        </span>
+
+      </div>
+
+
+      <div class="status-item">
+
+        <span class="status-dot"></span>
+
+        <div>
+
+          <strong>
+            API
+          </strong>
+
+          <small>
+            Worker API
+          </small>
+
+        </div>
+
+        <span class="status-ok">
+          Hoạt động
+        </span>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</section>
+
+
+<!-- ROBOTS -->
+
+<section
+  id="robots-section"
+  class="admin-section">
+
+  <header class="admin-header">
+
+    <div>
+
+      <p class="eyebrow">
+        QUẢN LÝ NỘI DUNG
+      </p>
+
+      <h1>
+        Robot
+      </h1>
+
+    </div>
+
+    <a
+      class="view-site"
+      href="/"
+      target="_blank">
+
+      Xem website ↗
+
+    </a>
+
+  </header>
+
+
+  <!-- =====================================================
+       DANH SÁCH ROBOT
+       ===================================================== -->
+       <div></div>
+
+       <section class="panel">
+       
+         <div class="panel-header">
+          <div>
+            <p class="eyebrow">
+              DANH SÁCH
+            </p>
+          
+            <h2>
+              Robot hiện có
+            </h2>
+          </div>
+          
+          <button
+            type="button"
+            id="robot-add-button"
+            class="button-primary">
+            ＋ Thêm Robot
+          </button>
+          
+        </div>
+
+      </section>
+
+      <div id="robot-list" class="robot-list">
+        <div class="robot-loading">
+          Đang tải dữ liệu Robot...
+        </div>
+      </div>
+
+    </section>
+  <!-- =====================================================
+       FORM CHỈNH SỬA ROBOT
+       ===================================================== -->
+
+  <section
+    id="robot-edit-panel"
+    class="panel robot-edit-panel"
+    hidden>
+
+    <div class="panel-header">
+
+      <div>
+
+        <p class="eyebrow">
+          CHỈNH SỬA
+        </p>
+
+        <h2 id="robot-edit-title">
+          Chỉnh sửa Robot
+        </h2>
+
+      </div>
+
+    </div>
+
+
+    <!-- THÔNG TIN CƠ BẢN -->
+
+    <div class="admin-form-section">
+
+      <h3>
+        Thông tin cơ bản
+      </h3>
+
+
+      <div class="admin-form-grid">
+
+        <label>
+
+          <span>
+            Hãng
+          </span>
+
+          <input
+            id="edit-brand"
+            type="text">
+
+        </label>
+
+
+        <label>
+
+          <span>
+            Model
+          </span>
+
+          <input
+            id="edit-model"
+            type="text">
+
+        </label>
+
+
+        <label>
+
+          <span>
+            Năm
+          </span>
+
+          <input
+            id="edit-year"
+            type="number">
+
+        </label>
+
+
+        <label>
+
+          <span>
+            Danh mục
+          </span>
+
+          <input
+            id="edit-category"
+            type="text">
+
+        </label>
+
+
+        <label>
+
+          <span>
+            Trạng thái
+          </span>
+
+          <select id="edit-status">
+
+            <option value="active">
+              Đang hiển thị
+            </option>
+
+            <option value="inactive">
+              Tạm ẩn
+            </option>
+
+          </select>
+
+        </label>
+
+      </div>
+
+    </div>
+
+
+    <!-- THÔNG SỐ KỸ THUẬT -->
+
+    <div class="admin-form-section">
+
+      <h3>
+        Thông số kỹ thuật
+      </h3>
+
+
+      <div class="admin-form-grid">
+
+        <label>
+          <span>Lực hút</span>
+          <input id="edit-suction" type="text">
+        </label>
+
+        <label>
+          <span>Pin</span>
+          <input id="edit-battery" type="text">
+        </label>
+
+        <label>
+          <span>Hộp bụi</span>
+          <input id="edit-dustbin" type="text">
+        </label>
+
+        <label>
+          <span>Bình nước</span>
+          <input id="edit-water-tank" type="text">
+        </label>
+
+        <label>
+          <span>Điều hướng</span>
+          <input id="edit-navigation" type="text">
+        </label>
+
+        <label>
+          <span>Độ ồn</span>
+          <input id="edit-noise" type="text">
+        </label>
+
+        <label>
+          <span>Nước nóng</span>
+          <input id="edit-hot-water" type="text">
+        </label>
+
+        <label>
+          <span>Giặt khăn</span>
+          <input id="edit-mop-wash" type="text">
+        </label>
+
+        <label>
+          <span>Sấy khăn</span>
+          <input id="edit-mop-dry" type="text">
+        </label>
+
+        <label>
+          <span>Nâng khăn</span>
+          <input id="edit-mop-lift" type="text">
+        </label>
+
+        <label>
+          <span>Tự đổ bụi</span>
+          <input id="edit-self-empty" type="text">
+        </label>
+
+        <label>
+          <span>Dung dịch vệ sinh</span>
+          <input id="edit-detergent" type="text">
+        </label>
+
+      </div>
+
+    </div>
+
+
+    <!-- NỘI DUNG -->
+
+    <div class="admin-form-section">
+
+      <h3>
+        Nội dung
+      </h3>
+
+
+      <label>
+
+        <span>
+          Giới thiệu
+        </span>
+
+        <textarea
+          id="edit-intro"
+          rows="5"></textarea>
+
+      </label>
+
+
+      <label>
+
+        <span>
+          Điểm nổi bật
+        </span>
+
+        <textarea
+          id="edit-highlights"
+          rows="5"></textarea>
+
+      </label>
+
+
+      <label>
+
+        <span>
+          Ưu điểm
+        </span>
+
+        <textarea
+          id="edit-pros"
+          rows="5"></textarea>
+
+      </label>
+
+
+      <label>
+
+        <span>
+          Lưu ý
+        </span>
+
+        <textarea
+          id="edit-notes"
+          rows="5"></textarea>
+
+      </label>
+
+
+      <label>
+
+        <span>
+          Phù hợp với
+        </span>
+
+        <textarea
+          id="edit-suitable-for"
+          rows="5"></textarea>
+
+      </label>
+
+    </div>
+
+
+    <!-- TÍNH NĂNG -->
+
+    <div class="admin-form-section">
+
+      <h3>
+        Tính năng nổi bật
+      </h3>
+
+
+      <div
+        id="edit-features">
+
+      </div>
+
+    </div>
+
+
+    <!-- HÌNH ẢNH -->
+
+    <div class="admin-form-section">
+
+      <h3>
+        Hình ảnh
+      </h3>
+
+
+      <div class="robot-edit-image-toolbar">
+
+        <button
+          type="button"
+          id="robot-add-image"
+          class="button-secondary">
+          ＋ Thêm hình ảnh
+        </button>
+      
+      </div>
+      
+      <div
+        id="edit-images"
+        class="robot-edit-images">
+      </div>
+
+    </div>
+
+
+    <!-- NÚT -->
+
+    <div class="admin-form-actions">
+
+      <button
+        type="button"
+        id="robot-edit-cancel"
+        class="button-secondary">
+
+        Hủy
+
+      </button>
+
+
+      <button
+        type="button"
+        id="robot-edit-save"
+        class="button-primary">
+
+        Lưu thay đổi
+
+      </button>
+
+    </div>
+
+  </section>
+
+</section>
+</main> </div> <script src="admin.js"></script> </body> </html>

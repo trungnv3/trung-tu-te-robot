@@ -1,0 +1,1821 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="Thông tin robot lau nhà, thông số kỹ thuật và góc nhìn kỹ thuật từ Trung Tử Tế."
+  >
+
+  <title>Robot lau nhà – Trung Tử Tế</title>
+
+  <link
+    rel="stylesheet"
+    href="/css/style.css"
+  >
+
+  <style>
+
+    .robot-page {
+      padding: 40px 0 60px;
+    }
+
+    .robot-loading,
+    .robot-error {
+      padding: 60px 20px;
+      text-align: center;
+    }
+
+    .robot-content {
+      width: 100%;
+    }
+
+    .robot-back {
+      display: inline-block;
+      margin-bottom: 22px;
+      text-decoration: none;
+    }
+
+    .robot-eyebrow {
+      margin: 0 0 8px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      color: #777;
+      text-transform: uppercase;
+    }
+
+    .robot-title {
+      margin: 0 0 30px;
+      font-size: 42px;
+      line-height: 1.15;
+    }
+
+    .product-gallery {
+      margin-bottom: 30px;
+    }
+
+    .product-gallery-main {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto 16px;
+      overflow: hidden;
+      border-radius: 16px;
+      background: #f5f5f5;
+    }
+
+    .product-gallery-main img {
+      display: block;
+      width: 100%;
+      max-height: 620px;
+      object-fit: contain;
+    }
+
+    .product-gallery-thumbs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .robot-thumb {
+      width: 90px;
+      height: 90px;
+      padding: 0;
+      overflow: hidden;
+      border: 2px solid transparent;
+      border-radius: 10px;
+      background: #f5f5f5;
+      cursor: pointer;
+    }
+
+    .robot-thumb.active {
+      border-color: #111;
+    }
+
+    .robot-thumb img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .product-highlights {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 30px 0 34px;
+    }
+
+    .product-highlight {
+      padding: 20px 16px;
+      border: 1px solid #e8e8e8;
+      border-radius: 14px;
+      background: #fafafa;
+    }
+
+    .product-highlight strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 22px;
+      line-height: 1.2;
+    }
+
+    .product-highlight span {
+      display: block;
+      font-size: 14px;
+      line-height: 1.45;
+      color: #666;
+    }
+
+    .article-intro {
+      margin: 0 0 35px;
+      font-size: 19px;
+      line-height: 1.75;
+    }
+
+    .article-content {
+      max-width: 900px;
+    }
+
+    .article-content h2 {
+      margin: 42px 0 16px;
+      font-size: 26px;
+      line-height: 1.3;
+    }
+
+    .article-content h2:first-child {
+      margin-top: 0;
+    }
+
+    .article-content p {
+      margin: 0 0 18px;
+      font-size: 17px;
+      line-height: 1.8;
+    }
+
+    .article-note {
+      margin: 34px 0;
+      padding: 22px 24px;
+      border-left: 4px solid #222;
+      border-radius: 8px;
+      background: #f7f7f7;
+    }
+
+    .article-note b {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+
+    .article-note p {
+      margin: 0;
+    }
+
+    .robot-spec-list {
+      margin: 0 0 10px;
+    }
+
+    .robot-spec-list p {
+      margin-bottom: 12px;
+    }
+
+    .robot-feature-list {
+      margin: 0 0 20px;
+      padding-left: 22px;
+    }
+
+    .robot-feature-list li {
+      margin-bottom: 10px;
+      font-size: 17px;
+      line-height: 1.65;
+    }
+
+    .article-models {
+      margin-top: 60px;
+      padding-top: 40px;
+      border-top: 1px solid #e5e5e5;
+    }
+
+    .article-models-header h2 {
+      margin: 0 0 24px;
+    }
+
+    .article-models-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .article-bottom-back {
+      margin-top: 30px;
+    }
+
+    @media (max-width: 900px) {
+
+      .product-highlights {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .article-models-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+    }
+
+    @media (max-width: 600px) {
+
+      .robot-page {
+        padding: 25px 0 40px;
+      }
+
+      .robot-title {
+        font-size: 30px;
+        margin-bottom: 22px;
+      }
+
+      .product-gallery-main {
+        border-radius: 12px;
+      }
+
+      .robot-thumb {
+        width: 70px;
+        height: 70px;
+      }
+
+      .product-highlights {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-top: 22px;
+      }
+
+      .product-highlight {
+        padding: 16px 12px;
+      }
+
+      .product-highlight strong {
+        font-size: 18px;
+      }
+
+      .product-highlight span {
+        font-size: 13px;
+      }
+
+      .article-intro {
+        font-size: 17px;
+      }
+
+      .article-content h2 {
+        margin-top: 34px;
+        font-size: 23px;
+      }
+
+      .article-content p,
+      .robot-feature-list li {
+        font-size: 16px;
+      }
+
+      .article-models-grid {
+        grid-template-columns: 1fr;
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+  <header id="site-header"></header>
+
+
+  <main>
+
+    <section class="article">
+
+      <div class="wrap article-wrap robot-page">
+
+        <div
+          id="robot-loading"
+          class="robot-loading"
+        >
+          Đang tải thông tin robot...
+        </div>
+
+
+        <div
+          id="robot-error"
+          class="robot-error"
+          style="display:none;"
+        >
+          Không tìm thấy robot.
+        </div>
+
+
+        <div
+          id="robot-content"
+          class="robot-content"
+          style="display:none;"
+        >
+
+          <a
+            id="robot-back"
+            class="back robot-back"
+            href="/robot/dreame/"
+          >
+            ← Quay lại Dreame
+          </a>
+
+
+          <p
+            id="robot-eyebrow"
+            class="eyebrow robot-eyebrow"
+          >
+            DREAME · MODEL
+          </p>
+
+
+          <h1
+            id="robot-title"
+            class="robot-title"
+          ></h1>
+
+
+          <div class="product-gallery">
+
+            <div class="product-gallery-main">
+
+              <img
+                id="robot-main-image"
+                src=""
+                alt=""
+              >
+
+            </div>
+
+
+            <div
+              id="robot-thumbs"
+              class="product-gallery-thumbs"
+            ></div>
+
+          </div>
+
+
+          <div
+            id="robot-highlights"
+            class="product-highlights"
+          >
+
+            <div class="product-highlight">
+
+              <strong
+                id="highlight-suction"
+              >
+                —
+              </strong>
+
+              <span>
+                Lực hút tối đa
+              </span>
+
+            </div>
+
+
+            <div class="product-highlight">
+
+              <strong
+                id="highlight-battery"
+              >
+                —
+              </strong>
+
+              <span>
+                Dung lượng pin
+              </span>
+
+            </div>
+
+
+            <div class="product-highlight">
+
+              <strong
+                id="highlight-hot-water"
+              >
+                —
+              </strong>
+
+              <span>
+                Giặt giẻ bằng nước nóng
+              </span>
+
+            </div>
+
+
+            <div class="product-highlight">
+
+              <strong
+                id="highlight-mop-lift"
+              >
+                —
+              </strong>
+
+              <span>
+                Nâng khăn lau
+              </span>
+
+            </div>
+
+          </div>
+
+
+          <div
+            id="robot-article-content"
+            class="article-content"
+          ></div>
+
+
+          <div class="article-models">
+
+            <div class="article-models-header">
+
+              <h2>
+                Các model Dreame
+              </h2>
+
+            </div>
+
+
+            <div
+              class="article-models-grid"
+              id="dreame-models-list"
+            ></div>
+
+
+            <div class="article-bottom-back">
+
+              <a
+                href="/robot/dreame/"
+                class="btn"
+              >
+                ← Quay lại Dreame
+              </a>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <div id="site-footer"></div>
+
+
+  <script src="/js/main.js"></script>
+
+  <script src="/js/footer.js"></script>
+
+
+  <script>
+
+    async function loadRobot() {
+
+      const pageUrl =
+        new URL(
+          window.location.href
+        );
+
+      let slug =
+        pageUrl.searchParams.get("slug") || "";
+
+
+      if (!slug) {
+
+        const path =
+          window.location.pathname;
+
+        const parts =
+          path
+            .split("/")
+            .filter(Boolean);
+
+        if (
+          parts.length >= 3 &&
+          parts[0] === "robot"
+        ) {
+
+          slug =
+            parts[1] +
+            "-" +
+            parts[2];
+
+        } else if (
+          parts.length > 0
+        ) {
+
+          slug =
+            parts[parts.length - 1];
+
+        }
+
+      }
+
+
+      console.log(
+        "Robot page path:",
+        window.location.pathname
+      );
+
+      console.log(
+        "Robot slug:",
+        slug
+      );
+
+
+      if (!slug) {
+
+        document
+          .getElementById("robot-loading")
+          .style.display = "none";
+
+        document
+          .getElementById("robot-error")
+          .style.display = "block";
+
+        return;
+
+      }
+
+
+      try {
+
+        const response =
+          await fetch(
+            "/api/robot/" +
+            encodeURIComponent(slug)
+          );
+
+
+        console.log(
+          "Robot API status:",
+          response.status
+        );
+
+
+        const data =
+          await response.json();
+
+
+        console.log(
+          "Robot API data:",
+          data
+        );
+
+
+        if (
+          !data.ok ||
+          !data.robot
+        ) {
+
+          throw new Error(
+            "Robot not found"
+          );
+
+        }
+
+
+        const robot =
+          data.robot;
+
+
+        document.title =
+          (
+            robot.brand ||
+            ""
+          ) +
+          (
+            robot.brand &&
+            robot.model
+              ? " "
+              : ""
+          ) +
+          (
+            robot.model ||
+            "Robot lau nhà"
+          ) +
+          " – Trung Tử Tế";
+
+
+        document
+          .getElementById("robot-title")
+          .textContent =
+            robot.model || "";
+
+
+        const brand =
+          robot.brand ||
+          "";
+
+
+        document
+          .getElementById("robot-eyebrow")
+          .textContent =
+            brand
+              ? brand.toUpperCase() +
+                " · MODEL"
+              : "ROBOT · MODEL";
+
+
+        document
+          .getElementById("robot-back")
+          .textContent =
+            brand.toLowerCase() === "dreame"
+              ? "← Quay lại Dreame"
+              : "← Quay lại Robot";
+
+
+        document
+          .getElementById("robot-back")
+          .href =
+            brand.toLowerCase() === "dreame"
+              ? "/robot/dreame/"
+              : "/";
+
+
+        renderGallery(
+          robot.images || [],
+          robot.model || ""
+        );
+
+
+        renderHighlights(
+          robot.specs || {}
+        );
+
+
+        renderArticle(
+          robot
+        );
+
+
+        document
+          .getElementById("robot-loading")
+          .style.display = "none";
+
+
+        document
+          .getElementById("robot-content")
+          .style.display = "block";
+
+
+        loadDreameModels();
+
+      } catch (error) {
+
+        console.error(
+          "Robot page error:",
+          error
+        );
+
+
+        document
+          .getElementById("robot-loading")
+          .style.display = "none";
+
+
+        document
+          .getElementById("robot-error")
+          .style.display = "block";
+
+      }
+
+    }
+
+
+    function renderGallery(
+      images,
+      model
+    ) {
+
+      const mainImage =
+        document.getElementById(
+          "robot-main-image"
+        );
+
+
+      const thumbs =
+        document.getElementById(
+          "robot-thumbs"
+        );
+
+
+      thumbs.innerHTML = "";
+
+
+      mainImage.style.display =
+        "block";
+
+
+      if (
+        !images ||
+        images.length === 0
+      ) {
+
+        mainImage.style.display =
+          "none";
+
+        return;
+
+      }
+
+
+      const firstImage =
+        images[0];
+
+
+      mainImage.src =
+        firstImage.url;
+
+
+      mainImage.alt =
+        model;
+
+
+      images.forEach(
+        function(
+          image,
+          index
+        ) {
+
+          const button =
+            document.createElement(
+              "button"
+            );
+
+
+          button.type =
+            "button";
+
+
+          button.className =
+            "robot-thumb";
+
+
+          if (
+            index === 0
+          ) {
+
+            button.classList.add(
+              "active"
+            );
+
+          }
+
+
+          const img =
+            document.createElement(
+              "img"
+            );
+
+
+          img.src =
+            image.url;
+
+
+          img.alt =
+            model +
+            " " +
+            (
+              index + 1
+            );
+
+
+          button.appendChild(
+            img
+          );
+
+
+          button.addEventListener(
+            "click",
+            function() {
+
+              mainImage.src =
+                image.url;
+
+
+              document
+                .querySelectorAll(
+                  ".robot-thumb"
+                )
+                .forEach(
+                  function(item) {
+
+                    item.classList.remove(
+                      "active"
+                    );
+
+                  }
+                );
+
+
+              button.classList.add(
+                "active"
+              );
+
+            }
+          );
+
+
+          thumbs.appendChild(
+            button
+          );
+
+        }
+      );
+
+    }
+
+
+    function renderHighlights(
+      specs
+    ) {
+
+      const suction =
+        specs.suction ||
+        "—";
+
+
+      const battery =
+        specs.battery ||
+        "—";
+
+
+      const hotWater =
+        specs.hot_water ||
+        "—";
+
+
+      const mopLift =
+        specs.mop_lift ||
+        "—";
+
+
+      document
+        .getElementById(
+          "highlight-suction"
+        )
+        .textContent =
+          suction;
+
+
+      document
+        .getElementById(
+          "highlight-battery"
+        )
+        .textContent =
+          battery;
+
+
+      document
+        .getElementById(
+          "highlight-hot-water"
+        )
+        .textContent =
+          hotWater;
+
+
+      document
+        .getElementById(
+          "highlight-mop-lift"
+        )
+        .textContent =
+          mopLift;
+
+    }
+
+
+    function addArticleHeading(
+      container,
+      title
+    ) {
+
+      const heading =
+        document.createElement(
+          "h2"
+        );
+
+
+      heading.textContent =
+        title;
+
+
+      container.appendChild(
+        heading
+      );
+
+    }
+
+
+    function addArticleParagraph(
+      container,
+      text
+    ) {
+
+      if (
+        text === null ||
+        text === undefined ||
+        text === ""
+      ) {
+
+        return;
+
+      }
+
+
+      const paragraph =
+        document.createElement(
+          "p"
+        );
+
+
+      paragraph.textContent =
+        text;
+
+
+      container.appendChild(
+        paragraph
+      );
+
+    }
+
+
+    function addArticleSpec(
+      container,
+      label,
+      value
+    ) {
+
+      if (
+        value === null ||
+        value === undefined ||
+        value === ""
+      ) {
+
+        return;
+
+      }
+
+
+      const paragraph =
+        document.createElement(
+          "p"
+        );
+
+
+      const strong =
+        document.createElement(
+          "strong"
+        );
+
+
+      strong.textContent =
+        label +
+        ":";
+
+
+      paragraph.appendChild(
+        strong
+      );
+
+
+      paragraph.appendChild(
+        document.createTextNode(
+          " " +
+          value
+        )
+      );
+
+
+      container.appendChild(
+        paragraph
+      );
+
+    }
+
+
+    function renderArticle(
+      robot
+    ) {
+
+      const container =
+        document.getElementById(
+          "robot-article-content"
+        );
+
+
+      container.innerHTML = "";
+
+
+      const content =
+        robot.content ||
+        {};
+
+
+      const specs =
+        robot.specs ||
+        {};
+
+
+      const features =
+        robot.features ||
+        [];
+
+
+      if (
+        content.intro
+      ) {
+
+        const intro =
+          document.createElement(
+            "p"
+          );
+
+
+        intro.className =
+          "article-intro";
+
+
+        intro.textContent =
+          content.intro;
+
+
+        container.appendChild(
+          intro
+        );
+
+      }
+
+
+      addArticleHeading(
+        container,
+        "Tổng quan"
+      );
+
+
+      if (
+        content.highlights
+      ) {
+
+        addArticleParagraph(
+          container,
+          content.highlights
+        );
+
+      } else if (
+        content.intro
+      ) {
+
+        addArticleParagraph(
+          container,
+          content.intro
+        );
+
+      }
+
+
+      addArticleHeading(
+        container,
+        "Chức năng nổi bật"
+      );
+
+
+      // =========================================================
+      // AI CONTENT - CHỨC NĂNG NỔI BẬT
+      // =========================================================
+
+      let aiContent = null;
+
+      if (
+        content.ai_content
+      ) {
+
+        try {
+
+          aiContent =
+            typeof content.ai_content === "string"
+              ? JSON.parse(
+                  content.ai_content
+                )
+              : content.ai_content;
+
+        } catch (error) {
+
+          aiContent = null;
+
+        }
+
+      }
+
+
+      if (
+        aiContent &&
+        typeof aiContent.highlight_intro === "string" &&
+        aiContent.highlight_intro.trim()
+      ) {
+
+        addArticleParagraph(
+          container,
+          aiContent.highlight_intro
+        );
+
+      }
+
+
+      if (
+        aiContent &&
+        Array.isArray(
+          aiContent.sections
+        ) &&
+        aiContent.sections.length > 0
+      ) {
+
+        aiContent.sections
+          .slice(0, 4)
+          .forEach(
+            function(section) {
+
+              if (
+                !section ||
+                typeof section.title !== "string" ||
+                !section.title.trim()
+              ) {
+
+                return;
+
+              }
+
+
+              addArticleHeading(
+                container,
+                section.title
+              );
+
+
+              if (
+                Array.isArray(
+                  section.paragraphs
+                )
+              ) {
+
+                section.paragraphs
+                  .slice(0, 3)
+                  .forEach(
+                    function(paragraph) {
+
+                      if (
+                        typeof paragraph === "string" &&
+                        paragraph.trim()
+                      ) {
+
+                        addArticleParagraph(
+                          container,
+                          paragraph
+                        );
+
+                      }
+
+                    }
+                  );
+
+              }
+
+            }
+          );
+
+      } else if (
+        features.length > 0
+      ) {
+
+        // =======================================================
+        // FALLBACK - NỘI DUNG CŨ
+        // =======================================================
+
+        const list =
+          document.createElement(
+            "ul"
+          );
+
+
+        list.className =
+          "robot-feature-list";
+
+
+        features.forEach(
+          function(feature) {
+
+            const li =
+              document.createElement(
+                "li"
+              );
+
+
+            if (
+              typeof feature === "string"
+            ) {
+
+              li.textContent =
+                feature;
+
+            } else {
+
+              li.textContent =
+                feature.title ||
+                feature.name ||
+                feature.content ||
+                "";
+
+            }
+
+
+            list.appendChild(
+              li
+            );
+
+          }
+        );
+
+
+        container.appendChild(
+          list
+        );
+
+      } else if (
+        content.pros
+      ) {
+
+        addArticleParagraph(
+          container,
+          content.pros
+        );
+
+      }
+
+
+      addArticleHeading(
+        container,
+        "Thông số kỹ thuật"
+      );
+
+
+      const specList =
+        document.createElement(
+          "div"
+        );
+
+
+      specList.className =
+        "robot-spec-list";
+
+
+      addArticleSpec(
+        specList,
+        "Lực hút",
+        specs.suction
+      );
+
+
+      addArticleSpec(
+        specList,
+        "Pin",
+        specs.battery
+      );
+
+
+      addArticleSpec(
+        specList,
+        "Hộp bụi robot",
+        specs.dustbin
+      );
+
+
+      addArticleSpec(
+        specList,
+        "Bình nước",
+        specs.water_tank
+      );
+
+
+      addArticleSpec(
+        specList,
+        "Hệ thống điều hướng",
+        specs.navigation
+      );
+
+
+      addArticleSpec(
+        specList,
+        "Độ ồn",
+        specs.noise
+      );
+
+
+      addArticleSpec(
+        specList,
+        "Nhiệt độ nước nóng",
+        specs.hot_water
+      );
+
+
+      addArticleSpec(
+        specList,
+        "Giặt khăn",
+        specs.mop_wash
+      );
+
+
+      addArticleSpec(
+        specList,
+        "Sấy khăn",
+        specs.mop_dry
+      );
+
+
+      addArticleSpec(
+        specList,
+        "Nâng khăn lau",
+        specs.mop_lift
+      );
+
+
+      addArticleSpec(
+        specList,
+        "Túi bụi của trạm",
+        specs.self_empty
+      );
+
+
+      addArticleSpec(
+        specList,
+        "Dung dịch vệ sinh",
+        specs.detergent
+      );
+
+
+      container.appendChild(
+        specList
+      );
+
+
+      if (
+        content.pros
+      ) {
+
+        addArticleHeading(
+          container,
+          "Ưu điểm"
+        );
+
+
+        addArticleParagraph(
+          container,
+          content.pros
+        );
+
+      }
+
+
+      // =========================================================
+      // GÓC NHÌN KỸ THUẬT
+      // =========================================================
+
+      const technicalView =
+        aiContent &&
+        typeof aiContent.technical_view === "string" &&
+        aiContent.technical_view.trim()
+          ? aiContent.technical_view
+          : content.notes;
+
+
+      if (
+        technicalView
+      ) {
+
+        const note =
+          document.createElement(
+            "div"
+          );
+
+
+        note.className =
+          "article-note";
+
+
+        const title =
+          document.createElement(
+            "b"
+          );
+
+
+        title.textContent =
+          "Góc nhìn kỹ thuật Trung Tử Tế";
+
+
+        const paragraph =
+          document.createElement(
+            "p"
+          );
+
+
+        paragraph.textContent =
+          technicalView;
+
+
+        note.appendChild(
+          title
+        );
+
+
+        note.appendChild(
+          paragraph
+        );
+
+
+        container.appendChild(
+          note
+        );
+
+      }
+
+
+        // =========================================================
+      // PHÙ HỢP VỚI
+      // =========================================================
+
+      const suitableFor =
+        aiContent &&
+        typeof aiContent.suitable_for === "string" &&
+        aiContent.suitable_for.trim()
+          ? aiContent.suitable_for
+          : content.suitable_for;
+
+
+      if (
+        suitableFor
+      ) {
+
+        addArticleHeading(
+          container,
+          "Phù hợp với ai?"
+        );
+
+
+        addArticleParagraph(
+          container,
+          suitableFor
+        );
+
+      }
+
+
+      addArticleHeading(
+        container,
+        "Bảo trì và sửa chữa"
+      );
+
+
+      addArticleParagraph(
+        container,
+        "Robot lau nhà có nhiều bộ phận cơ khí, cảm biến và hệ thống liên quan đến nước nên việc vệ sinh, kiểm tra và bảo trì định kỳ vẫn rất quan trọng."
+      );
+
+
+      addArticleParagraph(
+        container,
+        "Các khu vực nên chú ý gồm chổi chính, chổi cạnh, khăn lau, bộ lọc, cảm biến, bánh xe, tiếp điểm sạc và các khu vực tiếp xúc với nước tại trạm."
+      );
+
+
+      addArticleParagraph(
+        container,
+        "Khi robot xuất hiện lỗi, nên kiểm tra tình trạng thực tế và mã lỗi trước khi quyết định thay linh kiện."
+      );
+
+    }
+
+
+    async function loadDreameModels() {
+
+      const container =
+        document.getElementById(
+          "dreame-models-list"
+        );
+
+
+      if (!container) {
+        return;
+      }
+
+
+      try {
+
+        const response =
+          await fetch(
+            "/api/robots"
+          );
+
+
+        if (!response.ok) {
+
+          throw new Error(
+            "Không thể đọc API robot"
+          );
+
+        }
+
+
+        const data =
+          await response.json();
+
+
+        if (
+          !data.ok ||
+          !Array.isArray(
+            data.robots
+          )
+        ) {
+
+          throw new Error(
+            data.error ||
+            "API robot không đúng định dạng"
+          );
+
+        }
+
+
+        const robots =
+          data.robots.filter(
+            function(robot) {
+
+              return (
+                String(
+                  robot.brand || ""
+                ).toLowerCase() ===
+                "dreame"
+              );
+
+            }
+          );
+
+
+        container.innerHTML =
+          "";
+
+
+        robots.forEach(
+          function(robot) {
+
+            const link =
+              document.createElement(
+                "a"
+              );
+
+
+            link.href =
+              "/robot/template/index.html?slug=" +
+              encodeURIComponent(
+                robot.slug
+              );
+
+
+            link.className =
+              "article-model-card";
+
+
+            const primaryImage =
+              Array.isArray(
+                robot.images
+              )
+                ? (
+                    robot.images.find(
+                      function(image) {
+
+                        return (
+                          image.primary === true
+                        );
+
+                      }
+                    ) ||
+                    robot.images[0]
+                  )
+                : null;
+
+
+            const imageBox =
+              document.createElement(
+                "div"
+              );
+
+
+            imageBox.className =
+              "article-model-card-image";
+
+
+            if (
+              primaryImage &&
+              primaryImage.url
+            ) {
+
+              const image =
+                document.createElement(
+                  "img"
+                );
+
+
+              image.src =
+                primaryImage.url;
+
+
+              image.alt =
+                robot.model ||
+                "Robot lau nhà";
+
+
+              image.loading =
+                "lazy";
+
+
+              imageBox.appendChild(
+                image
+              );
+
+            } else {
+
+              imageBox.classList.add(
+                "no-image"
+              );
+
+
+              imageBox.textContent =
+                "Chưa có hình ảnh";
+
+            }
+
+
+            const content =
+              document.createElement(
+                "div"
+              );
+
+
+            content.className =
+              "article-model-card-content";
+
+
+            const brand =
+              document.createElement(
+                "span"
+              );
+
+
+            brand.className =
+              "article-model-card-brand";
+
+
+            brand.textContent =
+              robot.brand ||
+              "";
+
+
+            const name =
+              document.createElement(
+                "strong"
+              );
+
+
+            name.className =
+              "article-model-card-name";
+
+
+            name.textContent =
+              robot.model ||
+              "Robot lau nhà";
+
+
+            const year =
+              document.createElement(
+                "span"
+              );
+
+
+            year.className =
+              "article-model-card-year";
+
+
+            if (
+              robot.year !== null &&
+              robot.year !== undefined &&
+              robot.year !== ""
+            ) {
+
+              year.textContent =
+                "Năm " +
+                robot.year;
+
+            } else {
+
+              year.textContent =
+                "Đang cập nhật";
+
+            }
+
+
+            const detail =
+              document.createElement(
+                "span"
+              );
+
+
+            detail.className =
+              "article-model-card-link";
+
+
+            detail.textContent =
+              "Xem chi tiết →";
+
+
+            content.appendChild(
+              brand
+            );
+
+
+            content.appendChild(
+              name
+            );
+
+
+            content.appendChild(
+              year
+            );
+
+
+            content.appendChild(
+              detail
+            );
+
+
+            link.appendChild(
+              imageBox
+            );
+
+
+            link.appendChild(
+              content
+            );
+
+
+            container.appendChild(
+              link
+            );
+
+          }
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "Dreame Models:",
+          error
+        );
+
+
+        container.innerHTML =
+          "<span>Không thể tải danh sách Robot.</span>";
+
+      }
+
+    }
+
+
+    loadRobot();
+
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,2316 @@
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f5f7f6;
+  color: #18231e;
+}
+
+.admin-layout {
+  min-height: 100vh;
+  display: flex;
+}
+
+/* SIDEBAR */
+
+.sidebar {
+  width: 250px;
+  min-height: 100vh;
+  background: #18231e;
+  color: white;
+  padding: 22px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 4px 8px 28px;
+}
+
+.brand img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.brand strong {
+  display: block;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+}
+
+.brand span {
+  display: block;
+  margin-top: 3px;
+  color: #9eaaa4;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+.admin-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.admin-nav a {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 12px;
+  border-radius: 9px;
+  color: #b9c4bf;
+  text-decoration: none;
+  font-size: 14px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.admin-nav a span {
+  width: 22px;
+  text-align: center;
+  font-size: 16px;
+}
+
+.admin-nav a:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: white;
+}
+
+.admin-nav a.active {
+  background: #294238;
+  color: white;
+}
+
+.sidebar-bottom {
+  margin-top: auto;
+  padding: 18px 8px 4px;
+}
+
+.sidebar-bottom a {
+  color: #9eaaa4;
+  text-decoration: none;
+  font-size: 12px;
+}
+
+.sidebar-bottom a:hover {
+  color: white;
+}
+
+/* MAIN */
+
+.admin-main {
+  flex: 1;
+  min-width: 0;
+  padding: 34px 38px 50px;
+}
+
+.admin-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.eyebrow {
+  margin: 0 0 7px;
+  color: #718079;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.admin-header h1 {
+  margin: 0;
+  font-size: 30px;
+  line-height: 1.15;
+}
+
+.view-site {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 13px;
+  border: 1px solid #d8dfdb;
+  border-radius: 8px;
+  color: #294238;
+  background: white;
+  text-decoration: none;
+  font-size: 12px;
+}
+
+.view-site:hover {
+  background: #f0f4f2;
+}
+
+/* SECTIONS */
+
+.admin-section {
+  display: none;
+}
+
+.admin-section.active-section {
+  display: block;
+}
+
+/* STATS */
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.stat-card {
+  min-height: 96px;
+  padding: 17px;
+  background: white;
+  border: 1px solid #e2e7e4;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.stat-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #eef3f0;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.stat-label {
+  display: block;
+  color: #7b8781;
+  font-size: 11px;
+  margin-bottom: 4px;
+}
+
+.stat-card strong {
+  display: block;
+  font-size: 21px;
+}
+
+.stat-card strong.online {
+  color: #427158;
+  font-size: 15px;
+}
+
+/* PANEL */
+
+.panel {
+  margin-bottom: 22px;
+  padding: 22px;
+  background: white;
+  border: 1px solid #e2e7e4;
+  border-radius: 12px;
+}
+
+.panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 18px;
+}
+
+.panel-header h2 {
+  margin: 0;
+  font-size: 19px;
+}
+
+/* QUICK ACTIONS */
+
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 11px;
+}
+
+.quick-actions a {
+  padding: 15px;
+  border: 1px solid #e2e7e4;
+  border-radius: 10px;
+  color: #18231e;
+  text-decoration: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.quick-actions a:hover {
+  background: #f7f9f8;
+  border-color: #cbd5d0;
+}
+
+.quick-actions a > span {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 19px;
+}
+
+.quick-actions strong {
+  display: block;
+  font-size: 13px;
+}
+
+.quick-actions small {
+  display: block;
+  margin-top: 5px;
+  color: #7b8781;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+/* STATUS */
+
+.status-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.status-item {
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid #edf0ee;
+}
+
+.status-item:last-child {
+  border-bottom: 0;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4f8b67;
+  flex-shrink: 0;
+}
+
+.status-item > div {
+  flex: 1;
+}
+
+.status-item strong {
+  display: block;
+  font-size: 13px;
+}
+
+.status-item small {
+  display: block;
+  margin-top: 3px;
+  color: #7b8781;
+  font-size: 11px;
+}
+
+.status-ok {
+  color: #427158;
+  font-size: 11px;
+}
+
+/* ROBOT LIST */
+
+.robot-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.robot-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #e2e7e4;
+  border-radius: 11px;
+  background: white;
+}
+
+.robot-card-image {
+  height: 190px;
+  background: #f4f6f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.robot-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.robot-card-image > span {
+  font-size: 35px;
+}
+
+.robot-card-content {
+  padding: 15px 16px 17px;
+}
+
+.robot-brand {
+  display: block;
+  margin-bottom: 5px;
+  color: #718079;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.robot-card-content h3 {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.3;
+}
+
+.robot-card-content p {
+  margin: 7px 0 0;
+  color: #7b8781;
+  font-size: 11px;
+}
+
+.robot-loading {
+  padding: 30px;
+  color: #7b8781;
+  text-align: center;
+}
+
+/* MOBILE */
+
+@media (max-width: 900px) {
+  .sidebar {
+    width: 210px;
+  }
+
+  .admin-main {
+    padding: 28px 24px 40px;
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .quick-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 650px) {
+  .admin-layout {
+    display: block;
+  }
+
+  .sidebar {
+    width: 100%;
+    min-height: auto;
+    padding: 14px;
+  }
+
+  .brand {
+    padding: 2px 6px 14px;
+  }
+
+  .admin-nav {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+  }
+
+  .admin-nav a {
+    justify-content: center;
+    padding: 9px 4px;
+    flex-direction: column;
+    gap: 3px;
+    font-size: 10px;
+  }
+
+  .admin-nav a span {
+    width: auto;
+    font-size: 15px;
+  }
+
+  .sidebar-bottom {
+    display: none;
+  }
+
+  .admin-main {
+    padding: 22px 15px 35px;
+  }
+
+  .admin-header {
+    align-items: flex-start;
+    flex-direction: column;
+    margin-bottom: 20px;
+  }
+
+  .admin-header h1 {
+    font-size: 25px;
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .stat-card {
+    min-height: 82px;
+    padding: 12px;
+  }
+
+  .stat-icon {
+    width: 35px;
+    height: 35px;
+    font-size: 15px;
+  }
+
+  .quick-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .robot-list {
+    grid-template-columns: 1fr;
+  }
+
+  .robot-card-image {
+    height: 180px;
+  }
+}
+/* =========================================================
+   ROBOT EDITOR - GIAO DIỆN CHỈNH SỬA ROBOT
+   Chỉ áp dụng cho form chỉnh sửa Robot
+   ========================================================= */
+
+   .robot-edit-panel {
+    scroll-margin-top: 20px;
+  }
+  
+  .robot-edit-panel[hidden] {
+    display: none;
+  }
+  
+  /* ---------------------------------------------------------
+     Các nhóm nội dung
+     --------------------------------------------------------- */
+  
+  .robot-edit-panel .admin-form-section {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+  }
+  
+  .robot-edit-panel .admin-form-section:first-of-type {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+  
+  .robot-edit-panel .admin-form-section h3 {
+    margin: 0 0 16px;
+    font-size: 16px;
+    line-height: 1.4;
+  }
+  
+  /* ---------------------------------------------------------
+     Thông tin cơ bản + thông số
+     --------------------------------------------------------- */
+  
+  .robot-edit-panel .admin-form-grid {
+    display: grid;
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+    gap: 14px 16px;
+  }
+  
+  .robot-edit-panel .admin-form-grid label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+  }
+  
+  .robot-edit-panel .admin-form-grid label span,
+  .robot-edit-panel .admin-form-section > label > span {
+    color: #4b5563;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  
+  .robot-edit-panel .admin-form-grid input,
+  .robot-edit-panel .admin-form-grid select {
+    width: 100%;
+    height: 40px;
+    padding: 0 11px;
+    border: 1px solid #d9dee7;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #172033;
+    outline: none;
+  }
+  
+  .robot-edit-panel .admin-form-grid input:focus,
+  .robot-edit-panel .admin-form-grid select:focus {
+    border-color: #94a3b8;
+    box-shadow:
+      0 0 0 3px rgba(148, 163, 184, 0.14);
+  }
+  
+  /* ---------------------------------------------------------
+     Nội dung
+     --------------------------------------------------------- */
+  
+  .robot-edit-panel .admin-form-section > label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  
+  .robot-edit-panel .admin-form-section > label:last-child {
+    margin-bottom: 0;
+  }
+  
+  .robot-edit-panel .admin-form-section > label textarea {
+    width: 100%;
+    min-height: 105px;
+    padding: 10px 11px;
+    border: 1px solid #d9dee7;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #172033;
+    line-height: 1.5;
+    resize: vertical;
+    outline: none;
+  }
+  
+  .robot-edit-panel .admin-form-section > label textarea:focus {
+    border-color: #94a3b8;
+    box-shadow:
+      0 0 0 3px rgba(148, 163, 184, 0.14);
+  }
+  
+  /* ---------------------------------------------------------
+     Tính năng nổi bật
+     --------------------------------------------------------- */
+  
+  .robot-edit-panel #edit-features {
+    display: grid;
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+  
+  .robot-edit-panel .edit-feature-item {
+    min-width: 0;
+    padding: 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #f8fafc;
+  }
+  
+  .robot-edit-panel .edit-feature-item label {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 11px;
+  }
+  
+  .robot-edit-panel .edit-feature-item label:last-child {
+    margin-bottom: 0;
+  }
+  
+  .robot-edit-panel .edit-feature-item label span {
+    color: #6b7280;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  
+  .robot-edit-panel .edit-feature-item input,
+  .robot-edit-panel .edit-feature-item textarea {
+    width: 100%;
+    border: 1px solid #d9dee7;
+    border-radius: 7px;
+    background: #ffffff;
+    color: #172033;
+    outline: none;
+  }
+  
+  .robot-edit-panel .edit-feature-item input {
+    height: 37px;
+    padding: 0 9px;
+  }
+  
+  .robot-edit-panel .edit-feature-item textarea {
+    min-height: 76px;
+    padding: 8px 9px;
+    line-height: 1.45;
+    resize: vertical;
+  }
+  
+  .robot-edit-panel .edit-feature-item input:focus,
+  .robot-edit-panel .edit-feature-item textarea:focus {
+    border-color: #94a3b8;
+    box-shadow:
+      0 0 0 3px rgba(148, 163, 184, 0.12);
+  }
+  
+  /* ---------------------------------------------------------
+     Hình ảnh
+     --------------------------------------------------------- */
+  
+  .robot-edit-panel #edit-images {
+    display: grid;
+    grid-template-columns:
+      repeat(6, minmax(0, 1fr));
+    gap: 12px;
+  }
+  
+  .robot-edit-panel .robot-edit-image-item {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    border-radius: 9px;
+    background: #ffffff;
+  }
+  
+  .robot-edit-panel .robot-edit-image-preview {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: #f8fafc;
+  }
+  
+  .robot-edit-panel .robot-edit-image-preview img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  
+  .robot-edit-panel .robot-edit-image-info {
+    padding: 8px;
+  }
+  
+  .robot-edit-panel .robot-edit-image-info strong {
+    display: block;
+    overflow: hidden;
+    color: #374151;
+    font-size: 10px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .robot-edit-panel .robot-edit-image-info span {
+    display: block;
+    margin-top: 3px;
+    color: #6b7280;
+    font-size: 10px;
+  }
+  
+  /* ---------------------------------------------------------
+     Nút Hủy / Lưu
+     --------------------------------------------------------- */
+  
+  .robot-edit-panel .admin-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+  }
+  
+  .robot-edit-panel .button-primary,
+  .robot-edit-panel .button-secondary {
+    min-height: 40px;
+    padding: 0 17px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  
+  .robot-edit-panel .button-primary {
+    border: 1px solid #111827;
+    background: #111827;
+    color: #ffffff;
+  }
+  
+  .robot-edit-panel .button-primary:hover {
+    background: #1f2937;
+  }
+  
+  .robot-edit-panel .button-primary:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+  
+  .robot-edit-panel .button-secondary {
+    border: 1px solid #d9dee7;
+    background: #ffffff;
+    color: #374151;
+  }
+  
+  .robot-edit-panel .button-secondary:hover {
+    background: #f8fafc;
+  }
+  
+  /* ---------------------------------------------------------
+     Responsive
+     --------------------------------------------------------- */
+  
+  @media (max-width: 1100px) {
+  
+    .robot-edit-panel .admin-form-grid {
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    }
+  
+    .robot-edit-panel #edit-images {
+      grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+    }
+  
+  }
+  
+  @media (max-width: 760px) {
+  
+    .robot-edit-panel .admin-form-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .robot-edit-panel #edit-features {
+      grid-template-columns: 1fr;
+    }
+  
+    .robot-edit-panel #edit-images {
+      grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+    }
+  
+  }
+  
+  @media (max-width: 480px) {
+  
+    .robot-edit-panel #edit-images {
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    }
+  
+    .robot-edit-panel .admin-form-actions {
+      justify-content: stretch;
+    }
+  
+    .robot-edit-panel .button-primary,
+    .robot-edit-panel .button-secondary {
+      flex: 1;
+    }
+  
+  }
+  /* =========================================================
+   ROBOT IMAGE PICKER - HỘP CHỌN HÌNH ẢNH
+   ========================================================= */
+
+.robot-image-picker {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+}
+
+.robot-image-picker[hidden] {
+  display: none;
+}
+
+.robot-image-picker-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.48);
+  backdrop-filter: blur(3px);
+}
+
+.robot-image-picker-dialog {
+  width: min(760px, 100%);
+  max-height: min(720px, 90vh);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow:
+    0 24px 70px rgba(15, 23, 42, 0.22);
+}
+
+.robot-image-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 20px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.robot-image-picker-header .eyebrow {
+  margin: 0 0 4px;
+}
+
+.robot-image-picker-header h3 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.3;
+}
+
+.robot-image-picker-close {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #4b5563;
+  cursor: pointer;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.robot-image-picker-close:hover {
+  background: #f8fafc;
+}
+
+.robot-image-picker-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px;
+}
+
+.robot-image-picker-empty {
+  padding: 50px 20px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.robot-image-picker-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.robot-image-picker-item:last-child {
+  margin-bottom: 0;
+}
+
+.robot-image-picker-item:hover {
+  background: #f8fafc;
+}
+
+.robot-image-picker-checkbox {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+  cursor: pointer;
+}
+
+.robot-image-picker-preview {
+  width: 68px;
+  height: 68px;
+  flex: 0 0 auto;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.robot-image-picker-preview img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.robot-image-picker-info {
+  min-width: 0;
+}
+
+.robot-image-picker-info strong {
+  display: block;
+  overflow: hidden;
+  color: #374151;
+  font-size: 12px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   ROBOT IMAGE PICKER - KHU VỰC NÚT CUỐI HỘP
+   ========================================================= */
+
+   .robot-image-picker-dialog
+   .robot-image-picker-actions {
+     display: flex !important;
+     align-items: center !important;
+     justify-content: flex-end !important;
+     gap: 10px !important;
+     width: 100% !important;
+     min-height: 68px !important;
+     margin: 0 !important;
+     padding: 14px 20px !important;
+     box-sizing: border-box !important;
+     border-top: 1px solid #e5e7eb !important;
+     background: #fafafa !important;
+   }
+   
+   .robot-image-picker-dialog
+   .robot-image-picker-actions button {
+     display: inline-flex !important;
+     align-items: center !important;
+     justify-content: center !important;
+     position: static !important;
+     width: auto !important;
+     min-width: 112px !important;
+     height: 40px !important;
+     min-height: 40px !important;
+     margin: 0 !important;
+     padding: 0 16px !important;
+     box-sizing: border-box !important;
+     border-radius: 8px !important;
+     cursor: pointer !important;
+     font-size: 13px !important;
+     font-weight: 600 !important;
+     line-height: 1 !important;
+     white-space: nowrap !important;
+     flex: 0 0 auto !important;
+   }
+   
+   .robot-image-picker-dialog
+   .robot-image-picker-actions
+   .robot-image-picker-close {
+     border: 1px solid #d9dee7 !important;
+     background: #ffffff !important;
+     color: #374151 !important;
+   }
+   
+   .robot-image-picker-dialog
+   .robot-image-picker-actions
+   .robot-image-picker-close:hover {
+     background: #f3f4f6 !important;
+     border-color: #cbd5e1 !important;
+   }
+   
+   .robot-image-picker-dialog
+   .robot-image-picker-actions
+   #robot-image-picker-add {
+     min-width: 158px !important;
+     border: 1px solid #111827 !important;
+     background: #111827 !important;
+     color: #ffffff !important;
+   }
+   
+   .robot-image-picker-dialog
+   .robot-image-picker-actions
+   #robot-image-picker-add:hover {
+     background: #1f2937 !important;
+   }
+   
+   .robot-image-picker-dialog
+   .robot-image-picker-actions
+   #robot-image-picker-add:disabled {
+     opacity: 0.6 !important;
+     cursor: wait !important;
+   }
+   
+   @media (max-width: 600px) {
+   
+     .robot-image-picker-dialog
+     .robot-image-picker-actions {
+       gap: 8px !important;
+       min-height: 64px !important;
+       padding: 12px 15px !important;
+     }
+   
+     .robot-image-picker-dialog
+     .robot-image-picker-actions button {
+       min-width: 0 !important;
+       flex: 1 1 0 !important;
+     }
+   
+     .robot-image-picker-dialog
+     .robot-image-picker-actions
+     #robot-image-picker-add {
+       min-width: 0 !important;
+     }
+   
+   }
+  /* =========================================================
+   ROBOT IMAGE PICKER - GIAO DIỆN CÂY THƯ MỤC
+   ========================================================= */
+
+.robot-image-picker-browser {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  min-height: 420px;
+  max-height: 520px;
+  overflow: hidden;
+}
+
+.robot-image-picker-folders {
+  min-width: 0;
+  overflow-y: auto;
+  border-right: 1px solid #e5e7eb;
+  background: #f8fafc;
+}
+
+.robot-image-picker-files {
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+}
+
+.robot-image-picker-pane-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 16px;
+  border-bottom: 1px solid #e5e7eb;
+  color: #374151;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+#robot-image-picker-folder-name {
+  overflow: hidden;
+  max-width: 65%;
+  color: #6b7280;
+  font-size: 11px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.robot-folder-tree {
+  padding: 8px 6px 12px;
+}
+
+.robot-folder-row {
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+  margin: 1px 0;
+}
+
+.robot-folder-arrow {
+  width: 24px;
+  height: 30px;
+  flex: 0 0 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+  font-size: 10px;
+}
+
+.robot-folder-arrow:hover {
+  color: #111827;
+}
+
+.robot-folder-button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  min-width: 0;
+  min-height: 32px;
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #374151;
+  cursor: pointer;
+  text-align: left;
+}
+
+.robot-folder-button:hover {
+  background: #e5e7eb;
+}
+
+.robot-folder-button.is-selected {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.robot-folder-button.is-folder-group {
+  color: #4b5563;
+}
+
+.robot-folder-icon {
+  flex: 0 0 auto;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.robot-folder-name {
+  overflow: hidden;
+  min-width: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+.robot-folder-children {
+  margin-left: 24px;
+}
+
+.robot-folder-children[hidden] {
+  display: none;
+}
+
+.robot-image-picker-files .robot-image-picker-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 14px;
+}
+
+.robot-image-picker-files .robot-image-picker-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  padding: 8px;
+}
+
+.robot-image-picker-files .robot-image-picker-preview {
+  width: 64px;
+  height: 64px;
+}
+
+.robot-image-picker-files .robot-image-picker-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.robot-image-picker-files .robot-image-picker-info strong {
+  font-size: 11px;
+}
+
+.robot-image-picker-files .robot-image-picker-empty {
+  padding: 50px 20px;
+}
+
+@media (max-width: 700px) {
+
+  .robot-image-picker-browser {
+    grid-template-columns: 1fr;
+    max-height: 620px;
+  }
+
+  .robot-image-picker-folders {
+    max-height: 220px;
+    border-right: 0;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .robot-image-picker-files {
+    min-height: 300px;
+  }
+
+}
+/* =========================================================
+   ROBOT IMAGE EDITOR - CÁC NÚT THAO TÁC ẢNH
+   ========================================================= */
+
+   .robot-edit-panel .robot-edit-image-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 7px;
+    border-top: 1px solid #e5e7eb;
+    background: #fafafa;
+  }
+  
+  .robot-edit-panel .robot-edit-image-actions button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    margin: 0;
+    padding: 0 7px;
+    border: 1px solid #d9dee7;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #4b5563;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+  }
+  
+  .robot-edit-panel .robot-edit-image-actions button:hover {
+    background: #f3f4f6;
+    border-color: #cbd5e1;
+    color: #111827;
+  }
+  
+  .robot-edit-panel .robot-edit-image-actions .image-set-primary {
+    color: #b45309;
+  }
+  
+  .robot-edit-panel .robot-edit-image-actions .image-set-primary:hover {
+    background: #fffbeb;
+    border-color: #f59e0b;
+    color: #92400e;
+  }
+  
+  .robot-edit-panel .robot-edit-image-actions .image-remove {
+    padding: 0 8px;
+    color: #b91c1c;
+  }
+  
+  .robot-edit-panel .robot-edit-image-actions .image-remove:hover {
+    background: #fef2f2;
+    border-color: #fca5a5;
+    color: #991b1b;
+  }
+  
+  /* ---------------------------------------------------------
+     THANH NÚT THÊM HÌNH ẢNH
+     --------------------------------------------------------- */
+  
+  .robot-edit-panel .robot-edit-image-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-bottom: 12px;
+  }
+  
+  .robot-edit-panel .robot-edit-image-toolbar button {
+    min-height: 36px;
+    padding: 0 13px;
+    border: 1px solid #d9dee7;
+    border-radius: 7px;
+    background: #ffffff;
+    color: #374151;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  
+  .robot-edit-panel .robot-edit-image-toolbar button:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+  }
+  
+  .robot-edit-panel .robot-edit-image-toolbar button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+/* =========================================================
+   ROBOT ADD FORM - GIAO DIỆN THÊM ROBOT
+   ========================================================= */
+
+   .robot-add-panel {
+    margin-top: 20px;
+    overflow: hidden;
+  }
+  
+  .robot-add-panel[hidden] {
+    display: none;
+  }
+  
+  
+  /* =========================================================
+     HEADER
+     ========================================================= */
+  
+  .robot-add-panel .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding-bottom: 4px;
+  }
+  
+  .robot-add-panel .panel-header h2 {
+    margin: 0;
+  }
+  
+  
+  /* =========================================================
+     FORM SECTION
+     ========================================================= */
+  
+  .robot-add-panel .admin-form-section {
+    margin-top: 24px;
+    padding: 22px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: #fafbfc;
+  }
+  
+  .robot-add-panel .admin-form-section h3 {
+    margin: 0 0 18px;
+    font-size: 16px;
+    line-height: 1.4;
+    color: #1f2937;
+  }
+  
+  
+  /* =========================================================
+     GRID
+     ========================================================= */
+  
+  .robot-add-panel .admin-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 20px;
+  }
+  
+  
+  /* =========================================================
+     LABEL
+     ========================================================= */
+  
+  .robot-add-panel .admin-form-grid label,
+  .robot-add-panel .admin-form-content label {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 0;
+  }
+  
+  .robot-add-panel .admin-form-grid label span,
+  .robot-add-panel .admin-form-content label span {
+    color: #374151;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  
+  
+  /* =========================================================
+     INPUT / SELECT
+     ========================================================= */
+  
+  .robot-add-panel .admin-form-grid input,
+  .robot-add-panel .admin-form-grid select {
+    width: 100%;
+    min-height: 42px;
+    padding: 0 12px;
+    box-sizing: border-box;
+    border: 1px solid #d9dee7;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #1f2937;
+    font-size: 13px;
+    outline: none;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease,
+      background 0.15s ease;
+  }
+  
+  .robot-add-panel .admin-form-grid input:hover,
+  .robot-add-panel .admin-form-grid select:hover {
+    border-color: #cbd5e1;
+  }
+  
+  .robot-add-panel .admin-form-grid input:focus,
+  .robot-add-panel .admin-form-grid select:focus {
+    border-color: #94a3b8;
+    box-shadow:
+      0 0 0 3px rgba(148, 163, 184, 0.14);
+  }
+  
+  .robot-add-panel .admin-form-grid input::placeholder {
+    color: #9ca3af;
+  }
+  
+  
+  /* =========================================================
+     NỘI DUNG - TEXTAREA
+     ========================================================= */
+  
+  .robot-add-panel .admin-form-content {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 20px;
+  }
+  
+  .robot-add-panel .admin-form-content label:last-child {
+    grid-column: 1 / -1;
+  }
+  
+  .robot-add-panel .admin-form-content textarea {
+    width: 100%;
+    min-height: 130px;
+    padding: 11px 12px;
+    box-sizing: border-box;
+    resize: vertical;
+    border: 1px solid #d9dee7;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #1f2937;
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1.55;
+    outline: none;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  
+  .robot-add-panel .admin-form-content textarea:focus {
+    border-color: #94a3b8;
+    box-shadow:
+      0 0 0 3px rgba(148, 163, 184, 0.14);
+  }
+  
+  .robot-add-panel .admin-form-content textarea::placeholder {
+    color: #9ca3af;
+  }
+  
+  
+  /* =========================================================
+     BƯỚC TÍNH NĂNG
+     ========================================================= */
+  
+  .robot-add-feature-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 18px;
+  }
+  
+  .robot-add-feature-header h3 {
+    margin: 0;
+  }
+  
+  .robot-add-feature-note {
+    margin: 5px 0 0;
+    color: #6b7280;
+    font-size: 12px;
+  }
+  
+  .robot-add-features {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .robot-add-feature-row {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 14px;
+    padding: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #ffffff;
+  }
+  
+  .robot-add-feature-number {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  
+  .robot-add-feature-fields {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+    gap: 14px;
+    min-width: 0;
+  }
+  
+  .robot-add-feature-fields label {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+  
+  .robot-add-feature-fields label span {
+    color: #374151;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  
+  .robot-add-feature-fields input,
+  .robot-add-feature-fields textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #d9dee7;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #1f2937;
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+  }
+  
+  .robot-add-feature-fields input {
+    min-height: 40px;
+    padding: 0 11px;
+  }
+  
+  .robot-add-feature-fields textarea {
+    min-height: 82px;
+    padding: 10px 11px;
+    resize: vertical;
+    line-height: 1.5;
+  }
+  
+  .robot-add-feature-fields input:focus,
+  .robot-add-feature-fields textarea:focus {
+    border-color: #94a3b8;
+    box-shadow:
+      0 0 0 3px rgba(148, 163, 184, 0.14);
+  }
+  
+  .robot-add-feature-remove {
+    align-self: center;
+    min-height: 34px;
+    padding: 0 11px;
+    border: 1px solid #e5e7eb;
+    border-radius: 7px;
+    background: #ffffff;
+    color: #6b7280;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  
+  .robot-add-feature-remove:hover {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+  }
+  
+  
+  /* =========================================================
+     BƯỚC HÌNH ẢNH
+     ========================================================= */
+  
+  .robot-add-images {
+    display: grid;
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(150px, 180px)
+    );
+    gap: 14px;
+  }
+  
+  .robot-add-image-item {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #ffffff;
+  }
+  
+  .robot-add-image-preview {
+    width: 100%;
+    height: 135px;
+    overflow: hidden;
+    background: #f8fafc;
+  }
+  
+  .robot-add-image-preview img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .robot-add-image-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 9px 10px 5px;
+    min-width: 0;
+  }
+  
+  .robot-add-image-info strong {
+    overflow: hidden;
+    color: #374151;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.4;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .robot-add-image-info span {
+    color: #6b7280;
+    font-size: 10px;
+  }
+  
+  .robot-add-image-actions {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 8px 9px;
+  }
+  
+  .robot-add-image-actions button {
+    min-width: 30px;
+    min-height: 30px;
+    padding: 0 7px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #4b5563;
+    cursor: pointer;
+    font-size: 11px;
+  }
+  
+  .robot-add-image-actions button:hover {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+  }
+  
+  .robot-add-image-actions
+  .robot-add-image-primary {
+    flex: 1;
+    font-size: 10px;
+    white-space: nowrap;
+  }
+  
+  
+  /* =========================================================
+     KHU VỰC NÚT CUỐI
+     ========================================================= */
+  
+  .robot-add-panel .admin-form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid #e5e7eb;
+  }
+  
+  .robot-add-panel .admin-form-actions button {
+    min-height: 40px;
+    padding: 0 17px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  
+  
+  /* =========================================================
+     MOBILE
+     ========================================================= */
+  
+  @media (max-width: 800px) {
+  
+    .robot-add-panel .admin-form-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .robot-add-panel .admin-form-content {
+      grid-template-columns: 1fr;
+    }
+  
+    .robot-add-panel .admin-form-content label:last-child {
+      grid-column: auto;
+    }
+  
+    .robot-add-feature-fields {
+      grid-template-columns: 1fr;
+    }
+  
+    .robot-add-feature-row {
+      grid-template-columns: 30px minmax(0, 1fr);
+    }
+  
+    .robot-add-feature-remove {
+      grid-column: 2;
+      justify-self: start;
+    }
+  
+    .robot-add-feature-header {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  
+    .robot-add-image-preview {
+      height: 125px;
+    }
+  
+  }
+  
+  @media (max-width: 600px) {
+  
+    .robot-add-panel .admin-form-section {
+      padding: 16px;
+    }
+  
+    .robot-add-images {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+  
+    .robot-add-image-preview {
+      height: 110px;
+    }
+  
+    .robot-add-image-actions {
+      flex-wrap: wrap;
+    }
+  
+    .robot-add-image-actions
+    .robot-add-image-primary {
+      width: 100%;
+      flex: none;
+    }
+  
+    .robot-add-panel .admin-form-actions {
+      flex-direction: column-reverse;
+      align-items: stretch;
+    }
+  
+    .robot-add-panel .admin-form-actions button {
+      width: 100%;
+    }
+  
+  }
+  /* ============================================================
+   ADMIN UI - NÂNG CẤP GIAO DIỆN CÁC NÚT
+   ============================================================ */
+/* ------------------------------------------------------------
+   NÚT CHÍNH - THÊM ROBOT
+   ------------------------------------------------------------ */
+.robot-add-panel .panel-header > button,
+.robot-add-panel .panel-header .button-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 42px;
+  padding: 0 18px;
+  border: 1px solid #294238;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #355447 0%, #294238 100%);
+  color: #ffffff;
+  box-shadow: 0 3px 8px rgba(24, 35, 30, 0.14);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease,
+    background 0.16s ease;
+}
+.robot-add-panel .panel-header > button:hover,
+.robot-add-panel .panel-header .button-primary:hover {
+  background: linear-gradient(180deg, #3d5f50 0%, #294238 100%);
+  box-shadow: 0 6px 14px rgba(24, 35, 30, 0.18);
+  transform: translateY(-1px);
+}
+.robot-add-panel .panel-header > button:active,
+.robot-add-panel .panel-header .button-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 5px rgba(24, 35, 30, 0.12);
+}
+.robot-add-panel .panel-header > button:focus-visible,
+.robot-add-panel .panel-header .button-primary:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px rgba(66, 113, 88, 0.18),
+    0 4px 10px rgba(24, 35, 30, 0.15);
+}
+/* ------------------------------------------------------------
+   NÚT SỬA TRÊN THẺ ROBOT
+   ------------------------------------------------------------ */
+.robot-card button {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid #d8dfdb;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #294238;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.robot-card button:hover {
+  background: #f1f6f3;
+  border-color: #b8c8c0;
+  color: #1f352b;
+  box-shadow: 0 3px 8px rgba(24, 35, 30, 0.08);
+  transform: translateY(-1px);
+}
+.robot-card button:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+.robot-card button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(66, 113, 88, 0.14);
+}
+/* ------------------------------------------------------------
+   NÚT SỬA / LƯU TRONG FORM EDIT ROBOT
+   ------------------------------------------------------------ */
+.robot-edit-panel .button-primary {
+  min-height: 42px;
+  padding: 0 19px;
+  border: 1px solid #294238;
+  border-radius: 9px;
+  background: linear-gradient(180deg, #355447 0%, #294238 100%);
+  color: #ffffff;
+  box-shadow: 0 3px 8px rgba(24, 35, 30, 0.12);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+}
+.robot-edit-panel .button-primary:hover {
+  background: linear-gradient(180deg, #3d5f50 0%, #294238 100%);
+  box-shadow: 0 5px 12px rgba(24, 35, 30, 0.16);
+  transform: translateY(-1px);
+}
+.robot-edit-panel .button-primary:active {
+  transform: translateY(0);
+}
+/* ------------------------------------------------------------
+   NÚT ĐÓNG / HỦY
+   ------------------------------------------------------------ */
+.robot-edit-panel .button-secondary,
+.robot-add-panel .admin-form-actions .button-secondary {
+  min-height: 42px;
+  padding: 0 18px;
+  border: 1px solid #d6ddd9;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #52615a;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.robot-edit-panel .button-secondary:hover,
+.robot-add-panel .admin-form-actions .button-secondary:hover {
+  background: #f5f8f6;
+  border-color: #bcc8c2;
+  color: #294238;
+  box-shadow: 0 3px 8px rgba(24, 35, 30, 0.07);
+  transform: translateY(-1px);
+}
+.robot-edit-panel .button-secondary:active,
+.robot-add-panel .admin-form-actions .button-secondary:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+/* ------------------------------------------------------------
+   NÚT ĐÓNG TRONG HỘP CHỌN HÌNH ẢNH
+   ------------------------------------------------------------ */
+.robot-image-picker-close {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+  padding: 0 !important;
+  border: 1px solid #dce3df !important;
+  border-radius: 50% !important;
+  background: #f8faf9 !important;
+  color: #65736c !important;
+  cursor: pointer !important;
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-size: 21px !important;
+  font-weight: 400 !important;
+  line-height: 1 !important;
+  box-shadow: 0 2px 6px rgba(24, 35, 30, 0.06) !important;
+  transition:
+    background 0.16s ease,
+    border-color 0.16s ease,
+    color 0.16s ease,
+    transform 0.16s ease,
+    box-shadow 0.16s ease !important;
+}
+.robot-image-picker-close:hover {
+  background: #edf3f0 !important;
+  border-color: #c3d0c9 !important;
+  color: #294238 !important;
+  box-shadow: 0 4px 10px rgba(24, 35, 30, 0.10) !important;
+  transform: rotate(90deg) !important;
+}
+.robot-image-picker-close:active {
+  transform: rotate(90deg) scale(0.94) !important;
+}
+.robot-image-picker-close:focus-visible {
+  outline: none !important;
+  box-shadow:
+    0 0 0 3px rgba(66, 113, 88, 0.15),
+    0 3px 8px rgba(24, 35, 30, 0.08) !important;
+}
+/* ------------------------------------------------------------
+   HEADER CỦA HỘP CHỌN ẢNH
+   ------------------------------------------------------------ */
+.robot-image-picker-header {
+  min-height: 68px;
+  padding: 14px 18px 14px 20px;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfcfb 100%);
+}
+.robot-image-picker-header h3 {
+  color: #18231e;
+  font-size: 17px;
+  font-weight: 700;
+}
+.robot-image-picker-header .eyebrow {
+  color: #708078;
+  font-size: 9px;
+  letter-spacing: 0.13em;
+}
+/* ------------------------------------------------------------
+   KHUNG HỘP CHỌN ẢNH
+   ------------------------------------------------------------ */
+.robot-image-picker-dialog {
+  border: 1px solid #dfe6e2;
+  border-radius: 16px;
+  box-shadow:
+    0 30px 80px rgba(15, 23, 42, 0.20),
+    0 8px 24px rgba(24, 35, 30, 0.08);
+}
+/* ------------------------------------------------------------
+   NÚT CUỐI HỘP CHỌN ẢNH
+   ------------------------------------------------------------ */
+.robot-image-picker-dialog
+.robot-image-picker-actions
+.robot-image-picker-close {
+  min-width: 112px !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  padding: 0 16px !important;
+  border-radius: 9px !important;
+  background: #ffffff !important;
+  color: #52615a !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  transform: none !important;
+}
+.robot-image-picker-dialog
+.robot-image-picker-actions
+.robot-image-picker-close:hover {
+  background: #f3f7f5 !important;
+  border-color: #c4d0ca !important;
+  color: #294238 !important;
+  transform: translateY(-1px) !important;
+}
+/* ------------------------------------------------------------
+   NÚT THÊM ẢNH / XÁC NHẬN
+   ------------------------------------------------------------ */
+.robot-image-picker-dialog
+.robot-image-picker-actions
+#robot-image-picker-add {
+  min-width: 150px !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  border: 1px solid #294238 !important;
+  border-radius: 9px !important;
+  background: linear-gradient(180deg, #355447 0%, #294238 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 3px 8px rgba(24, 35, 30, 0.12) !important;
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease !important;
+}
+.robot-image-picker-dialog
+.robot-image-picker-actions
+#robot-image-picker-add:hover {
+  background: linear-gradient(180deg, #3d5f50 0%, #294238 100%) !important;
+  box-shadow: 0 5px 12px rgba(24, 35, 30, 0.16) !important;
+  transform: translateY(-1px) !important;
+}
+/* ------------------------------------------------------------
+   HIỆU ỨNG KHI DI CHUỘT VÀO NÚT CHỌN ẢNH
+   ------------------------------------------------------------ */
+.robot-image-picker-item {
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+.robot-image-picker-item:hover {
+  border-color: #cbd8d1;
+  background: #fbfdfc;
+  box-shadow: 0 3px 10px rgba(24, 35, 30, 0.06);
+  transform: translateY(-1px);
+}
+/* ------------------------------------------------------------
+   NÚT THÊM HÌNH ẢNH TRONG FORM EDIT
+   ------------------------------------------------------------ */
+.robot-edit-panel .robot-edit-image-toolbar button {
+  min-height: 38px;
+  padding: 0 15px;
+  border: 1px solid #cfd9d4;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #294238;
+  box-shadow: 0 2px 5px rgba(24, 35, 30, 0.04);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+.robot-edit-panel .robot-edit-image-toolbar button:hover {
+  background: #f1f6f3;
+  border-color: #b8c8c0;
+  box-shadow: 0 4px 9px rgba(24, 35, 30, 0.08);
+  transform: translateY(-1px);
+}
+/* ------------------------------------------------------------
+   MOBILE
+   ------------------------------------------------------------ */
+@media (max-width: 600px) {
+  .robot-add-panel .panel-header > button,
+  .robot-add-panel .panel-header .button-primary {
+    min-height: 40px;
+    padding: 0 14px;
+    border-radius: 9px;
+  }
+  .robot-image-picker-dialog {
+    border-radius: 13px;
+  }
+  .robot-image-picker-close {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+  }
+}
+/* ============================================================
+   ADMIN UI - NÚT THÊM TÍNH NĂNG / THÊM ẢNH
+   ============================================================ */
+/* ------------------------------------------------------------
+   NÚT THÊM TÍNH NĂNG
+   ------------------------------------------------------------ */
+   .robot-add-feature-header button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 38px;
+    padding: 0 15px;
+    border: 1px solid #cbd8d1;
+    border-radius: 9px;
+    background: #f5f8f6;
+    color: #294238;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    box-shadow: 0 2px 5px rgba(24, 35, 30, 0.04);
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease,
+      color 0.15s ease,
+      box-shadow 0.15s ease,
+      transform 0.15s ease;
+  }
+  .robot-add-feature-header button:hover {
+    background: #eaf2ed;
+    border-color: #aebfb5;
+    color: #1f352b;
+    box-shadow: 0 4px 10px rgba(24, 35, 30, 0.08);
+    transform: translateY(-1px);
+  }
+  .robot-add-feature-header button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(24, 35, 30, 0.05);
+  }
+  .robot-add-feature-header button:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 3px rgba(66, 113, 88, 0.14),
+      0 3px 8px rgba(24, 35, 30, 0.07);
+  }
+  /* ------------------------------------------------------------
+     NÚT THÊM ẢNH
+     ------------------------------------------------------------ */
+  .robot-edit-panel .robot-edit-image-toolbar button,
+  .robot-add-panel .robot-edit-image-toolbar button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 38px;
+    padding: 0 15px;
+    border: 1px solid #cbd8d1;
+    border-radius: 9px;
+    background: #f5f8f6;
+    color: #294238;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    box-shadow: 0 2px 5px rgba(24, 35, 30, 0.04);
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease,
+      color 0.15s ease,
+      box-shadow 0.15s ease,
+      transform 0.15s ease;
+  }
+  .robot-edit-panel .robot-edit-image-toolbar button:hover,
+  .robot-add-panel .robot-edit-image-toolbar button:hover {
+    background: #eaf2ed;
+    border-color: #aebfb5;
+    color: #1f352b;
+    box-shadow: 0 4px 10px rgba(24, 35, 30, 0.08);
+    transform: translateY(-1px);
+  }
+  .robot-edit-panel .robot-edit-image-toolbar button:active,
+  .robot-add-panel .robot-edit-image-toolbar button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(24, 35, 30, 0.05);
+  }
+  .robot-edit-panel .robot-edit-image-toolbar button:focus-visible,
+  .robot-add-panel .robot-edit-image-toolbar button:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 3px rgba(66, 113, 88, 0.14),
+      0 3px 8px rgba(24, 35, 30, 0.07);
+  }
+  /* ------------------------------------------------------------
+     NÚT THÊM ẢNH TRONG FORM THÊM ROBOT
+     ------------------------------------------------------------ */
+  .robot-add-panel .robot-add-images + button,
+  .robot-add-panel button[data-action="add-image"],
+  .robot-add-panel #robot-add-image {
+    min-height: 38px;
+    padding: 0 15px;
+    border: 1px solid #cbd8d1;
+    border-radius: 9px;
+    background: #f5f8f6;
+    color: #294238;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    box-shadow: 0 2px 5px rgba(24, 35, 30, 0.04);
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease,
+      color 0.15s ease,
+      box-shadow 0.15s ease,
+      transform 0.15s ease;
+  }
+  .robot-add-panel .robot-add-images + button:hover,
+  .robot-add-panel button[data-action="add-image"]:hover,
+  .robot-add-panel #robot-add-image:hover {
+    background: #eaf2ed;
+    border-color: #aebfb5;
+    color: #1f352b;
+    box-shadow: 0 4px 10px rgba(24, 35, 30, 0.08);
+    transform: translateY(-1px);
+  }
+/* ------------------------------------------------------------
+     NÚT THÊM ROBOT - ADMIN
+     ------------------------------------------------------------ */
+  .robot-add-button,
+#robot-add-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 18px;
+  border: 1px solid #294238;
+  border-radius: 10px;
+  background: #294238;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(24, 35, 30, 0.12);
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+#robot-add-button:hover {
+  background: #355447;
+  box-shadow: 0 5px 14px rgba(24, 35, 30, 0.18);
+  transform: translateY(-1px);
+}
+#robot-add-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(24, 35, 30, 0.12);
+}
+#robot-add-button:focus-visible {
+  outline: 3px solid rgba(53, 84, 71, 0.22);
+  outline-offset: 2px;
+}
