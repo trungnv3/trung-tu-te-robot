@@ -1,3 +1,110 @@
+const adminLogin = document.getElementById("admin-login");
+const adminLayout = document.querySelector(".admin-layout");
+const adminLoginForm = document.getElementById("admin-login-form");
+const adminPassword = document.getElementById("admin-password");
+const adminLoginButton = document.getElementById("admin-login-button");
+const adminLoginError = document.getElementById("admin-login-error");
+function showAdminLogin() {
+  if (adminLogin) {
+    adminLogin.style.display = "flex";
+  }
+  if (adminLayout) {
+    adminLayout.style.display = "none";
+  }
+  if (adminPassword) {
+    adminPassword.focus();
+  }
+}
+function showAdminPanel() {
+  if (adminLogin) {
+    adminLogin.style.display = "none";
+  }
+  if (adminLayout) {
+    adminLayout.style.display = "";
+  }
+}
+async function checkAdminSession() {
+  try {
+    const response = await fetch("/api/admin/session", {
+      method: "GET",
+      credentials: "same-origin"
+    });
+const data = await response.json();
+
+if (data.ok && data.authenticated === true) {
+  showAdminPanel();
+  return true;
+}
+
+showAdminLogin();
+return false;
+
+  } catch (error) {
+    showAdminLogin();
+    return false;
+  }
+}
+if (adminLoginForm) {
+  adminLoginForm.addEventListener("submit", async function (event) {
+    event.preventDefault();
+const password = adminPassword
+  ? adminPassword.value
+  : "";
+
+if (!password) {
+  return;
+}
+
+adminLoginButton.disabled = true;
+adminLoginButton.textContent = "Đang đăng nhập...";
+
+if (adminLoginError) {
+  adminLoginError.style.display = "none";
+  adminLoginError.textContent = "";
+}
+
+try {
+  const response = await fetch("/api/admin/login", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      password: password
+    })
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || !data.ok) {
+    throw new Error(
+      data.error || "Đăng nhập không thành công"
+    );
+  }
+
+  if (adminPassword) {
+    adminPassword.value = "";
+  }
+
+  showAdminPanel();
+
+  await loadRobots();
+
+} catch (error) {
+  if (adminLoginError) {
+    adminLoginError.textContent =
+      error.message || "Đăng nhập không thành công";
+    adminLoginError.style.display = "block";
+  }
+} finally {
+  adminLoginButton.disabled = false;
+  adminLoginButton.textContent = "Đăng nhập";
+}
+
+  });
+}
+checkAdminSession();
 let currentRobotImages = [];
 let addRobotImages = [];
 const state = {
@@ -5,7 +112,90 @@ const state = {
   loading: false,
   error: null
 };
+async function loadAnalytics() {
+  try {
+    const response = await fetch(
+      "/api/admin/analytics",
+      {
+        method: "GET",
+        credentials: "same-origin"
+      }
+    );
 
+    const data = await response.json();
+
+    if (
+      !response.ok ||
+      !data.ok ||
+      !data.analytics
+    ) {
+      throw new Error(
+        data.error ||
+        "Không thể tải thống kê."
+      );
+    }
+
+    const analytics = data.analytics;
+
+    function setValue(id, value) {
+      const element =
+        document.getElementById(id);
+
+      if (!element) {
+        return;
+      }
+
+      element.textContent =
+        Number(value || 0).toLocaleString("vi-VN");
+    }
+
+    setValue(
+      "analytics-today-visitors",
+      analytics.today.visitors
+    );
+
+    setValue(
+      "analytics-today-views",
+      analytics.today.views
+    );
+
+    setValue(
+      "analytics-7d-visitors",
+      analytics.last_7_days.visitors
+    );
+
+    setValue(
+      "analytics-7d-views",
+      analytics.last_7_days.views
+    );
+
+    setValue(
+      "analytics-30d-visitors",
+      analytics.last_30_days.visitors
+    );
+
+    setValue(
+      "analytics-30d-views",
+      analytics.last_30_days.views
+    );
+
+    setValue(
+      "analytics-total-visitors",
+      analytics.total.visitors
+    );
+
+    setValue(
+      "analytics-total-views",
+      analytics.total.views
+    );
+
+  } catch (error) {
+    console.error(
+      "Load analytics error:",
+      error
+    );
+  }
+}
 async function loadRobots() {
   state.loading = true;
   state.error = null;
@@ -190,7 +380,8 @@ function showSection(sectionName) {
   if (sectionName === "robots") {
     renderRobotList();
   }
-}
+}  
+
 
 
 function setupNavigation() {
@@ -1042,6 +1233,9 @@ document.addEventListener("DOMContentLoaded", function() {
   loadInitialSection();
 
   loadRobots();
+
+  loadAnalytics();
+
 });
 document.addEventListener("click", function (event) {
 
@@ -1935,11 +2129,526 @@ function saveAddRobotStep4() {
   return true;
 }
 
+// ============================================================
+// AUTO FILL ROBOT
+// ============================================================
 
+function normalizeAutoFillText(value) {
+  return String(value || "")
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n")
+    .replace(/\u00a0/g, " ")
+    .trim();
+}
+
+
+function autoFillCleanValue(value) {
+  return String(value || "")
+    .replace(/^[\s•\-–—*]+/, "")
+    .trim();
+}
+
+
+function autoFillFindLine(lines, patterns) {
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+
+    for (let j = 0; j < patterns.length; j++) {
+      const match = line.match(patterns[j]);
+
+      if (match && match[1]) {
+        return autoFillCleanValue(match[1]);
+      }
+    }
+  }
+
+  return "";
+}
+
+
+function autoFillParseProductText(rawText) {
+  const text = normalizeAutoFillText(rawText);
+
+  if (!text) {
+    throw new Error(
+      "Vui lòng dán nội dung thông tin Robot trước."
+    );
+  }
+
+  const lines = text
+    .split("\n")
+    .map(function (line) {
+      return line.trim();
+    })
+    .filter(function (line) {
+      return Boolean(line);
+    });
+
+
+  const result = {
+    robot: {
+      brand: "",
+      model: "",
+      year: "",
+      category: "robot-lau-nha",
+      status: "active"
+    },
+
+    specs: {
+      suction: "",
+      battery: "",
+      dustbin: "",
+      water_tank: "",
+      navigation: "",
+      noise: "",
+      hot_water: "",
+      mop_wash: "",
+      mop_dry: "",
+      mop_lift: "",
+      self_empty: "",
+      detergent: ""
+    },
+
+    features: []
+  };
+
+
+  // ==========================================================
+  // TÊN SẢN PHẨM
+  // ==========================================================
+
+  let productName = "";
+
+  for (let i = 0; i < lines.length; i++) {
+    const candidate = lines[i]
+      .replace(/^[\s•\-–—*]+/, "")
+      .trim();
+
+    if (
+      candidate &&
+      !/^📌?\s*CHỨC NĂNG NỔI BẬT/i.test(candidate) &&
+      !/^⚙️?\s*THÔNG SỐ KỸ THUẬT/i.test(candidate) &&
+      !/^🏠?\s*TRẠM/i.test(candidate)
+    ) {
+      productName = candidate;
+      break;
+    }
+  }
+
+
+  // ==========================================================
+  // HÃNG + MODEL
+  // ==========================================================
+
+  const knownBrands = [
+    "Dreame",
+    "Roborock",
+    "Ecovacs",
+    "Xiaomi",
+    "Mova",
+    "Tineco",
+    "Lumias",
+    "Narwal"
+  ];
+
+
+  if (productName) {
+    let matchedBrand = "";
+
+    for (let i = 0; i < knownBrands.length; i++) {
+      const brand = knownBrands[i];
+
+      const escapedBrand = brand.replace(
+        /[.*+?^${}()|[\]\\]/g,
+        "\\$&"
+      );
+
+      if (
+        new RegExp(
+          "^" + escapedBrand + "\\b",
+          "i"
+        ).test(productName)
+      ) {
+        matchedBrand = brand;
+        break;
+      }
+    }
+
+
+    if (matchedBrand) {
+      result.robot.brand = matchedBrand;
+
+      result.robot.model = productName
+        .replace(
+          new RegExp(
+            "^" +
+              matchedBrand.replace(
+                /[.*+?^${}()|[\]\\]/g,
+                "\\$&"
+              ) +
+              "\\s*",
+            "i"
+          ),
+          ""
+        )
+        .trim();
+    } else {
+      const parts = productName.split(/\s+/);
+
+      result.robot.brand =
+        parts.shift() || "";
+
+      result.robot.model =
+        parts.join(" ").trim();
+    }
+  }
+
+
+  // ==========================================================
+  // NĂM
+  // ==========================================================
+
+  const yearMatch = text.match(
+    /\b(20\d{2})\b/
+  );
+
+  if (yearMatch) {
+    result.robot.year = yearMatch[1];
+  }
+
+
+  // ==========================================================
+  // THÔNG SỐ KỸ THUẬT
+  // ==========================================================
+
+  result.specs.suction =
+    autoFillFindLine(lines, [
+      /^[-•*]?\s*Lực hút(?:\s+[^:]+)?\s*:\s*(.+)$/i,
+      /^[-•*]?\s*Lực hút\s+(.+)$/i
+    ]);
+
+
+  result.specs.battery =
+    autoFillFindLine(lines, [
+      /^[-•*]?\s*Pin\s*:\s*(.+)$/i
+    ]);
+
+
+  result.specs.dustbin =
+    autoFillFindLine(lines, [
+      /^[-•*]?\s*Hộp bụi(?:\s+robot)?\s*:\s*(.+)$/i
+    ]);
+
+
+  result.specs.water_tank =
+    autoFillFindLine(lines, [
+      /^[-•*]?\s*Hộp nước(?:\s+robot)?\s*:\s*(.+)$/i,
+      /^[-•*]?\s*Bình nước(?:\s+robot)?\s*:\s*(.+)$/i,
+      /^[-•*]?\s*Bình nước sạch.*:\s*(.+)$/i
+    ]);
+
+
+  result.specs.navigation =
+    autoFillFindLine(lines, [
+      /^[-•*]?\s*Điều hướng\s*:\s*(.+)$/i
+    ]);
+
+
+  result.specs.noise =
+    autoFillFindLine(lines, [
+      /^[-•*]?\s*Độ ồn\s*:\s*(.+)$/i
+    ]);
+
+
+  // ==========================================================
+  // NƯỚC NÓNG
+  // ==========================================================
+
+  result.specs.hot_water =
+    autoFillFindLine(lines, [
+      /^[-•*]?\s*Giặt giẻ bằng nước nóng\s*:\s*(.+)$/i,
+      /^[-•*]?\s*Nước nóng\s*:\s*(.+)$/i
+    ]);
+
+
+  // ==========================================================
+  // GIẶT GIẺ
+  // ==========================================================
+
+  result.specs.mop_wash =
+    autoFillFindLine(lines, [
+      /^[-•*]?\s*(?:Tự động\s+)?Giặt (?:giẻ|khăn)(?:\s+.*)?\s*:\s*(.+)$/i
+    ]);
+
+
+  // ==========================================================
+  // SẤY GIẺ
+  // ==========================================================
+
+  result.specs.mop_dry =
+    autoFillFindLine(lines, [
+      /^[-•*]?\s*(?:Tự động\s+)?Sấy (?:giẻ|khăn)(?:\s+.*)?\s*:\s*(.+)$/i
+    ]);
+
+
+  // ==========================================================
+  // NÂNG GIẺ
+  // ==========================================================
+
+  result.specs.mop_lift =
+    autoFillFindLine(lines, [
+      /^[-•*]?\s*Nâng giẻ\s*:\s*(.+)$/i,
+      /^[-•*]?\s*Nâng khăn\s*:\s*(.+)$/i
+    ]);
+
+
+  // ==========================================================
+  // TỰ ĐỔ BỤI
+  // ==========================================================
+
+  result.specs.self_empty =
+    autoFillFindLine(lines, [
+      /^[-•*]?\s*Tự động đổ bụi\s*:\s*(.+)$/i,
+      /^[-•*]?\s*Tự đổ bụi\s*:\s*(.+)$/i,
+      /^[-•*]?\s*Túi bụi\s*:\s*(.+)$/i
+    ]);
+
+
+  // Dạng:
+  // Tự động gom bụi vào túi
+  // Tự động đổ bụi vào túi
+
+  if (!result.specs.self_empty) {
+    const selfEmptyLine = lines.find(
+      function (line) {
+        return /tự động\s+(gom|đổ)\s+bụi/i.test(
+          line
+        );
+      }
+    );
+
+    if (selfEmptyLine) {
+      result.specs.self_empty = "Có";
+    }
+  }
+
+
+  // ==========================================================
+  // DUNG DỊCH
+  // ==========================================================
+
+  result.specs.detergent =
+    autoFillFindLine(lines, [
+      /^[-•*]?\s*Dung dịch vệ sinh\s*:\s*(.+)$/i,
+      /^[-•*]?\s*Dung dịch\s*:\s*(.+)$/i
+    ]);
+
+
+  // ==========================================================
+  // CHỨC NĂNG NỔI BẬT
+  // CHỈ LẤY TỐI ĐA 4
+  // ==========================================================
+
+  let inFeatures = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    if (
+      /^📌?\s*CHỨC NĂNG NỔI BẬT/i.test(
+        line
+      )
+    ) {
+      inFeatures = true;
+      continue;
+    }
+
+
+    if (
+      inFeatures &&
+      (
+        /^⚙️?\s*THÔNG SỐ KỸ THUẬT/i.test(
+          line
+        ) ||
+        /^🏠?\s*TRẠM/i.test(line)
+      )
+    ) {
+      inFeatures = false;
+      continue;
+    }
+
+
+    if (
+      inFeatures &&
+      result.features.length < 4
+    ) {
+      const featureText =
+        autoFillCleanValue(line);
+
+      if (
+        featureText &&
+        !/^📌|^⚙️|^🏠/.test(
+          featureText
+        )
+      ) {
+        result.features.push({
+          title: featureText,
+          description: "",
+          sort_order:
+            result.features.length + 1
+        });
+      }
+    }
+  }
+
+
+  return result;
+}
+
+
+// ============================================================
+// ĐƯA DỮ LIỆU AUTO FILL VÀO FORM THÊM ROBOT
+// ============================================================
+
+function applyAutoFillToAddRobotForm(parsed) {
+  if (!parsed) return;
+
+
+  // ----------------------------------------------------------
+  // ROBOT
+  // ----------------------------------------------------------
+
+  if (parsed.robot) {
+    Object.keys(parsed.robot).forEach(
+      function (key) {
+        const value =
+          parsed.robot[key];
+
+        if (
+          value !== undefined &&
+          value !== ""
+        ) {
+          addRobotState.robot[key] =
+            value;
+        }
+      }
+    );
+  }
+
+
+  // ----------------------------------------------------------
+  // THÔNG SỐ
+  // ----------------------------------------------------------
+
+  if (parsed.specs) {
+    Object.keys(parsed.specs).forEach(
+      function (key) {
+        const value =
+          parsed.specs[key];
+
+        if (
+          value !== undefined &&
+          value !== ""
+        ) {
+          addRobotState.specs[key] =
+            value;
+        }
+      }
+    );
+  }
+
+
+  // ----------------------------------------------------------
+  // CHỨC NĂNG
+  // ----------------------------------------------------------
+
+  if (
+    Array.isArray(parsed.features) &&
+    parsed.features.length > 0
+  ) {
+    addRobotState.features =
+      parsed.features;
+  }
+}
+
+
+// ============================================================
+// XỬ LÝ NÚT AUTO FILL
+// ============================================================
+
+function handleAutoFillRobot() {
+  const input =
+    document.querySelector(
+      "#robot-autofill-input"
+    );
+
+  if (!input) {
+    alert(
+      "Không tìm thấy ô Auto Fill Robot."
+    );
+    return;
+  }
+
+
+  try {
+    const parsed =
+      autoFillParseProductText(
+        input.value
+      );
+
+    applyAutoFillToAddRobotForm(
+      parsed
+    );
+
+
+    if (
+      typeof renderAddRobotStep1 ===
+      "function"
+    ) {
+      renderAddRobotStep1();
+    }
+
+
+    const specCount =
+      Object.values(
+        addRobotState.specs || {}
+      ).filter(Boolean).length;
+
+
+    alert(
+      "Đã nhận dạng thông tin Robot.\n\n" +
+      "Hãng: " +
+      (addRobotState.robot.brand ||
+        "(trống)") +
+      "\nModel: " +
+      (addRobotState.robot.model ||
+        "(trống)") +
+      "\nSố thông số đã nhận: " +
+      specCount +
+      "\nSố tính năng: " +
+      (
+        addRobotState.features || []
+      ).length
+    );
+
+  } catch (error) {
+    console.error(
+      "Auto Fill Robot error:",
+      error
+    );
+
+    alert(
+      "Không thể Auto Fill.\n\n" +
+      (
+        error.message ||
+        "Nội dung không hợp lệ."
+      )
+    );
+  }
+}
 // ============================================================
 // BƯỚC 1
 // ============================================================
-
 function renderAddRobotStep1() {
   const panel =
     getAddRobotPanel();
@@ -1959,6 +2668,40 @@ function renderAddRobotStep1() {
       '</div>' +
       '<button type="button" id="robot-add-close" class="button-secondary">Đóng</button>' +
     '</div>' +
+
+    // ========================================================
+    // AUTO FILL
+    // ========================================================
+
+    '<div class="admin-form-section robot-autofill-section">' +
+
+      '<div class="robot-autofill-header">' +
+        '<div>' +
+          '<h3>✨ Auto Fill thông tin Robot</h3>' +
+          '<p class="panel-description">' +
+            'Dán toàn bộ thông tin sản phẩm để tự động nhận dạng hãng, model, thông số và 4 chức năng nổi bật.' +
+          '</p>' +
+        '</div>' +
+      '</div>' +
+
+      '<textarea ' +
+        'id="robot-autofill-input" ' +
+        'class="robot-autofill-input" ' +
+        'rows="10" ' +
+        'placeholder="Dán toàn bộ nội dung thông tin Robot vào đây...">' +
+      '</textarea>' +
+
+      '<div class="admin-form-actions robot-autofill-actions">' +
+        '<button type="button" id="robot-autofill-button" class="button-primary">' +
+          '✨ Auto Fill' +
+        '</button>' +
+      '</div>' +
+
+    '</div>' +
+
+    // ========================================================
+    // THÔNG TIN CƠ BẢN
+    // ========================================================
 
     '<div class="admin-form-section">' +
       '<h3>Thông tin cơ bản</h3>' +
@@ -2013,10 +2756,24 @@ function renderAddRobotStep1() {
       '<button type="button" id="robot-add-next-step-1" class="button-primary">Tiếp tục</button>' +
     '</div>';
 
+  // ============================================================
+  // NÚT AUTO FILL
+  // ============================================================
+
+  const autoFillButton =
+    document.querySelector(
+      "#robot-autofill-button"
+    );
+
+  if (autoFillButton) {
+    autoFillButton.addEventListener(
+      "click",
+      handleAutoFillRobot
+    );
+  }
+
   scrollAddRobotPanel();
 }
-
-
 // ============================================================
 // BƯỚC 2
 // ============================================================
@@ -3745,8 +4502,1871 @@ document.addEventListener(
 
   }
 );
+document.addEventListener(
+  "click",
+  async function (event) {
 
+    const button =
+      event.target.closest(
+        "#article-create-cover-select"
+      );
+      document.addEventListener(
+        "click",
+        function (event) {
+      
+          const selectButton =
+            event.target.closest(
+              "#article-cover-picker-select"
+            );
+      
+          if (!selectButton) {
+            return;
+          }
+      
+          const modal =
+            document.querySelector(
+              "#article-cover-image-picker"
+            );
+      
+          if (!modal) {
+            return;
+          }
+      
+          const selected =
+            modal.querySelector(
+              ".article-cover-image-radio:checked"
+            );
+      
+          if (!selected) {
+            alert(
+              "Vui lòng chọn một ảnh đại diện."
+            );
+      
+            return;
+          }
+      
+          const driveId =
+            selected.value;
+      
+          const item =
+            selected.closest(
+              ".robot-image-picker-item"
+            );
+      
+          const imageElement =
+            item
+              ? item.querySelector("img")
+              : null;
+      
+          const coverInput =
+            document.getElementById(
+              "article-create-cover"
+            );
+      
+          const preview =
+            document.getElementById(
+              "article-create-cover-preview"
+            );
+      
+          const previewImage =
+            document.getElementById(
+              "article-create-cover-preview-image"
+            );
+      
+          if (coverInput) {
+            coverInput.value =
+              driveId;
+          }
+      
+          if (
+            preview &&
+            previewImage
+          ) {
+      
+            previewImage.src =
+              imageElement
+                ? imageElement.src
+                : "/api/image/" + driveId;
+      
+            preview.style.display =
+              "block";
+      
+          }
+      
+          modal.hidden =
+            true;
+      
+        }
+      );
 
+    if (!button) {
+      return;
+    }
+
+    const folderResponse =
+      await fetch(
+        "/api/admin/drive/folders"
+      );
+
+    const folderData =
+      await folderResponse.json();
+
+    if (
+      !folderResponse.ok ||
+      !folderData.ok
+    ) {
+      alert(
+        folderData.error ||
+        "Không thể lấy danh sách thư mục."
+      );
+
+      return;
+    }
+
+    const folders =
+      Array.isArray(
+        folderData.folders
+      )
+        ? folderData.folders
+        : [];
+
+    if (folders.length === 0) {
+      alert(
+        "Không có thư mục Google Drive."
+      );
+
+      return;
+    }
+
+    let modal =
+      document.querySelector(
+        "#article-cover-image-picker"
+      );
+
+    if (!modal) {
+
+      modal =
+        document.createElement(
+          "div"
+        );
+
+      modal.id =
+        "article-cover-image-picker";
+
+      modal.className =
+        "robot-image-picker";
+
+      document.body.appendChild(
+        modal
+      );
+
+    }
+
+    modal.innerHTML =
+      '<div class="robot-image-picker-overlay">' +
+
+        '<div class="robot-image-picker-dialog">' +
+
+          '<div class="robot-image-picker-header">' +
+
+            '<div>' +
+              '<p class="eyebrow">GOOGLE DRIVE</p>' +
+              '<h3>Chọn ảnh đại diện</h3>' +
+            '</div>' +
+
+            '<button type="button" class="article-cover-picker-close">×</button>' +
+
+          '</div>' +
+
+          '<div class="robot-image-picker-browser">' +
+
+            '<div class="robot-image-picker-folders">' +
+              '<div class="robot-image-picker-pane-title">Thư mục</div>' +
+              '<div id="article-cover-folder-tree" class="robot-folder-tree"></div>' +
+            '</div>' +
+
+            '<div class="robot-image-picker-files">' +
+
+              '<div class="robot-image-picker-pane-title">' +
+                '<span>Hình ảnh</span>' +
+                '<span id="article-cover-folder-name"></span>' +
+              '</div>' +
+
+              '<div id="article-cover-image-list" class="robot-image-picker-list">' +
+                '<div class="robot-image-picker-empty">Chọn một thư mục để xem hình ảnh.</div>' +
+              '</div>' +
+
+            '</div>' +
+
+          '</div>' +
+
+          '<div class="robot-image-picker-actions">' +
+            '<button type="button" class="button-secondary article-cover-picker-close">Hủy</button>' +
+            '<button type="button" id="article-cover-picker-select" class="button-primary">Chọn ảnh</button>' +
+          '</div>' +
+
+        '</div>' +
+
+      '</div>';
+
+    const tree =
+      modal.querySelector(
+        "#article-cover-folder-tree"
+      );
+
+    const folderName =
+      modal.querySelector(
+        "#article-cover-folder-name"
+      );
+
+    const imageList =
+      modal.querySelector(
+        "#article-cover-image-list"
+      );
+
+    function createCoverFolderTree(
+      folderList
+    ) {
+
+      const root = {
+        name: "",
+        path: "",
+        children: {},
+        folder: null
+      };
+
+      folderList.forEach(
+        function (folder) {
+
+          const parts =
+            folder.path
+              .split("/")
+              .filter(Boolean);
+
+          let current =
+            root;
+
+          parts.forEach(
+            function (part, index) {
+
+              if (
+                !current.children[part]
+              ) {
+
+                current.children[part] = {
+                  name: part,
+                  path: parts
+                    .slice(
+                      0,
+                      index + 1
+                    )
+                    .join("/"),
+                  children: {},
+                  folder: null
+                };
+
+              }
+
+              current =
+                current.children[part];
+
+              if (
+                index ===
+                parts.length - 1
+              ) {
+
+                current.folder =
+                  folder;
+
+              }
+
+            }
+          );
+
+        }
+      );
+
+      return root;
+
+    }
+
+    function renderCoverTreeNode(
+      node,
+      parentElement,
+      level
+    ) {
+
+      const names =
+        Object.keys(
+          node.children
+        ).sort(
+          function (a, b) {
+            return a.localeCompare(
+              b,
+              "vi"
+            );
+          }
+        );
+
+      names.forEach(
+        function (name) {
+
+          const child =
+            node.children[name];
+
+          const row =
+            document.createElement(
+              "div"
+            );
+
+          row.className =
+            "robot-folder-row";
+
+          row.dataset.level =
+            level;
+
+          const hasChildren =
+            Object.keys(
+              child.children
+            ).length > 0;
+
+          const arrow =
+            document.createElement(
+              "button"
+            );
+
+          arrow.type =
+            "button";
+
+          arrow.className =
+            "robot-folder-arrow";
+
+          arrow.textContent =
+            hasChildren
+              ? "▶"
+              : "";
+
+          const folderButton =
+            document.createElement(
+              "button"
+            );
+
+          folderButton.type =
+            "button";
+
+          folderButton.className =
+            "robot-folder-button";
+
+          folderButton.innerHTML =
+            '<span class="robot-folder-icon">📁</span>' +
+            '<span class="robot-folder-name">' +
+              escapeAddRobotHtml(
+                child.name
+              ) +
+            "</span>";
+
+          row.appendChild(
+            arrow
+          );
+
+          row.appendChild(
+            folderButton
+          );
+
+          parentElement.appendChild(
+            row
+          );
+
+          let childrenContainer =
+            null;
+
+          if (hasChildren) {
+
+            childrenContainer =
+              document.createElement(
+                "div"
+              );
+
+            childrenContainer.className =
+              "robot-folder-children";
+
+            childrenContainer.hidden =
+              true;
+
+            parentElement.appendChild(
+              childrenContainer
+            );
+
+            arrow.addEventListener(
+              "click",
+              function () {
+
+                childrenContainer.hidden =
+                  !childrenContainer.hidden;
+
+                arrow.textContent =
+                  childrenContainer.hidden
+                    ? "▶"
+                    : "▼";
+
+              }
+            );
+
+          }
+
+          if (child.folder) {
+
+            folderButton.dataset.folderId =
+              child.folder.id;
+
+            folderButton.dataset.folderPath =
+              child.folder.path;
+
+            folderButton.addEventListener(
+              "click",
+              async function () {
+
+                tree
+                  .querySelectorAll(
+                    ".robot-folder-button"
+                  )
+                  .forEach(
+                    function (button) {
+                      button.classList.remove(
+                        "is-selected"
+                      );
+                    }
+                  );
+
+                folderButton.classList.add(
+                  "is-selected"
+                );
+
+                folderName.textContent =
+                  child.folder.path;
+
+                imageList.innerHTML =
+                  '<div class="robot-image-picker-empty">Đang tải hình ảnh...</div>';
+
+                try {
+
+                  const response =
+                    await fetch(
+                      "/api/admin/drive/images?folderId=" +
+                      encodeURIComponent(
+                        child.folder.id
+                      )
+                    );
+
+                  const data =
+                    await response.json();
+
+                  if (
+                    !response.ok ||
+                    !data.ok
+                  ) {
+                    throw new Error(
+                      data.error ||
+                      "Không thể lấy hình ảnh"
+                    );
+                  }
+
+                  if (
+                    !Array.isArray(
+                      data.images
+                    ) ||
+                    data.images.length === 0
+                  ) {
+
+                    imageList.innerHTML =
+                      '<div class="robot-image-picker-empty">' +
+                        "Không có hình ảnh trong thư mục này." +
+                      "</div>";
+
+                    return;
+
+                  }
+
+                  imageList.innerHTML =
+                    "";
+
+                  data.images.forEach(
+                    function (image) {
+
+                      const item =
+                        document.createElement(
+                          "label"
+                        );
+
+                      item.className =
+                        "robot-image-picker-item";
+
+                      item.innerHTML =
+                        '<input type="radio" name="article-cover-image" class="article-cover-image-radio" value="' +
+                          escapeAddRobotHtml(
+                            image.driveId
+                          ) +
+                        '">' +
+
+                        '<div class="robot-image-picker-preview">' +
+                          '<img src="' +
+                            escapeAddRobotHtml(
+                              image.url
+                            ) +
+                            '" alt="' +
+                            escapeAddRobotHtml(
+                              image.fileName ||
+                              "Ảnh"
+                            ) +
+                          '">' +
+                        "</div>" +
+
+                        '<div class="robot-image-picker-info">' +
+                          "<strong>" +
+                            escapeAddRobotHtml(
+                              image.fileName ||
+                              ""
+                            ) +
+                          "</strong>" +
+                        "</div>";
+
+                      imageList.appendChild(
+                        item
+                      );
+
+                    }
+                  );
+
+                } catch (error) {
+
+                  imageList.innerHTML =
+                    '<div class="robot-image-picker-empty">' +
+                      "Không thể tải hình ảnh: " +
+                      escapeAddRobotHtml(
+                        error.message
+                      ) +
+                    "</div>";
+
+                }
+
+              }
+            );
+
+          } else {
+
+            folderButton.classList.add(
+              "is-folder-group"
+            );
+
+          }
+
+          if (
+            hasChildren &&
+            childrenContainer
+          ) {
+
+            renderCoverTreeNode(
+              child,
+              childrenContainer,
+              level + 1
+            );
+
+          }
+
+        }
+      );
+
+    }
+
+    const folderTree =
+      createCoverFolderTree(
+        folders
+      );
+
+    tree.innerHTML =
+      "";
+
+    renderCoverTreeNode(
+      folderTree,
+      tree,
+      0
+    );
+
+    modal.hidden =
+      false;
+
+  }
+);
+document.addEventListener(
+  "click",
+  async function (event) {
+
+    const button =
+      event.target.closest(
+        "#article-create-insert-image, #article-edit-insert-image"
+      );
+
+    if (!button) {
+      return;
+    }
+
+    const editor =
+      button
+        .closest(".article-editor")
+        ?.querySelector(
+          ".article-editor-content"
+        );
+
+    if (!editor) {
+      return;
+    }
+
+    window.articleImageEditor =
+      editor;
+
+    try {
+
+      const response =
+        await fetch(
+          "/api/admin/drive/folders"
+        );
+
+      const data =
+        await response.json();
+
+      if (
+        !response.ok ||
+        !data.ok
+      ) {
+        throw new Error(
+          data.error ||
+          "Không thể lấy danh sách thư mục."
+        );
+      }
+
+      const folders =
+        Array.isArray(data.folders)
+          ? data.folders
+          : [];
+
+      if (!folders.length) {
+        alert(
+          "Không có thư mục Google Drive."
+        );
+        return;
+      }
+
+      let modal =
+        document.querySelector(
+          "#article-content-image-picker"
+        );
+
+      if (!modal) {
+
+        modal =
+          document.createElement(
+            "div"
+          );
+
+        modal.id =
+          "article-content-image-picker";
+
+        modal.className =
+          "robot-image-picker";
+
+        document.body.appendChild(
+          modal
+        );
+      }
+
+      modal.innerHTML =
+        `
+          <div class="robot-image-picker-overlay">
+
+            <div class="robot-image-picker-dialog">
+
+              <div class="robot-image-picker-header">
+
+                <div>
+                  <p class="eyebrow">
+                    GOOGLE DRIVE
+                  </p>
+
+                  <h3>
+                    Chèn ảnh vào bài viết
+                  </h3>
+                </div>
+
+                <button
+                  type="button"
+                  class="article-content-image-picker-close"
+                >
+                  ×
+                </button>
+
+              </div>
+
+              <div class="robot-image-picker-browser">
+
+                <div class="robot-image-picker-folders">
+
+                  <div class="robot-image-picker-pane-title">
+                    Thư mục
+                  </div>
+
+                  <div
+                    id="article-content-image-folder-tree"
+                    class="robot-folder-tree"
+                  ></div>
+
+                </div>
+
+                <div class="robot-image-picker-files">
+
+                  <div
+                    class="robot-image-picker-pane-title"
+                  >
+                    <span>Hình ảnh</span>
+
+                    <span
+                      id="article-content-image-folder-name"
+                    ></span>
+                  </div>
+
+                  <div
+                    id="article-content-image-list"
+                    class="robot-image-picker-list"
+                  >
+                    <div class="robot-image-picker-empty">
+                      Chọn một thư mục để xem hình ảnh.
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+
+              <div class="robot-image-picker-actions">
+
+                <button
+                  type="button"
+                  class="button-secondary article-content-image-picker-close"
+                >
+                  Hủy
+                </button>
+
+                <button
+                  type="button"
+                  id="article-content-image-picker-insert"
+                  class="button-primary"
+                >
+                  Chèn ảnh
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+        `;
+
+      const tree =
+        modal.querySelector(
+          "#article-content-image-folder-tree"
+        );
+
+      const folderName =
+        modal.querySelector(
+          "#article-content-image-folder-name"
+        );
+
+      const imageList =
+        modal.querySelector(
+          "#article-content-image-list"
+        );
+
+      function createContentFolderTree(
+        folderList
+      ) {
+
+        const root = {
+          name: "",
+          path: "",
+          children: {},
+          folder: null
+        };
+
+        folderList.forEach(
+          function (folder) {
+
+            const parts =
+              folder.path
+                .split("/")
+                .filter(Boolean);
+
+            let current =
+              root;
+
+            parts.forEach(
+              function (part, index) {
+
+                if (
+                  !current.children[part]
+                ) {
+
+                  current.children[part] = {
+                    name: part,
+                    path: parts
+                      .slice(
+                        0,
+                        index + 1
+                      )
+                      .join("/"),
+                    children: {},
+                    folder: null
+                  };
+
+                }
+
+                current =
+                  current.children[part];
+
+                if (
+                  index ===
+                  parts.length - 1
+                ) {
+                  current.folder =
+                    folder;
+                }
+
+              }
+            );
+
+          }
+        );
+
+        return root;
+      }
+
+      function renderContentFolderTree(
+        node,
+        parentElement,
+        level
+      ) {
+
+        const names =
+          Object.keys(
+            node.children
+          ).sort(
+            function (a, b) {
+              return a.localeCompare(
+                b,
+                "vi"
+              );
+            }
+          );
+
+        names.forEach(
+          function (name) {
+
+            const child =
+              node.children[name];
+
+            const row =
+              document.createElement(
+                "div"
+              );
+
+            row.className =
+              "robot-folder-row";
+
+            row.dataset.level =
+              level;
+
+            const hasChildren =
+              Object.keys(
+                child.children
+              ).length > 0;
+
+            const arrow =
+              document.createElement(
+                "button"
+              );
+
+            arrow.type =
+              "button";
+
+            arrow.className =
+              "robot-folder-arrow";
+
+            arrow.textContent =
+              hasChildren
+                ? "▶"
+                : "";
+
+            const folderButton =
+              document.createElement(
+                "button"
+              );
+
+            folderButton.type =
+              "button";
+
+            folderButton.className =
+              "robot-folder-button";
+
+            folderButton.innerHTML =
+              '<span class="robot-folder-icon">📁</span>' +
+              '<span class="robot-folder-name">' +
+                escapeAddRobotHtml(
+                  child.name
+                ) +
+              "</span>";
+
+            row.appendChild(
+              arrow
+            );
+
+            row.appendChild(
+              folderButton
+            );
+
+            parentElement.appendChild(
+              row
+            );
+
+            let childrenContainer =
+              null;
+
+            if (hasChildren) {
+
+              childrenContainer =
+                document.createElement(
+                  "div"
+                );
+
+              childrenContainer.className =
+                "robot-folder-children";
+
+              childrenContainer.hidden =
+                true;
+
+              parentElement.appendChild(
+                childrenContainer
+              );
+
+              arrow.addEventListener(
+                "click",
+                function () {
+
+                  childrenContainer.hidden =
+                    !childrenContainer.hidden;
+
+                  arrow.textContent =
+                    childrenContainer.hidden
+                      ? "▶"
+                      : "▼";
+
+                }
+              );
+
+            }
+
+            if (child.folder) {
+
+              folderButton.dataset.folderId =
+                child.folder.id;
+
+              folderButton.addEventListener(
+                "click",
+                async function () {
+
+                  tree
+                    .querySelectorAll(
+                      ".robot-folder-button"
+                    )
+                    .forEach(
+                      function (item) {
+                        item.classList.remove(
+                          "is-selected"
+                        );
+                      }
+                    );
+
+                  folderButton.classList.add(
+                    "is-selected"
+                  );
+
+                  folderName.textContent =
+                    child.folder.path;
+
+                  imageList.innerHTML =
+                    '<div class="robot-image-picker-empty">Đang tải hình ảnh...</div>';
+
+                  try {
+
+                    const imageResponse =
+                      await fetch(
+                        "/api/admin/drive/images?folderId=" +
+                        encodeURIComponent(
+                          child.folder.id
+                        )
+                      );
+
+                    const imageData =
+                      await imageResponse.json();
+
+                    if (
+                      !imageResponse.ok ||
+                      !imageData.ok
+                    ) {
+                      throw new Error(
+                        imageData.error ||
+                        "Không thể lấy hình ảnh"
+                      );
+                    }
+
+                    if (
+                      !Array.isArray(
+                        imageData.images
+                      ) ||
+                      !imageData.images.length
+                    ) {
+
+                      imageList.innerHTML =
+                        '<div class="robot-image-picker-empty">' +
+                        "Không có hình ảnh trong thư mục này." +
+                        "</div>";
+
+                      return;
+                    }
+
+                    imageList.innerHTML =
+                      "";
+
+                    imageData.images.forEach(
+                      function (image) {
+
+                        const item =
+                          document.createElement(
+                            "label"
+                          );
+
+                        item.className =
+                          "robot-image-picker-item";
+
+                        item.innerHTML =
+                          '<input type="radio" name="article-content-image" class="article-content-image-radio" value="' +
+                          escapeAddRobotHtml(
+                            image.driveId
+                          ) +
+                          '">' +
+
+                          '<div class="robot-image-picker-preview">' +
+                          '<img src="' +
+                          escapeAddRobotHtml(
+                            image.url
+                          ) +
+                          '" alt="' +
+                          escapeAddRobotHtml(
+                            image.fileName ||
+                            "Ảnh"
+                          ) +
+                          '">' +
+                          "</div>" +
+
+                          '<div class="robot-image-picker-info">' +
+                          "<strong>" +
+                          escapeAddRobotHtml(
+                            image.fileName ||
+                            ""
+                          ) +
+                          "</strong>" +
+                          "</div>";
+
+                        imageList.appendChild(
+                          item
+                        );
+
+                      }
+                    );
+
+                  } catch (error) {
+
+                    imageList.innerHTML =
+                      '<div class="robot-image-picker-empty">' +
+                      "Không thể tải hình ảnh: " +
+                      escapeAddRobotHtml(
+                        error.message
+                      ) +
+                      "</div>";
+
+                  }
+
+                }
+              );
+
+            }
+
+            if (
+              hasChildren &&
+              childrenContainer
+            ) {
+
+              renderContentFolderTree(
+                child,
+                childrenContainer,
+                level + 1
+              );
+
+            }
+
+          }
+        );
+
+      }
+
+      const folderTree =
+        createContentFolderTree(
+          folders
+        );
+
+      tree.innerHTML =
+        "";
+
+      renderContentFolderTree(
+        folderTree,
+        tree,
+        0
+      );
+
+      modal.hidden =
+        false;
+
+    } catch (error) {
+
+      alert(
+        error.message ||
+        "Không thể mở trình chọn ảnh."
+      );
+
+    }
+
+  }
+);
+document.addEventListener(
+  "mousedown",
+  function (event) {
+    const button =
+      event.target.closest(
+        "#article-create-insert-image, #article-edit-insert-image"
+      );
+
+    if (!button) return;
+
+    const editor =
+      button
+        .closest(".article-editor")
+        ?.querySelector(
+          ".article-editor-content"
+        );
+
+    if (!editor) return;
+
+    const selection =
+      window.getSelection();
+
+    if (
+      selection &&
+      selection.rangeCount > 0 &&
+      editor.contains(selection.anchorNode)
+    ) {
+      window.articleImageEditor =
+        editor;
+
+      window.articleImageRange =
+        selection
+          .getRangeAt(0)
+          .cloneRange();
+    }
+  }
+);
+document.addEventListener(
+  "click",
+  function (event) {
+    const button =
+      event.target.closest(
+        "#article-content-image-picker-insert"
+      );
+
+    if (!button) return;
+
+    const modal =
+      document.querySelector(
+        "#article-content-image-picker"
+      );
+
+    if (!modal) return;
+
+    const selected =
+      modal.querySelector(
+        ".article-content-image-radio:checked"
+      );
+
+    if (!selected) {
+      alert("Vui lòng chọn một ảnh.");
+      return;
+    }
+
+    const item =
+      selected.closest(
+        ".robot-image-picker-item"
+      );
+
+    const imageElement =
+      item
+        ? item.querySelector("img")
+        : null;
+
+    const imageUrl =
+      imageElement
+        ? imageElement.src
+        : "/api/image/" +
+          encodeURIComponent(
+            selected.value
+          );
+
+    const fileName =
+      imageElement?.alt ||
+      "Ảnh bài viết";
+
+    const editor =
+      window.articleImageEditor;
+
+    if (!editor) {
+      alert(
+        "Không xác định được vị trí chèn ảnh."
+      );
+      return;
+    }
+
+    editor.focus();
+
+    const range =
+      window.articleImageRange;
+
+    if (range) {
+      const selection =
+        window.getSelection();
+
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+
+    const currentSelection =
+      window.getSelection();
+
+    if (
+      !currentSelection ||
+      currentSelection.rangeCount === 0
+    ) {
+      alert(
+        "Không xác định được vị trí chèn ảnh."
+      );
+      return;
+    }
+
+    const activeRange =
+      currentSelection.getRangeAt(0);
+
+    const image =
+      document.createElement("img");
+
+    image.src = imageUrl;
+    image.alt = fileName;
+    image.loading = "lazy";
+    image.style.maxWidth = "100%";
+    image.style.height = "auto";
+    image.style.display = "block";
+    image.style.margin = "16px auto";
+
+    activeRange.deleteContents();
+    activeRange.insertNode(image);
+
+    const paragraph =
+      document.createElement("p");
+
+    paragraph.innerHTML = "<br>";
+
+    image.parentNode.insertBefore(
+      paragraph,
+      image.nextSibling
+    );
+
+    const newRange =
+      document.createRange();
+
+    newRange.setStart(
+      paragraph,
+      0
+    );
+    newRange.collapse(true);
+
+    currentSelection.removeAllRanges();
+    currentSelection.addRange(
+      newRange
+    );
+
+    editor.dispatchEvent(
+      new Event("input", {
+        bubbles: true
+      })
+    );
+
+    modal.remove();
+
+    window.articleImageEditor =
+      null;
+
+    window.articleImageRange =
+      null;
+  }
+);
+document.addEventListener(
+  "click",
+  function (event) {
+
+    const removeButton =
+      event.target.closest(
+        "#article-create-cover-remove"
+      );
+
+    if (!removeButton) {
+      return;
+    }
+
+    const coverInput =
+      document.getElementById(
+        "article-create-cover"
+      );
+
+    const preview =
+      document.getElementById(
+        "article-create-cover-preview"
+      );
+
+    const previewImage =
+      document.getElementById(
+        "article-create-cover-preview-image"
+      );
+
+    if (coverInput) {
+      coverInput.value = "";
+    }
+
+    if (previewImage) {
+      previewImage.src = "";
+    }
+
+    if (preview) {
+      preview.style.display =
+        "none";
+    }
+
+  }
+);
+document.addEventListener(
+  "click",
+  async function (event) {
+
+    const selectButton =
+      event.target.closest(
+        "#article-edit-cover-select"
+      );
+
+    if (!selectButton) {
+      return;
+    }
+
+    try {
+
+      const response =
+        await fetch(
+          "/api/admin/drive/folders"
+        );
+
+      const data =
+        await response.json();
+
+      if (
+        !response.ok ||
+        !data.ok
+      ) {
+        throw new Error(
+          data.error ||
+          "Không thể tải thư mục Google Drive"
+        );
+      }
+
+      const folders =
+        Array.isArray(data.folders)
+          ? data.folders
+          : [];
+
+      const modal =
+        document.createElement(
+          "div"
+        );
+
+      modal.id =
+        "article-edit-cover-image-picker";
+
+      modal.className =
+        "robot-image-picker-modal";
+
+      modal.hidden = false;
+
+      modal.innerHTML = `
+        <div class="robot-image-picker-backdrop"></div>
+
+        <div class="robot-image-picker-dialog">
+
+          <div class="robot-image-picker-header">
+            <strong>
+              Chọn ảnh đại diện
+            </strong>
+
+            <button
+              type="button"
+              class="article-edit-cover-picker-close"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div class="robot-image-picker-body">
+
+            <div
+              class="robot-folder-tree"
+              id="article-edit-cover-folder-tree"
+            ></div>
+
+            <div class="robot-image-picker-content">
+
+              <div
+                class="robot-image-picker-folder-name"
+                id="article-edit-cover-folder-name"
+              >
+                Chọn thư mục
+              </div>
+
+              <div
+                class="robot-image-picker-list"
+                id="article-edit-cover-image-list"
+              >
+                <p>
+                  Hãy chọn một thư mục.
+                </p>
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="robot-image-picker-footer">
+
+            <button
+              type="button"
+              class="button-secondary article-edit-cover-picker-close"
+            >
+              Hủy
+            </button>
+
+            <button
+              type="button"
+              id="article-edit-cover-picker-select"
+              class="button-primary"
+            >
+              Chọn ảnh
+            </button>
+
+          </div>
+
+        </div>
+      `;
+
+      document.body.appendChild(
+        modal
+      );
+
+      const folderTree =
+        modal.querySelector(
+          "#article-edit-cover-folder-tree"
+        );
+
+      const folderName =
+        modal.querySelector(
+          "#article-edit-cover-folder-name"
+        );
+
+      const imageList =
+        modal.querySelector(
+          "#article-edit-cover-image-list"
+        );
+
+      function renderFolders(
+        folderList,
+        parent
+      ) {
+
+        folderList.forEach(
+          function (folder) {
+
+            const row =
+              document.createElement(
+                "div"
+              );
+
+            row.className =
+              "robot-folder-row";
+
+            const button =
+              document.createElement(
+                "button"
+              );
+
+            button.type =
+              "button";
+
+            button.className =
+              "robot-folder-button";
+
+            button.textContent =
+              folder.name;
+
+            button.dataset.folderId =
+              folder.id;
+
+            button.dataset.folderPath =
+              folder.path || "";
+
+            row.appendChild(
+              button
+            );
+
+            parent.appendChild(
+              row
+            );
+
+            button.addEventListener(
+              "click",
+              async function () {
+
+                folderName.textContent =
+                  folder.path ||
+                  folder.name;
+
+                folderTree
+                  .querySelectorAll(
+                    ".robot-folder-button"
+                  )
+                  .forEach(
+                    function (item) {
+                      item.classList.remove(
+                        "selected"
+                      );
+                    }
+                  );
+
+                button.classList.add(
+                  "selected"
+                );
+
+                await loadEditCoverImages(
+                  folder.id
+                );
+              }
+            );
+
+            if (
+              Array.isArray(
+                folder.children
+              ) &&
+              folder.children.length
+            ) {
+
+              const children =
+                document.createElement(
+                  "div"
+                );
+
+              children.className =
+                "robot-folder-children";
+
+              row.appendChild(
+                children
+              );
+
+              renderFolders(
+                folder.children,
+                children
+              );
+            }
+          }
+        );
+      }
+
+      async function loadEditCoverImages(
+        folderId
+      ) {
+
+        imageList.innerHTML =
+          "<p>Đang tải ảnh...</p>";
+
+        const response =
+          await fetch(
+            "/api/admin/drive/images?folderId=" +
+              encodeURIComponent(
+                folderId
+              )
+          );
+
+        const data =
+          await response.json();
+
+        if (
+          !response.ok ||
+          !data.ok
+        ) {
+          throw new Error(
+            data.error ||
+            "Không thể tải ảnh"
+          );
+        }
+
+        const images =
+          Array.isArray(data.images)
+            ? data.images
+            : [];
+
+        if (!images.length) {
+
+          imageList.innerHTML =
+            "<p>Thư mục chưa có ảnh.</p>";
+
+          return;
+        }
+
+        imageList.innerHTML = "";
+
+        images.forEach(
+          function (image) {
+
+            const item =
+              document.createElement(
+                "label"
+              );
+
+            item.className =
+              "robot-image-picker-item";
+
+            item.innerHTML = `
+              <input
+                type="radio"
+                name="article-edit-cover-image"
+                class="article-edit-cover-image-radio"
+                value="${escapeAddRobotHtml(image.driveId || "")}"
+              >
+
+              <img
+                src="/api/image/${encodeURIComponent(image.driveId || "")}"
+                alt="${escapeAddRobotHtml(image.fileName || "")}"
+              >
+
+              <span>
+                ${escapeAddRobotHtml(image.fileName || "")}
+              </span>
+            `;
+
+            imageList.appendChild(
+              item
+            );
+          }
+        );
+      }
+
+      renderFolders(
+        folders,
+        folderTree
+      );
+
+    } catch (error) {
+
+      alert(
+        error.message ||
+        "Không thể mở trình chọn ảnh."
+      );
+
+    }
+
+  }
+);
+document.addEventListener(
+  "click",
+  function (event) {
+
+    const selectButton =
+      event.target.closest(
+        "#article-edit-cover-picker-select"
+      );
+
+    if (!selectButton) {
+      return;
+    }
+
+    const modal =
+      document.querySelector(
+        "#article-edit-cover-image-picker"
+      );
+
+    if (!modal) {
+      return;
+    }
+
+    const selected =
+      modal.querySelector(
+        ".article-edit-cover-image-radio:checked"
+      );
+
+    if (!selected) {
+      alert(
+        "Vui lòng chọn một ảnh đại diện."
+      );
+
+      return;
+    }
+
+    const driveId =
+      selected.value;
+
+    const item =
+      selected.closest(
+        ".robot-image-picker-item"
+      );
+
+    const imageElement =
+      item
+        ? item.querySelector("img")
+        : null;
+
+    const coverInput =
+      document.getElementById(
+        "article-edit-cover"
+      );
+
+    const preview =
+      document.getElementById(
+        "article-edit-cover-preview"
+      );
+
+    const previewImage =
+      document.getElementById(
+        "article-edit-cover-preview-image"
+      );
+
+    if (coverInput) {
+      coverInput.value =
+        driveId;
+    }
+
+    if (
+      preview &&
+      previewImage
+    ) {
+
+      previewImage.src =
+        imageElement
+          ? imageElement.src
+          : "/api/image/" +
+            encodeURIComponent(
+              driveId
+            );
+
+      preview.style.display =
+        "block";
+    }
+
+    modal.remove();
+
+  }
+);
+document.addEventListener(
+  "click",
+  function (event) {
+
+    const closeButton =
+      event.target.closest(
+        ".article-edit-cover-picker-close"
+      );
+
+    if (!closeButton) {
+      return;
+    }
+
+    const modal =
+      document.querySelector(
+        "#article-edit-cover-image-picker"
+      );
+
+    if (modal) {
+      modal.remove();
+    }
+
+  }
+);
+document.addEventListener(
+  "click",
+  function (event) {
+
+    const removeButton =
+      event.target.closest(
+        "#article-edit-cover-remove"
+      );
+
+    if (!removeButton) {
+      return;
+    }
+
+    const coverInput =
+      document.getElementById(
+        "article-edit-cover"
+      );
+
+    const preview =
+      document.getElementById(
+        "article-edit-cover-preview"
+      );
+
+    const previewImage =
+      document.getElementById(
+        "article-edit-cover-preview-image"
+      );
+
+    if (coverInput) {
+      coverInput.value = "";
+    }
+
+    if (previewImage) {
+      previewImage.src = "";
+    }
+
+    if (preview) {
+      preview.style.display =
+        "none";
+    }
+
+  }
+);
 // ============================================================
 // QUẢN LÝ ẢNH - ẢNH CHÍNH / TRÁI / PHẢI / XÓA
 // ============================================================
@@ -4110,5 +6730,1778 @@ document.addEventListener(
 
     }
 
+  }
+);
+// ============================================================
+// QUẢN LÝ BÀI CHIA SẺ - DANH SÁCH
+// ============================================================
+
+async function loadArticles() {
+
+  const articleList =
+    document.getElementById(
+      "article-list"
+    );
+
+  if (!articleList) {
+    return;
+  }
+
+  articleList.innerHTML =
+    `
+      <div class="robot-loading">
+        Đang tải bài viết...
+      </div>
+    `;
+
+  try {
+
+    const response =
+      await fetch(
+        "/api/admin/articles",
+        {
+          method: "GET",
+          credentials: "same-origin"
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !data.ok
+    ) {
+      throw new Error(
+        data.error ||
+        "Không thể tải danh sách bài viết"
+      );
+    }
+
+    const articles =
+      Array.isArray(
+        data.articles
+      )
+        ? data.articles
+        : [];
+
+    renderArticleList(
+      articles
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Load articles error:",
+      error
+    );
+
+    articleList.innerHTML =
+      `
+        <div class="robot-error">
+          Không thể tải danh sách bài viết.
+          <br>
+          ${escapeAddRobotHtml(
+            error.message
+          )}
+        </div>
+      `;
+
+  }
+}
+
+
+function renderArticleList(
+  articles
+) {
+
+  const articleList =
+    document.getElementById(
+      "article-list"
+    );
+
+  if (!articleList) {
+    return;
+  }
+
+  if (
+    !articles.length
+  ) {
+
+    articleList.innerHTML =
+      `
+        <div class="robot-loading">
+          Chưa có bài viết nào.
+        </div>
+      `;
+
+    return;
+  }
+
+  articleList.innerHTML =
+    articles
+      .map(
+        function (article) {
+
+          const statusLabel =
+            article.status ===
+            "published"
+              ? "Đã xuất bản"
+              : "Bản nháp";
+
+          return `
+            <article
+              class="robot-card"
+            >
+
+              <div
+                class="robot-card-content"
+              >
+
+                <div
+                  class="robot-card-header"
+                >
+
+                  <div>
+
+                    <p
+                      class="eyebrow"
+                    >
+                      ${
+                        escapeAddRobotHtml(
+                          article.category ||
+                          "CHIA SẺ"
+                        )
+                      }
+                    </p>
+
+                    <h3>
+                      ${
+                        escapeAddRobotHtml(
+                          article.icon ||
+                          "📖"
+                        )
+                      }
+
+                      ${
+                        escapeAddRobotHtml(
+                          article.title ||
+                          ""
+                        )
+                      }
+                    </h3>
+
+                  </div>
+
+                  <span
+                    class="status-badge"
+                  >
+                    ${
+                      escapeAddRobotHtml(
+                        statusLabel
+                      )
+                    }
+                  </span>
+
+                </div>
+
+                <p>
+                  ${
+                    escapeAddRobotHtml(
+                      article.excerpt ||
+                      ""
+                    )
+                  }
+                </p>
+
+                <small>
+                  Slug:
+                  ${
+                    escapeAddRobotHtml(
+                      article.slug ||
+                      ""
+                    )
+                  }
+
+                  ·
+
+                  Lượt xem:
+                  ${
+                    Number(
+                      article.view_count ||
+                      0
+                    )
+                  }
+                </small>
+
+              </div>
+
+              <div
+                class="robot-card-actions"
+              >
+
+                <button
+                  type="button"
+                  class="button-secondary article-edit-button"
+                  data-article-id="${
+                    Number(
+                      article.id
+                    )
+                  }"
+                >
+                  Sửa
+                </button>
+
+              </div>
+
+            </article>
+          `;
+
+        }
+      )
+      .join("");
+
+}
+document.addEventListener(
+  "click",
+  function (event) {
+
+    const sectionButton =
+      event.target.closest(
+        '[data-section="articles"]'
+      );
+
+    if (!sectionButton) {
+      return;
+    }
+
+    setTimeout(
+      function () {
+        loadArticles();
+      },
+      0
+    );
+
+  }
+);
+// ============================================================
+// QUẢN LÝ BÀI CHIA SẺ - THÊM BÀI VIẾT
+// ============================================================
+
+function openArticleCreateForm() {
+  articleSlugManuallyEdited = false;
+
+  const panel =
+    document.getElementById(
+      "article-edit-panel"
+    );
+
+  if (!panel) {
+    return;
+  }
+
+  panel.style.display =
+    "block";
+
+  panel.innerHTML =
+    `
+      <section class="panel">
+
+        <div class="panel-header">
+
+          <div>
+
+            <p class="eyebrow">
+              BÀI CHIA SẺ
+            </p>
+
+            <h2>
+              Thêm bài viết
+            </h2>
+
+          </div>
+
+          <button
+            type="button"
+            id="article-create-cancel"
+            class="button-secondary"
+          >
+            Đóng
+          </button>
+
+        </div>
+
+
+        <form
+          id="article-create-form"
+        >
+
+          <div class="form-grid">
+
+            <div class="form-group">
+
+              <label
+                for="article-create-title"
+              >
+                Tiêu đề
+              </label>
+
+              <input
+                id="article-create-title"
+                type="text"
+                required
+              >
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label
+                for="article-create-slug"
+              >
+                Slug
+              </label>
+
+              <input
+                id="article-create-slug"
+                type="text"
+                required
+                placeholder="robot-khong-sac"
+              >
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label
+                for="article-create-category"
+              >
+                Chuyên mục
+              </label>
+
+              <input
+                id="article-create-category"
+                type="text"
+                value="CHIA SẺ"
+              >
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label
+                for="article-create-icon"
+              >
+                Icon
+              </label>
+
+              <input
+                id="article-create-icon"
+                type="text"
+                value="📖"
+              >
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label
+                for="article-create-sort-order"
+              >
+                Thứ tự
+              </label>
+
+              <input
+                id="article-create-sort-order"
+                type="number"
+                value="0"
+              >
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label
+                for="article-create-status"
+              >
+                Trạng thái
+              </label>
+
+              <select
+                id="article-create-status"
+              >
+
+                <option
+                  value="draft"
+                >
+                  Bản nháp
+                </option>
+
+                <option
+                  value="published"
+                >
+                  Xuất bản
+                </option>
+
+              </select>
+
+            </div>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label
+              for="article-create-excerpt"
+            >
+              Mô tả ngắn
+            </label>
+
+            <textarea
+              id="article-create-excerpt"
+              rows="3"
+            ></textarea>
+
+          </div>
+
+
+          <div class="form-group">
+
+  <label>
+    Ảnh đại diện
+  </label>
+
+  <div
+    class="article-cover-picker"
+    id="article-create-cover-picker"
+  >
+
+    <div
+      class="article-cover-preview"
+      id="article-create-cover-preview"
+      style="display:none;"
+    >
+      <img
+        id="article-create-cover-preview-image"
+        src=""
+        alt="Ảnh đại diện"
+      >
+
+      <button
+        type="button"
+        id="article-create-cover-remove"
+        class="button-secondary"
+      >
+        ✕ Bỏ ảnh
+      </button>
+    </div>
+
+    <input
+      id="article-create-cover"
+      type="hidden"
+      value=""
+    >
+
+    <button
+      type="button"
+      id="article-create-cover-select"
+      class="button-secondary"
+    >
+      📷 Chọn ảnh đại diện
+    </button>
+
+  </div>
+
+</div>
+
+
+          <div class="form-group">
+  <label>Nội dung bài viết</label>
+
+  <div class="article-editor">
+    <div class="article-editor-toolbar">
+
+      <button
+        type="button"
+        class="article-editor-button"
+        data-command="bold"
+        title="In đậm"
+      >
+        <b>B</b>
+      </button>
+
+      <button
+        type="button"
+        class="article-editor-button"
+        data-command="italic"
+        title="In nghiêng"
+      >
+        <i>I</i>
+      </button>
+
+      <button
+        type="button"
+        class="article-editor-button"
+        data-command="formatBlock"
+        data-value="h2"
+        title="Tiêu đề lớn"
+      >
+        H2
+      </button>
+
+      <button
+        type="button"
+        class="article-editor-button"
+        data-command="formatBlock"
+        data-value="h3"
+        title="Tiêu đề nhỏ"
+      >
+        H3
+      </button>
+
+      <button
+        type="button"
+        class="article-editor-button"
+        data-command="insertUnorderedList"
+        title="Danh sách"
+      >
+        • Danh sách
+      </button>
+
+      <button
+        type="button"
+        class="article-editor-button"
+        data-command="insertOrderedList"
+        title="Danh sách đánh số"
+      >
+        1. Danh sách
+      </button>
+
+      <button
+        type="button"
+        class="article-editor-button"
+        data-command="createLink"
+        title="Chèn liên kết"
+      >
+        🔗 Link
+      </button>
+      <button
+        type="button"
+        class="article-editor-button"
+        id="article-create-insert-image"
+        title="Chèn ảnh"
+      >
+        🖼️ Ảnh
+      </button>
+
+    <div
+      id="article-create-editor"
+      class="article-editor-content"
+      contenteditable="true"
+      data-placeholder="Nhập nội dung bài viết..."
+    ></div>
+
+    <textarea
+      id="article-create-content"
+      style="display:none;"
+    ></textarea>
+  </div>
+</div>
+
+
+          <div
+            id="article-create-error"
+            class="robot-error"
+            style="display:none;"
+          ></div>
+
+
+          <div
+            class="form-actions"
+          >
+
+            <button
+              type="submit"
+              id="article-create-save"
+              class="button-primary"
+            >
+              Lưu bài viết
+            </button>
+
+            <button
+              type="button"
+              id="article-create-cancel-bottom"
+              class="button-secondary"
+            >
+              Hủy
+            </button>
+
+          </div>
+
+        </form>
+
+      </section>
+    `;
+
+  panel.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+
+}
+document.addEventListener(
+  "click",
+  function (event) {
+
+    const addButton =
+      event.target.closest(
+        "#article-add-button"
+      );
+
+    if (!addButton) {
+      return;
+    }
+
+    openArticleCreateForm();
+
+  }
+);
+document.addEventListener(
+  "click",
+  function (event) {
+
+    const button =
+      event.target.closest(
+        "#article-create-cancel, #article-create-cancel-bottom"
+      );
+
+    if (!button) {
+      return;
+    }
+
+    const panel =
+      document.getElementById(
+        "article-edit-panel"
+      );
+
+    if (panel) {
+      panel.style.display =
+        "none";
+
+      panel.innerHTML =
+        "";
+    }
+
+  }
+);
+// ============================================================
+// LƯU BÀI VIẾT MỚI
+// ============================================================
+
+document.addEventListener(
+  "submit",
+  async function (event) {
+
+    const form =
+      event.target.closest(
+        "#article-create-form"
+      );
+
+    if (!form) {
+      return;
+    }
+
+    event.preventDefault();
+
+    const saveButton =
+      document.getElementById(
+        "article-create-save"
+      );
+
+    const errorBox =
+      document.getElementById(
+        "article-create-error"
+      );
+
+    try {
+
+      if (saveButton) {
+        saveButton.disabled =
+          true;
+
+        saveButton.textContent =
+          "Đang lưu...";
+      }
+
+      if (errorBox) {
+        errorBox.style.display =
+          "none";
+
+        errorBox.textContent =
+          "";
+      }
+
+      const title =
+        document
+          .getElementById(
+            "article-create-title"
+          )
+          ?.value
+          .trim() || "";
+
+      const slug =
+        document
+          .getElementById(
+            "article-create-slug"
+          )
+          ?.value
+          .trim() || "";
+
+      const category =
+        document
+          .getElementById(
+            "article-create-category"
+          )
+          ?.value
+          .trim() || "CHIA SẺ";
+
+      const icon =
+        document
+          .getElementById(
+            "article-create-icon"
+          )
+          ?.value
+          .trim() || "📖";
+
+      const excerpt =
+        document
+          .getElementById(
+            "article-create-excerpt"
+          )
+          ?.value
+          .trim() || "";
+
+      const content =
+        document
+          .getElementById(
+            "article-create-content"
+          )
+          ?.value || "";
+
+      const coverImage =
+        document
+          .getElementById(
+            "article-create-cover"
+          )
+          ?.value
+          .trim() || "";
+
+      const status =
+        document
+          .getElementById(
+            "article-create-status"
+          )
+          ?.value || "draft";
+
+      const sortOrder =
+        Number(
+          document
+            .getElementById(
+              "article-create-sort-order"
+            )
+            ?.value || 0
+        );
+
+      if (!title) {
+        throw new Error(
+          "Vui lòng nhập tiêu đề bài viết."
+        );
+      }
+
+      if (!slug) {
+        throw new Error(
+          "Vui lòng nhập slug bài viết."
+        );
+      }
+
+      const response =
+        await fetch(
+          "/api/admin/article",
+          {
+            method: "POST",
+
+            credentials:
+              "same-origin",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body:
+              JSON.stringify({
+                title,
+                slug,
+                category,
+                icon,
+                excerpt,
+                content,
+                cover_image:
+                  coverImage,
+                status,
+                sort_order:
+                  Number.isFinite(
+                    sortOrder
+                  )
+                    ? sortOrder
+                    : 0
+              })
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (
+        !response.ok ||
+        !data.ok
+      ) {
+        throw new Error(
+          data.error ||
+          "Không thể tạo bài viết."
+        );
+      }
+
+      alert(
+        "Đã tạo bài viết thành công.\n\n" +
+        data.article.title
+      );
+
+      const panel =
+        document.getElementById(
+          "article-edit-panel"
+        );
+
+      if (panel) {
+        panel.style.display =
+          "none";
+
+        panel.innerHTML =
+          "";
+      }
+
+      await loadArticles();
+
+    } catch (error) {
+
+      console.error(
+        "Create article error:",
+        error
+      );
+
+      if (errorBox) {
+
+        errorBox.textContent =
+          error.message ||
+          "Không thể tạo bài viết.";
+
+        errorBox.style.display =
+          "block";
+
+      } else {
+
+        alert(
+          "Không thể tạo bài viết:\n\n" +
+          error.message
+        );
+
+      }
+
+    } finally {
+
+      if (saveButton) {
+
+        saveButton.disabled =
+          false;
+
+        saveButton.textContent =
+          "Lưu bài viết";
+
+      }
+
+    }
+
+  }
+);
+async function openArticleEditForm(articleId) {
+  const panel =
+    document.getElementById(
+      "article-edit-panel"
+    );
+
+  if (!panel) return;
+
+  panel.style.display = "block";
+
+  panel.innerHTML = `
+    <section class="panel article-form-panel">
+
+      <div class="panel-header">
+
+        <div>
+          <p class="eyebrow">
+            BÀI CHIA SẺ
+          </p>
+
+          <h2>
+            Đang tải bài viết...
+          </h2>
+        </div>
+
+        <button
+          type="button"
+          id="article-edit-cancel"
+          class="button-secondary"
+        >
+          Đóng
+        </button>
+
+      </div>
+
+    </section>
+  `;
+
+  panel.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+
+  try {
+    const response =
+      await fetch(
+        "/api/admin/article/" +
+        encodeURIComponent(articleId),
+        {
+          method: "GET",
+          credentials: "same-origin"
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if (!response.ok || !data.ok) {
+      throw new Error(
+        data.error ||
+        "Không thể tải bài viết."
+      );
+    }
+
+    const article =
+      data.article;
+
+    const articleContent =
+      article.content || "";
+
+    panel.innerHTML = `
+      <section class="panel article-form-panel">
+
+        <div class="panel-header">
+
+          <div>
+            <p class="eyebrow">
+              BÀI CHIA SẺ
+            </p>
+
+            <h2>
+              Sửa bài viết
+            </h2>
+          </div>
+
+          <button
+            type="button"
+            id="article-edit-cancel"
+            class="button-secondary"
+          >
+            Đóng
+          </button>
+
+        </div>
+
+
+        <form id="article-edit-form">
+
+          <input
+            type="hidden"
+            id="article-edit-id"
+            value="${Number(article.id)}"
+          >
+
+
+          <!-- -------------------------------------------------
+               THÔNG TIN CƠ BẢN
+               ------------------------------------------------- -->
+
+          <div class="admin-form-section">
+
+            <div class="admin-form-grid">
+
+              <label>
+                <span>Tiêu đề</span>
+
+                <input
+                  id="article-edit-title"
+                  type="text"
+                  required
+                  value="${escapeAddRobotHtml(article.title || "")}"
+                  placeholder="Nhập tiêu đề bài viết"
+                >
+              </label>
+
+
+              <label>
+                <span>Slug</span>
+
+                <input
+                  id="article-edit-slug"
+                  type="text"
+                  required
+                  value="${escapeAddRobotHtml(article.slug || "")}"
+                  placeholder="duong-dan-bai-viet"
+                >
+
+                <small class="form-help">
+                  Dùng chữ thường, số và dấu gạch ngang.
+                </small>
+              </label>
+
+
+              <label>
+                <span>Chuyên mục</span>
+
+                <input
+                  id="article-edit-category"
+                  type="text"
+                  value="${escapeAddRobotHtml(article.category || "CHIA SẺ")}"
+                  placeholder="CHIA SẺ"
+                >
+              </label>
+
+
+              <label>
+                <span>Icon</span>
+
+                <input
+                  id="article-edit-icon"
+                  type="text"
+                  value="${escapeAddRobotHtml(article.icon || "📖")}"
+                  placeholder="📖"
+                >
+              </label>
+
+
+              <label>
+                <span>Thứ tự hiển thị</span>
+
+                <input
+                  id="article-edit-sort-order"
+                  type="number"
+                  min="0"
+                  value="${Number(article.sort_order || 0)}"
+                >
+
+                <small class="form-help">
+                  Số nhỏ hơn sẽ hiển thị trước.
+                </small>
+              </label>
+
+
+              <label>
+                <span>Trạng thái</span>
+
+                <select id="article-edit-status">
+
+                  <option
+                    value="draft"
+                    ${article.status === "draft" ? "selected" : ""}
+                  >
+                    Bản nháp
+                  </option>
+
+                  <option
+                    value="published"
+                    ${article.status === "published" ? "selected" : ""}
+                  >
+                    Xuất bản
+                  </option>
+
+                </select>
+              </label>
+
+            </div>
+
+          </div>
+
+
+          <!-- -------------------------------------------------
+               MÔ TẢ NGẮN
+               ------------------------------------------------- -->
+
+          <div class="admin-form-section">
+
+            <label>
+              <span>Mô tả ngắn</span>
+
+              <textarea
+                id="article-edit-excerpt"
+                rows="4"
+                placeholder="Nhập mô tả ngắn cho bài viết..."
+              >${escapeAddRobotHtml(article.excerpt || "")}</textarea>
+            </label>
+
+          </div>
+
+
+          <!-- -------------------------------------------------
+               ẢNH ĐẠI DIỆN
+               ------------------------------------------------- -->
+
+          <div class="admin-form-section">
+
+            <label>
+              <span>Ảnh đại diện</span>
+            </label>
+
+
+            <div
+              class="article-cover-picker"
+              id="article-edit-cover-picker"
+            >
+
+              <div
+                class="article-cover-preview"
+                id="article-edit-cover-preview"
+                style="display:${article.cover_image ? "flex" : "none"};"
+              >
+
+                <img
+                  id="article-edit-cover-preview-image"
+                  src="${
+                    article.cover_image
+                      ? "/api/image/" +
+                        encodeURIComponent(
+                          article.cover_image
+                        )
+                      : ""
+                  }"
+                  alt="Ảnh đại diện"
+                >
+
+                <button
+                  type="button"
+                  id="article-edit-cover-remove"
+                  class="button-secondary"
+                >
+                  ✕ Bỏ ảnh
+                </button>
+
+              </div>
+
+
+              <input
+                id="article-edit-cover"
+                type="hidden"
+                value="${escapeAddRobotHtml(article.cover_image || "")}"
+              >
+
+
+              <button
+                type="button"
+                id="article-edit-cover-select"
+                class="button-secondary"
+              >
+                📷 Chọn ảnh đại diện
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <!-- -------------------------------------------------
+               NỘI DUNG BÀI VIẾT
+               ------------------------------------------------- -->
+
+          <div class="admin-form-section">
+
+            <label>
+              <span>Nội dung bài viết</span>
+            </label>
+
+
+            <div class="article-editor">
+
+              <div class="article-editor-toolbar">
+
+                <button
+                  type="button"
+                  class="article-editor-button"
+                  data-command="bold"
+                  title="In đậm"
+                >
+                  <b>B</b>
+                </button>
+
+
+                <button
+                  type="button"
+                  class="article-editor-button"
+                  data-command="italic"
+                  title="In nghiêng"
+                >
+                  <i>I</i>
+                </button>
+
+
+                <button
+                  type="button"
+                  class="article-editor-button"
+                  data-command="formatBlock"
+                  data-value="h2"
+                  title="Tiêu đề lớn"
+                >
+                  H2
+                </button>
+
+
+                <button
+                  type="button"
+                  class="article-editor-button"
+                  data-command="formatBlock"
+                  data-value="h3"
+                  title="Tiêu đề nhỏ"
+                >
+                  H3
+                </button>
+
+
+                <button
+                  type="button"
+                  class="article-editor-button"
+                  data-command="insertUnorderedList"
+                  title="Danh sách"
+                >
+                  • Danh sách
+                </button>
+
+
+                <button
+                  type="button"
+                  class="article-editor-button"
+                  data-command="insertOrderedList"
+                  title="Danh sách đánh số"
+                >
+                  1. Danh sách
+                </button>
+
+
+                <button
+                  type="button"
+                  class="article-editor-button"
+                  data-command="createLink"
+                  title="Chèn liên kết"
+                >
+                  🔗 Link
+                </button>
+
+
+                <button
+                  type="button"
+                  class="article-editor-button"
+                  id="article-edit-insert-image"
+                  title="Chèn ảnh"
+                >
+                  🖼️ Ảnh
+                </button>
+
+              </div>
+
+
+              <div
+                id="article-edit-editor"
+                class="article-editor-content"
+                contenteditable="true"
+              ></div>
+
+
+              <textarea
+                id="article-edit-content"
+                style="display:none;"
+              ></textarea>
+
+            </div>
+
+          </div>
+
+
+          <!-- -------------------------------------------------
+               ERROR
+               ------------------------------------------------- -->
+
+          <div
+            id="article-edit-error"
+            class="robot-error"
+            style="display:none;"
+          ></div>
+
+
+          <!-- -------------------------------------------------
+               ACTIONS
+               ------------------------------------------------- -->
+
+          <div class="form-actions">
+
+            <button
+              type="submit"
+              id="article-edit-save"
+              class="button-primary"
+            >
+              Lưu thay đổi
+            </button>
+
+
+            <button
+              type="button"
+              id="article-edit-cancel-bottom"
+              class="button-secondary"
+            >
+              Hủy
+            </button>
+
+          </div>
+
+        </form>
+
+      </section>
+    `;
+
+
+    const editEditor =
+      document.getElementById(
+        "article-edit-editor"
+      );
+
+    const editContent =
+      document.getElementById(
+        "article-edit-content"
+      );
+
+    if (editEditor) {
+      editEditor.innerHTML =
+        articleContent;
+    }
+
+    if (editContent) {
+      editContent.value =
+        articleContent;
+    }
+
+  } catch (error) {
+
+    console.error(
+      "Load article edit error:",
+      error
+    );
+
+    panel.innerHTML = `
+      <section class="panel">
+
+        <div class="robot-error">
+          Không thể tải bài viết.<br>
+          ${escapeAddRobotHtml(error.message)}
+        </div>
+
+      </section>
+    `;
+  }
+}
+document.addEventListener(
+  "click",
+  function (event) {
+    const editButton =
+      event.target.closest(
+        ".article-edit-button"
+      );
+
+    if (!editButton) return;
+
+    const articleId =
+      Number(
+        editButton.getAttribute(
+          "data-article-id"
+        )
+      );
+
+    if (!articleId) return;
+
+    openArticleEditForm(articleId);
+  }
+);
+document.addEventListener(
+  "click",
+  function (event) {
+    const button =
+      event.target.closest(
+        "#article-edit-cancel, #article-edit-cancel-bottom"
+      );
+
+    if (!button) return;
+
+    const panel =
+      document.getElementById(
+        "article-edit-panel"
+      );
+
+    if (!panel) return;
+
+    panel.style.display = "none";
+    panel.innerHTML = "";
+  }
+);
+document.addEventListener(
+  "submit",
+  async function (event) {
+    const form =
+      event.target.closest(
+        "#article-edit-form"
+      );
+
+    if (!form) return;
+
+    event.preventDefault();
+
+    const articleId =
+      Number(
+        document.getElementById(
+          "article-edit-id"
+        )?.value || 0
+      );
+
+    const saveButton =
+      document.getElementById(
+        "article-edit-save"
+      );
+
+    const errorBox =
+      document.getElementById(
+        "article-edit-error"
+      );
+
+    try {
+      if (!articleId) {
+        throw new Error(
+          "Không xác định được ID bài viết."
+        );
+      }
+
+      if (saveButton) {
+        saveButton.disabled = true;
+        saveButton.textContent =
+          "Đang lưu...";
+      }
+
+      if (errorBox) {
+        errorBox.style.display = "none";
+        errorBox.textContent = "";
+      }
+
+      const title =
+        document.getElementById(
+          "article-edit-title"
+        )?.value.trim() || "";
+
+      const slug =
+        document.getElementById(
+          "article-edit-slug"
+        )?.value.trim() || "";
+
+      const category =
+        document.getElementById(
+          "article-edit-category"
+        )?.value.trim() || "CHIA SẺ";
+
+      const icon =
+        document.getElementById(
+          "article-edit-icon"
+        )?.value.trim() || "📖";
+
+      const excerpt =
+        document.getElementById(
+          "article-edit-excerpt"
+        )?.value.trim() || "";
+
+      const content =
+        document.getElementById(
+          "article-edit-content"
+        )?.value || "";
+
+      const coverImage =
+        document.getElementById(
+          "article-edit-cover"
+        )?.value.trim() || "";
+
+      const status =
+        document.getElementById(
+          "article-edit-status"
+        )?.value || "draft";
+
+      const sortOrder =
+        Number(
+          document.getElementById(
+            "article-edit-sort-order"
+          )?.value || 0
+        );
+
+      if (!title) {
+        throw new Error(
+          "Vui lòng nhập tiêu đề bài viết."
+        );
+      }
+
+      if (!slug) {
+        throw new Error(
+          "Vui lòng nhập slug bài viết."
+        );
+      }
+
+      const response =
+        await fetch(
+          "/api/admin/article/" +
+          encodeURIComponent(articleId),
+          {
+            method: "PUT",
+            credentials: "same-origin",
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+            body: JSON.stringify({
+              title,
+              slug,
+              category,
+              icon,
+              excerpt,
+              content,
+              cover_image: coverImage,
+              status,
+              sort_order:
+                Number.isFinite(sortOrder)
+                  ? sortOrder
+                  : 0
+            })
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (!response.ok || !data.ok) {
+        throw new Error(
+          data.error ||
+          "Không thể cập nhật bài viết."
+        );
+      }
+
+      alert(
+        "Đã cập nhật bài viết thành công.\n\n" +
+        data.article.title
+      );
+
+      const panel =
+        document.getElementById(
+          "article-edit-panel"
+        );
+
+      if (panel) {
+        panel.style.display = "none";
+        panel.innerHTML = "";
+      }
+
+      await loadArticles();
+
+    } catch (error) {
+      console.error(
+        "Update article error:",
+        error
+      );
+
+      if (errorBox) {
+        errorBox.textContent =
+          error.message ||
+          "Không thể cập nhật bài viết.";
+
+        errorBox.style.display =
+          "block";
+      } else {
+        alert(
+          "Không thể cập nhật bài viết:\n\n" +
+          error.message
+        );
+      }
+
+    } finally {
+      if (saveButton) {
+        saveButton.disabled = false;
+        saveButton.textContent =
+          "Lưu thay đổi";
+      }
+    }
+  }
+);
+function generateArticleSlug(text) {
+  return String(text || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+let articleSlugManuallyEdited = false;
+
+document.addEventListener(
+  "input",
+  function (event) {
+    const slugInput =
+      event.target.closest(
+        "#article-create-slug"
+      );
+
+    if (slugInput) {
+      articleSlugManuallyEdited = true;
+      return;
+    }
+
+    const titleInput =
+      event.target.closest(
+        "#article-create-title"
+      );
+
+    if (!titleInput) return;
+
+    const slugInputElement =
+      document.getElementById(
+        "article-create-slug"
+      );
+
+    if (!slugInputElement) return;
+
+    if (articleSlugManuallyEdited) {
+      return;
+    }
+
+    slugInputElement.value =
+      generateArticleSlug(
+        titleInput.value
+      );
+  }
+);
+
+document.addEventListener(
+  "click",
+  function (event) {
+    const button =
+      event.target.closest(
+        ".article-editor-button"
+      );
+
+    if (!button) return;
+
+    const editor =
+      button
+        .closest(".article-editor")
+        ?.querySelector(
+          ".article-editor-content"
+        );
+
+    if (!editor) return;
+
+    editor.focus();
+
+    const command =
+      button.dataset.command;
+
+    const value =
+      button.dataset.value || null;
+
+    if (command === "createLink") {
+      const url =
+        window.prompt(
+          "Nhập đường dẫn:"
+        );
+
+      if (!url) return;
+
+      document.execCommand(
+        "createLink",
+        false,
+        url
+      );
+
+      return;
+    }
+
+    if (command === "formatBlock") {
+      document.execCommand(
+        "formatBlock",
+        false,
+        value
+      );
+
+      return;
+    }
+
+    document.execCommand(
+      command,
+      false,
+      null
+    );
+  }
+);
+
+document.addEventListener(
+  "input",
+  function (event) {
+    const editor =
+      event.target.closest(
+        ".article-editor-content"
+      );
+
+    if (!editor) return;
+
+    const container =
+      editor.closest(
+        ".article-editor"
+      );
+
+    if (!container) return;
+
+    const textarea =
+      container.querySelector(
+        "textarea"
+      );
+
+    if (!textarea) return;
+
+    textarea.value =
+      editor.innerHTML;
   }
 );

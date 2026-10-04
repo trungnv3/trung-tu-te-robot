@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    id="article-description"
+    name="description"
+    content="Thông tin và góc nhìn kỹ thuật từ Trung Tử Tế."
+  >
+
+  <title id="article-title">Chia sẻ – Trung Tử Tế</title>
+  <meta
+  name="robots"
+  content="index, follow"
+>
+
+<meta
+  name="author"
+  content="Trung Tử Tế"
+>
+
+<meta
+  id="article-og-title"
+  property="og:title"
+  content="Chia sẻ – Trung Tử Tế"
+>
+
+<meta
+  id="article-og-description"
+  property="og:description"
+  content="Thông tin và góc nhìn kỹ thuật từ Trung Tử Tế."
+>
+
+<meta
+  id="article-og-type"
+  property="og:type"
+  content="article"
+>
+
+<meta
+  id="article-og-image"
+  property="og:image"
+  content=""
+>
+
+<meta
+  id="article-published-time"
+  property="article:published_time"
+  content=""
+>
+
+  <link
+    rel="stylesheet"
+    href="/css/style.css"
+  >
+  <script
+  id="article-schema"
+  type="application/ld+json"
+>
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "",
+  "description": "",
+  "author": {
+    "@type": "Person",
+    "name": "Trung Tử Tế"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Trung Tử Tế"
+  },
+  "datePublished": "",
+  "image": ""
+}
+</script>
+
+<script
+  id="breadcrumb-schema"
+  type="application/ld+json"
+>
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Trang chủ",
+      "item": "/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Chia sẻ",
+      "item": "/chia-se/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "",
+      "item": ""
+    }
+  ]
+}
+</script>
+
+  <style>
+    
+
+    .robot-page {
+      padding: 40px 0 60px;
+    }
+
+    .robot-loading,
+    .robot-error {
+      padding: 60px 20px;
+      text-align: center;
+    }
+
+    .robot-content {
+      width: 100%;
+    }
+
+    .robot-back {
+      display: inline-block;
+      margin-bottom: 22px;
+      text-decoration: none;
+    }
+
+    .robot-eyebrow {
+      margin: 0 0 8px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      color: #777;
+      text-transform: uppercase;
+    }
+
+    .robot-title {
+      margin: 0 0 30px;
+      font-size: 42px;
+      line-height: 1.15;
+    }
+
+    .article-intro {
+      margin: 0 0 35px;
+      font-size: 19px;
+      line-height: 1.75;
+    }
+
+    .article-content {
+      max-width: 900px;
+    }
+
+    .article-content h2 {
+      margin: 42px 0 16px;
+      font-size: 26px;
+      line-height: 1.3;
+    }
+
+    .article-content h2:first-child {
+      margin-top: 0;
+    }
+
+    .article-content h3 {
+      margin: 32px 0 14px;
+      font-size: 21px;
+      line-height: 1.4;
+    }
+
+    .article-content p {
+      margin: 0 0 18px;
+      font-size: 17px;
+      line-height: 1.8;
+    }
+
+    .article-content ul,
+    .article-content ol {
+      margin: 0 0 22px;
+      padding-left: 24px;
+    }
+
+    .article-content li {
+      margin-bottom: 10px;
+      font-size: 17px;
+      line-height: 1.7;
+    }
+
+    .article-note {
+      margin: 34px 0;
+      padding: 22px 24px;
+      border-left: 4px solid #222;
+      border-radius: 8px;
+      background: #f7f7f7;
+    }
+
+    .article-note b {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+
+    .article-note p {
+      margin: 0;
+    }
+
+    .article-bottom-back {
+      margin-top: 30px;
+    }
+
+    @media (max-width: 600px) {
+
+      .robot-page {
+        padding: 25px 0 40px;
+      }
+
+      .robot-title {
+        font-size: 30px;
+        margin-bottom: 22px;
+      }
+
+      .article-intro {
+        font-size: 17px;
+      }
+
+      .article-content h2 {
+        margin-top: 34px;
+        font-size: 23px;
+      }
+
+      .article-content h3 {
+        font-size: 20px;
+      }
+
+      .article-content p,
+      .article-content li {
+        font-size: 16px;
+      }
+      .article-content img {
+        display: block;
+         max-width: 100%;
+        height: auto;
+         margin: 20px auto;
+         border-radius: 10px;
+        }
+
+        .article-content p img {
+        max-width: 100%;
+        }
+
+    }
+    
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+  <header class="header">
+
+    <div class="wrap nav-wrap">
+
+      <a
+        class="logo"
+        href="../../index.html"
+      >
+
+        <img
+          class="logo-image"
+          src="/api/image/11o8kadVPE6ZbWvYAlrf-pkSQGaTkVFf2"
+          alt="Trung Tử Tế - Robot lau nhà"
+        >
+
+        <span>
+
+          <b>
+            TRUNG TỬ TẾ
+          </b>
+
+          <small>
+            Robot lau nhà
+          </small>
+
+        </span>
+
+      </a>
+
+
+      <button
+        class="menu"
+        aria-label="Mở menu"
+        aria-expanded="false"
+      >
+        ☰
+      </button>
+
+
+      <nav>
+
+        <a href="../../index.html">
+          Trang chủ
+        </a>
+
+        <a href="../index.html">
+          Robot
+        </a>
+
+        <a href="../../chia-se/index.html">
+          Chia sẻ
+        </a>
+
+        <a href="../../index.html#dich-vu">
+          Dịch vụ
+        </a>
+
+        <a href="../../index.html#lien-he">
+          Liên hệ
+        </a>
+
+      </nav>
+
+    </div>
+
+  </header>
+
+
+  <main>
+
+    <section class="robot-page">
+
+      <div class="wrap">
+
+        <div class="robot-content">
+
+          <a
+            class="robot-back"
+            href="/chia-se/"
+          >
+            ← Quay lại Chia sẻ
+          </a>
+
+
+          <p
+            class="robot-eyebrow"
+            id="article-category"
+          >
+            CHIA SẺ
+          </p>
+
+
+          <h1
+            class="robot-title"
+            id="article-heading"
+          >
+            Đang tải bài viết...
+          </h1>
+
+
+          <p
+            class="article-intro"
+            id="article-excerpt"
+          ></p>
+
+
+          <div
+            class="article-content"
+            id="article-content"
+          >
+
+            <p>
+              Đang tải nội dung...
+            </p>
+
+          </div>
+
+
+          <div class="article-bottom-back">
+
+            <a
+              class="robot-back"
+              href="/chia-se/"
+            >
+              ← Quay lại danh sách bài viết
+            </a>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <div id="site-footer"></div>
+
+
+  <script>
+
+    function getArticleSlug() {
+
+      const params =
+        new URLSearchParams(
+          window.location.search
+        );
+
+      const querySlug =
+        params.get("slug");
+
+      if (querySlug) {
+        return querySlug;
+      }
+
+
+      const pathParts =
+        window.location.pathname
+          .split("/")
+          .filter(Boolean);
+
+
+      if (
+        pathParts.length >= 2 &&
+        pathParts[0] === "chia-se"
+      ) {
+
+        return pathParts[
+          pathParts.length - 1
+        ];
+
+      }
+
+
+      return "";
+
+    }
+
+
+    function escapeHtml(value) {
+
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+    }
+
+
+    async function loadArticle() {
+
+      const slug =
+        getArticleSlug();
+
+
+      const heading =
+        document.getElementById(
+          "article-heading"
+        );
+
+      const category =
+        document.getElementById(
+          "article-category"
+        );
+
+      const excerpt =
+        document.getElementById(
+          "article-excerpt"
+        );
+
+      const content =
+        document.getElementById(
+          "article-content"
+        );
+
+
+      if (!slug) {
+
+        heading.textContent =
+          "Không tìm thấy bài viết";
+
+        content.innerHTML =
+          "<p>Thiếu slug bài viết.</p>";
+
+        return;
+
+      }
+
+
+      try {
+
+        const response =
+          await fetch(
+            "/api/article/" +
+            encodeURIComponent(slug)
+          );
+
+
+        const data =
+          await response.json();
+
+
+        if (
+          !response.ok ||
+          !data.ok ||
+          !data.article
+        ) {
+
+          throw new Error(
+            data.error ||
+            "Không tìm thấy bài viết"
+          );
+
+        }
+
+        const article =
+        data.article;
+
+
+        // =========================================================
+        // SEO BÀI VIẾT
+        // =========================================================
+
+        const articleTitle =
+        article.title ||
+        "Chia sẻ – Trung Tử Tế";
+
+        const articleDescription =
+        article.excerpt ||
+        article.title ||
+        "Thông tin và góc nhìn kỹ thuật từ Trung Tử Tế.";
+
+        const articleImage =
+        article.cover_image ||
+        "";
+
+
+      // Title
+      document.title =
+      articleTitle +
+      " – Trung Tử Tế";
+
+
+// Meta description
+const metaDescription =
+  document.getElementById(
+    "article-description"
+  );
+
+if (metaDescription) {
+  metaDescription.setAttribute(
+    "content",
+    articleDescription
+  );
+}
+
+
+// Open Graph title
+      const ogTitle =
+      document.getElementById(
+      "article-og-title"
+    );
+
+      if (ogTitle) {
+      ogTitle.setAttribute(
+      "content",
+      articleTitle +
+      " – Trung Tử Tế"
+    );
+  }
+
+
+// Open Graph description
+const ogDescription =
+  document.getElementById(
+    "article-og-description"
+  );
+
+if (ogDescription) {
+  ogDescription.setAttribute(
+    "content",
+    articleDescription
+  );
+}
+
+
+// Open Graph image
+const ogImage =
+  document.getElementById(
+    "article-og-image"
+  );
+
+if (ogImage && articleImage) {
+  ogImage.setAttribute(
+    "content",
+    articleImage
+  );
+}
+
+
+// Ngày đăng bài viết
+const publishedTime =
+  document.getElementById(
+    "article-published-time"
+  );
+
+if (
+  publishedTime &&
+  article.created_at
+) {
+  publishedTime.setAttribute(
+    "content",
+    article.created_at
+  );
+}  
+    // =========================================================
+    // SCHEMA.ORG ARTICLE
+    // =========================================================
+
+    const schemaElement =
+      document.getElementById(
+        "article-schema"
+      );
+
+    if (schemaElement) {
+
+      const schemaData = {
+        "@context": "https://schema.org",
+        "@type": "Article",
+
+        "headline":
+          article.title ||
+          "",
+
+        "description":
+          article.excerpt ||
+          article.title ||
+          "",
+
+        "author": {
+          "@type": "Person",
+          "name": "Trung Tử Tế"
+        },
+
+        "publisher": {
+          "@type": "Organization",
+          "name": "Trung Tử Tế"
+        },
+
+        "datePublished":
+          article.created_at ||
+          "",
+
+        "image":
+          article.cover_image ||
+          ""
+      };
+
+      schemaElement.textContent =
+        JSON.stringify(
+          schemaData
+        );
+    }        
+      // SCHEMA.ORG BREADCRUMB
+const breadcrumbSchema =
+  document.getElementById(
+    "breadcrumb-schema"
+  );
+
+if (breadcrumbSchema) {
+
+  const breadcrumbData = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Trang chủ",
+        "item": "/"
+      },
+
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Chia sẻ",
+        "item": "/chia-se/"
+      },
+
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name":
+          article.title ||
+          "",
+        "item":
+          window.location.pathname
+      }
+    ]
+  };
+
+  breadcrumbSchema.textContent =
+    JSON.stringify(
+      breadcrumbData
+    );
+}
+
+        const description =
+          document.getElementById(
+            "article-description"
+          );
+
+
+        if (description) {
+
+          description.setAttribute(
+            "content",
+            article.excerpt ||
+            article.title
+          );
+
+        }
+
+
+        heading.textContent =
+          article.title ||
+          "";
+
+
+        category.textContent =
+          article.icon
+            ? article.icon +
+              " " +
+              (article.category || "CHIA SẺ")
+            : (
+              article.category ||
+              "CHIA SẺ"
+            );
+
+
+        excerpt.textContent =
+          article.excerpt ||
+          "";
+
+
+        content.innerHTML =
+          article.content ||
+          "<p>Chưa có nội dung bài viết.</p>";
+
+
+      } catch (error) {
+
+        console.error(
+          "Lỗi tải bài viết:",
+          error
+        );
+
+
+        heading.textContent =
+          "Không thể tải bài viết";
+
+
+        content.innerHTML =
+          "<p>" +
+          escapeHtml(
+            error.message ||
+            "Đã xảy ra lỗi khi tải bài viết."
+          ) +
+          "</p>";
+
+      }
+
+    }
+
+
+    loadArticle();
+
+  </script>
+
+
+  <script src="/js/main.js"></script>
+
+  <script src="/js/footer.js"></script>
+
+
+</body>
+
+</html>

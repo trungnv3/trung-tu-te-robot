@@ -1,15 +1,28 @@
 <!doctype html>
 <html lang="vi">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-
-<meta name="description" content="Chia sẻ kinh nghiệm thực tế về robot lau nhà, sửa chữa, sử dụng và lựa chọn robot.">
-
-<title>Chia sẻ thực tế – Trung Tử Tế</title>
-
-<link rel="stylesheet" href="../css/style.css">
-</head>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    
+    <title>Chia sẻ kinh nghiệm robot lau nhà – Trung Tử Tế</title>
+    
+    <meta name="description"
+    content="Chia sẻ kinh nghiệm thực tế về robot lau nhà: sử dụng, vệ sinh, sửa chữa, bảo trì và lựa chọn robot phù hợp từ Trung Tử Tế.">
+    
+    <meta name="robots" content="index, follow">
+    
+    <meta name="author" content="Trung Tử Tế">
+    
+    <meta property="og:type" content="website">
+    <meta property="og:title"
+    content="Chia sẻ kinh nghiệm robot lau nhà – Trung Tử Tế">
+    <meta property="og:description"
+    content="Kinh nghiệm thực tế về sử dụng, sửa chữa, bảo trì và lựa chọn robot lau nhà.">
+    <meta property="og:site_name"
+    content="Trung Tử Tế – Robot lau nhà">
+    
+    <link rel="stylesheet" href="../css/style.css">
+    </head>
 
 <body>
 
@@ -64,87 +77,10 @@
       </p>
 
 
-      <div class="cards">
+      <div class="cards" id="article-list">
 
-        <article>
-          <span class="icon">🔧</span>
-
-          <small>SỬA CHỮA</small>
-
-          <h3>
-            Robot không sạc: đừng vội nghĩ là hỏng pin
-          </h3>
-
-          <p>
-            Một số nguyên nhân đơn giản nhưng thường bị bỏ qua
-            khi robot không nhận dock.
-          </p>
-
-          <a href="../posts/sua-chua/robot-khong-sac.html">
-            Đọc bài viết →
-          </a>
-        </article>
-
-
-        <article>
-          <span class="icon">🧹</span>
-
-          <small>KINH NGHIỆM</small>
-
-          <h3>
-            Lực hút càng cao có phải robot càng tốt?
-          </h3>
-
-          <p>
-            Con số Pa chỉ là một phần.
-            Cùng nhìn vào những yếu tố thực tế khi chọn robot.
-          </p>
-
-          <a href="#">
-            Sắp có bài viết →
-          </a>
-        </article>
-
-
-        <article>
-          <span class="icon">🤖</span>
-
-          <small>TRẢI NGHIỆM</small>
-
-          <h3>
-            Tôi thường kiểm tra gì trước khi tư vấn robot?
-          </h3>
-
-          <p>
-            Diện tích nhà, loại sàn, thói quen sử dụng
-            và khả năng bảo trì đều đáng quan tâm.
-          </p>
-
-          <a href="#">
-            Sắp có bài viết →
-          </a>
-        </article>
-
-
-        <article>
-          <span class="icon">📖</span>
-
-          <small>HƯỚNG DẪN</small>
-
-          <h3>
-            Những điều nên biết trước khi sử dụng robot lau nhà
-          </h3>
-
-          <p>
-            Một vài thói quen đơn giản giúp robot hoạt động
-            ổn định và thuận tiện hơn.
-          </p>
-
-          <a href="#">
-            Sắp có bài viết →
-          </a>
-        </article>
-
+        <p>Đang tải bài viết...</p>
+      
       </div>
 
     </div>
@@ -155,7 +91,88 @@
 </main>
 
 <div id="site-footer"></div>
-
+<script>
+  async function loadArticles() {
+    const articleList =
+      document.getElementById("article-list");
+  
+    try {
+      const response =
+        await fetch("/api/articles");
+  
+      if (!response.ok) {
+        throw new Error("Không thể tải danh sách bài viết");
+      }
+  
+      const data =
+        await response.json();
+  
+      if (
+        !data.ok ||
+        !Array.isArray(data.articles)
+      ) {
+        throw new Error("Dữ liệu bài viết không hợp lệ");
+      }
+  
+      if (data.articles.length === 0) {
+        articleList.innerHTML =
+          "<p>Chưa có bài viết.</p>";
+        return;
+      }
+  
+      articleList.innerHTML =
+        data.articles.map(article => `
+          <article>
+  
+            <span class="icon">
+              ${escapeHtml(article.icon || "📖")}
+            </span>
+  
+            <small>
+              ${escapeHtml(article.category || "CHIA SẺ")}
+            </small>
+  
+            <h3>
+              ${escapeHtml(article.title || "")}
+            </h3>
+  
+            <p>
+              ${escapeHtml(article.excerpt || "")}
+            </p>
+  
+            <a href="/chia-se/${encodeURIComponent(article.slug)}">
+              Đọc bài viết →
+            </a>
+  
+          </article>
+        `).join("");
+  
+    } catch (error) {
+  
+      console.error(
+        "LOAD ARTICLES ERROR:",
+        error
+      );
+  
+      articleList.innerHTML =
+        "<p>Không thể tải bài viết.</p>";
+    }
+  }
+  
+  
+  function escapeHtml(value) {
+  
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+  
+  
+  loadArticles();
+  </script>
 <script src="../js/main.js"></script>
 <script src="../js/footer.js"></script>
 </body>

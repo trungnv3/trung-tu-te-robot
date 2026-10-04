@@ -1205,3 +1205,52 @@ footer {
   }
 
 }
+.visitor-counter {
+  position: fixed;
+  right: 8px;
+  bottom: 8px;
+  z-index: 999;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+
+  padding: 4px 7px;
+
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(6px);
+
+  color: #7a8088;
+  font-size: 9px;
+  line-height: 1;
+
+  box-shadow:
+    0 1px 5px rgba(0, 0, 0, 0.06);
+
+  pointer-events: none;
+}
+
+.visitor-counter > span:first-child {
+  font-size: 9px;
+}
+
+#visitor-counter-number {
+  color: #555c65;
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  .visitor-counter {
+    right: 6px;
+    bottom: 6px;
+    padding: 3px 6px;
+    font-size: 8px;
+  }
+
+  .visitor-counter > span:first-child {
+    font-size: 8px;
+  }
+}

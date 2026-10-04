@@ -239,12 +239,490 @@ function getDriveRobotImages(allItems) {
 
   return robotImages;
 }
+function base64UrlEncode(value) {
+  const bytes =
+    typeof value === "string"
+      ? new TextEncoder().encode(value)
+      : value;
 
+  let binary = "";
+
+  for (const byte of bytes) {
+    binary += String.fromCharCode(byte);
+  }
+
+  return btoa(binary)
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
+}
+
+function base64UrlDecode(value) {
+  const padded =
+    value
+      .replace(/-/g, "+")
+      .replace(/_/g, "/") +
+    "=".repeat(
+      (4 - (value.length % 4)) % 4
+    );
+
+  const binary = atob(padded);
+
+  const bytes = new Uint8Array(
+    binary.length
+  );
+
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] =
+      binary.charCodeAt(i);
+  }
+
+  return bytes;
+}
+
+async function createSessionToken(
+  env
+) {
+  const payload = {
+    role: "admin",
+    exp:
+      Math.floor(
+        Date.now() / 1000
+      ) +
+      60 * 60 * 8
+  };
+
+  const encodedPayload =
+    base64UrlEncode(
+      JSON.stringify(payload)
+    );
+
+  const key =
+    await crypto.subtle.importKey(
+      "raw",
+      new TextEncoder().encode(
+        env.ADMIN_SESSION_SECRET
+      ),
+      {
+        name: "HMAC",
+        hash: "SHA-256"
+      },
+      false,
+      ["sign"]
+    );
+
+  const signature =
+    await crypto.subtle.sign(
+      "HMAC",
+      key,
+      new TextEncoder().encode(
+        encodedPayload
+      )
+    );
+
+  return (
+    encodedPayload +
+    "." +
+    base64UrlEncode(
+      new Uint8Array(signature)
+    )
+  );
+}
+
+async function verifySessionToken(
+  env,
+  token
+) {
+  try {
+    if (!token) {
+      return false;
+    }
+
+    const parts =
+      token.split(".");
+
+    if (parts.length !== 2) {
+      return false;
+    }
+
+    const [
+      encodedPayload,
+      encodedSignature
+    ] = parts;
+
+    const key =
+      await crypto.subtle.importKey(
+        "raw",
+        new TextEncoder().encode(
+          env.ADMIN_SESSION_SECRET
+        ),
+        {
+          name: "HMAC",
+          hash: "SHA-256"
+        },
+        false,
+        ["verify"]
+      );
+
+    const valid =
+      await crypto.subtle.verify(
+        "HMAC",
+        key,
+        base64UrlDecode(
+          encodedSignature
+        ),
+        new TextEncoder().encode(
+          encodedPayload
+        )
+      );
+
+    if (!valid) {
+      return false;
+    }
+
+    const payload =
+      JSON.parse(
+        new TextDecoder().decode(
+          base64UrlDecode(
+            encodedPayload
+          )
+        )
+      );
+
+    if (
+      payload.role !== "admin"
+    ) {
+      return false;
+    }
+
+    if (
+      !Number.isInteger(
+        payload.exp
+      )
+    ) {
+      return false;
+    }
+
+    if (
+      payload.exp <
+      Math.floor(
+        Date.now() / 1000
+      )
+    ) {
+      return false;
+    }
+
+    return true;
+
+  } catch (error) {
+    return false;
+  }
+}
+
+function getSessionFromRequest(
+  request
+) {
+  const cookie =
+    request.headers.get(
+      "Cookie"
+    );
+
+  if (!cookie) {
+    return null;
+  }
+
+  const match =
+    cookie.match(
+      /(?:^|;\s*)admin_session=([^;]+)/
+    );
+
+  return match
+    ? match[1]
+    : null;
+}
+
+
+async function requireAdminSession(
+request,
+env
+) {
+const token =
+getSessionFromRequest(
+request
+);
+
+return await verifySessionToken(
+env,
+token
+);
+}
 export default {
   async fetch(request, env) {
     const url =
       new URL(request.url);
+    // =========================================================
+    // ADMIN LOGIN
+    // =========================================================
 
+    if (
+      url.pathname === "/api/admin/login" &&
+      request.method === "POST"
+    ) {
+      try {
+        const body =
+          await request.json();
+
+        const password =
+          String(
+            body.password || ""
+          );
+
+        if (!password) {
+          return Response.json(
+            {
+              ok: false,
+              error: "Vui lòng nhập mật khẩu"
+            },
+            {
+              status: 400
+            }
+          );
+        }
+
+        if (
+          password !==
+          env.ADMIN_PASSWORD
+        ) {
+          return Response.json(
+            {
+              ok: false,
+              error: "Mật khẩu không đúng"
+            },
+            {
+              status: 401
+            }
+          );
+        }
+
+        const token =
+          await createSessionToken(
+            env
+          );
+
+        return new Response(
+          JSON.stringify({
+            ok: true,
+            message:
+              "Đăng nhập thành công"
+          }),
+          {
+            status: 200,
+            headers: {
+              "Content-Type":
+                "application/json",
+              "Set-Cookie":
+                [
+                  "admin_session=" +
+                    token,
+                  "HttpOnly",
+                  "Secure",
+                  "SameSite=Strict",
+                  "Path=/",
+                  "Max-Age=28800"
+                ].join("; ")
+            }
+          }
+        );
+
+      } catch (error) {
+        console.error(
+          "ADMIN LOGIN ERROR:",
+          error
+        );
+    
+        return Response.json(
+          {
+            ok: false,
+            error:
+              "Dữ liệu đăng nhập không hợp lệ"
+          },
+          {
+            status: 400
+          }
+        );
+      }
+    }
+        // =========================================================
+    // ADMIN SESSION CHECK
+    // =========================================================
+
+    if (
+      url.pathname === "/api/admin/session" &&
+      request.method === "GET"
+    ) {
+      const isAdmin =
+        await requireAdminSession(
+          request,
+          env
+        );
+
+      return Response.json({
+        ok: true,
+        authenticated: isAdmin
+      });
+    }
+    // =========================================================
+    // ARTICLES API - PUBLIC READ
+    // =========================================================
+    if (
+      url.pathname === "/api/articles" &&
+      request.method === "GET"
+    ) {
+      try {
+        const result =
+          await env
+            .trung_tu_te_robot_db
+            .prepare(
+              `
+              SELECT
+                id,
+                title,
+                slug,
+                category,
+                icon,
+                excerpt,
+                cover_image,
+                status,
+                sort_order,
+                view_count,
+                created_at,
+                updated_at,
+                published_at
+              FROM articles
+              WHERE status = 'published'
+              ORDER BY
+                sort_order ASC,
+                published_at DESC,
+                id DESC
+              `
+            )
+            .all();
+    
+            return new Response(   JSON.stringify({     ok: true,     articles:       result.results || []   }),   {     headers: {       "Content-Type":         "application/json; charset=utf-8"     }   } );
+    
+      } catch (error) {
+        console.error(
+          "ARTICLES LIST ERROR:",
+          error
+        );
+    
+        return Response.json(
+          {
+            ok: false,
+            error:
+              error.message
+          },
+          {
+            status: 500
+          }
+        );
+      }
+    }
+    
+    // =========================================================
+    // ARTICLE DETAIL API - PUBLIC READ
+    // =========================================================
+    
+    if (
+      url.pathname.startsWith(
+        "/api/article/"
+      ) &&
+      request.method === "GET"
+    ) {
+      try {
+        const slug =
+          decodeURIComponent(
+            url.pathname
+              .slice(
+                "/api/article/".length
+              )
+          ).trim();
+    
+        if (!slug) {
+          return Response.json(
+            {
+              ok: false,
+              error:
+                "Thiếu slug bài viết"
+            },
+            {
+              status: 400
+            }
+          );
+        }
+    
+        const article =
+          await env
+            .trung_tu_te_robot_db
+            .prepare(
+              `
+              SELECT
+                id,
+                title,
+                slug,
+                category,
+                icon,
+                excerpt,
+                content,
+                cover_image,
+                status,
+                sort_order,
+                view_count,
+                created_at,
+                updated_at,
+                published_at
+              FROM articles
+              WHERE slug = ?
+                AND status = 'published'
+              LIMIT 1
+              `
+            )
+            .bind(slug)
+            .first();
+    
+        if (!article) {
+          return Response.json(
+            {
+              ok: false,
+              error:
+                "Không tìm thấy bài viết"
+            },
+            {
+              status: 404
+            }
+          );
+        }
+    
+        return new Response(   JSON.stringify({     ok: true,     article   }),   {     headers: {       "Content-Type":         "application/json; charset=utf-8"     }   } );
+    
+      } catch (error) {
+        console.error(
+          "ARTICLE DETAIL ERROR:",
+          error
+        );
+    
+        return Response.json(
+          {
+            ok: false,
+            error:
+              error.message
+          },
+          {
+            status: 500
+          }
+        );
+      }
+    }
     // =========================================================
     // TEST API
     // =========================================================
@@ -1602,6 +2080,23 @@ return Response.json({
         "/api/admin/drive/folders" &&
       request.method === "GET"
     ) {
+      const isAdmin =
+      await requireAdminSession(
+        request,
+        env
+      );
+
+    if (!isAdmin) {
+      return Response.json(
+        {
+          ok: false,
+          error: "Unauthorized"
+        },
+        {
+          status: 401
+        }
+      );
+    }
 
       try {
 
@@ -1684,7 +2179,22 @@ return Response.json({
       ) &&
       request.method === "GET"
     ) {
-
+      const isAdmin =
+        await requireAdminSession(
+          request,
+          env
+        );
+      if (!isAdmin) {
+        return Response.json(
+          {
+            ok: false,
+            error: "Unauthorized"
+          },
+          {
+            status: 401
+          }
+        );
+      }
       try {
 
         const parts =
@@ -1922,7 +2432,22 @@ return Response.json({
       ) &&
       request.method === "PUT"
     ) {
-
+      const isAdmin =
+        await requireAdminSession(
+          request,
+          env
+        );
+      if (!isAdmin) {
+        return Response.json(
+          {
+            ok: false,
+            error: "Unauthorized"
+          },
+          {
+            status: 401
+          }
+        );
+      }
       try {
 
         const parts =
@@ -2314,7 +2839,22 @@ return Response.json({
           ) &&
           request.method === "DELETE"
         ) {
-
+          const isAdmin =
+            await requireAdminSession(
+              request,
+              env
+            );
+          if (!isAdmin) {
+            return Response.json(
+              {
+                ok: false,
+                error: "Unauthorized"
+              },
+              {
+                status: 401
+              }
+            );
+          }
           try {
 
             const parts =
@@ -2473,7 +3013,22 @@ return Response.json({
         "/api/admin/drive/images" &&
       request.method === "GET"
     ) {
-
+      const isAdmin =
+        await requireAdminSession(
+          request,
+          env
+        );
+      if (!isAdmin) {
+        return Response.json(
+          {
+            ok: false,
+            error: "Unauthorized"
+          },
+          {
+            status: 401
+          }
+        );
+      }
       try {
 
         const folderId =
@@ -2598,7 +3153,22 @@ return Response.json({
         "/api/admin/robot" &&
       request.method === "POST"
     ) {
-
+      const isAdmin =
+        await requireAdminSession(
+          request,
+          env
+        );
+      if (!isAdmin) {
+        return Response.json(
+          {
+            ok: false,
+            error: "Unauthorized"
+          },
+          {
+            status: 401
+          }
+        );
+      }
       try {
 
         const body =
@@ -3114,6 +3684,800 @@ return Response.json({
 
     }
     // =========================================================
+// ARTICLE LIST - ADMIN
+// API GET /api/admin/articles
+// =========================================================
+
+if (
+  url.pathname === "/api/admin/articles" &&
+  request.method === "GET"
+) {
+  const isAdmin =
+    await requireAdminSession(
+      request,
+      env
+    );
+
+  if (!isAdmin) {
+    return Response.json(
+      {
+        ok: false,
+        error: "Unauthorized"
+      },
+      {
+        status: 401
+      }
+    );
+  }
+
+  try {
+
+    const result =
+      await env
+        .trung_tu_te_robot_db
+        .prepare(
+          `
+          SELECT
+            id,
+            title,
+            slug,
+            category,
+            icon,
+            excerpt,
+            cover_image,
+            status,
+            sort_order,
+            view_count,
+            created_at,
+            updated_at,
+            published_at
+          FROM articles
+          ORDER BY
+            sort_order ASC,
+            updated_at DESC,
+            id DESC
+          `
+        )
+        .all();
+
+    return Response.json(
+      {
+        ok: true,
+        articles:
+          result.results || []
+      }
+    );
+
+  } catch (error) {
+
+    return Response.json(
+      {
+        ok: false,
+        error:
+          error.message
+      },
+      {
+        status: 500
+      }
+    );
+
+  }
+}
+// =========================================================
+// ARTICLE DETAIL - ADMIN
+// API GET /api/admin/article/:id
+// =========================================================
+
+if (
+  url.pathname.startsWith(
+    "/api/admin/article/"
+  ) &&
+  request.method === "GET"
+) {
+  const isAdmin =
+    await requireAdminSession(
+      request,
+      env
+    );
+
+  if (!isAdmin) {
+    return Response.json(
+      {
+        ok: false,
+        error: "Unauthorized"
+      },
+      {
+        status: 401
+      }
+    );
+  }
+
+  try {
+
+    const parts =
+      url.pathname
+        .split("/")
+        .filter(Boolean);
+
+    const articleId =
+      Number(
+        parts[parts.length - 1]
+      );
+
+    if (
+      !articleId ||
+      !Number.isInteger(articleId)
+    ) {
+      return Response.json(
+        {
+          ok: false,
+          error:
+            "ID bài viết không hợp lệ"
+        },
+        {
+          status: 400
+        }
+      );
+    }
+
+    const article =
+      await env
+        .trung_tu_te_robot_db
+        .prepare(
+          `
+          SELECT
+            id,
+            title,
+            slug,
+            category,
+            icon,
+            excerpt,
+            content,
+            cover_image,
+            status,
+            sort_order,
+            view_count,
+            created_at,
+            updated_at,
+            published_at
+          FROM articles
+          WHERE id = ?
+          LIMIT 1
+          `
+        )
+        .bind(articleId)
+        .first();
+
+    if (!article) {
+      return Response.json(
+        {
+          ok: false,
+          error:
+            "Không tìm thấy bài viết"
+        },
+        {
+          status: 404
+        }
+      );
+    }
+
+    return Response.json(
+      {
+        ok: true,
+        article
+      }
+    );
+
+  } catch (error) {
+
+    return Response.json(
+      {
+        ok: false,
+        error:
+          error.message
+      },
+      {
+        status: 500
+      }
+    );
+
+  }
+}
+// =========================================================
+// CREATE ARTICLE - ADMIN
+// API POST /api/admin/article
+// =========================================================
+
+if (
+  url.pathname === "/api/admin/article" &&
+  request.method === "POST"
+) {
+  const isAdmin =
+    await requireAdminSession(
+      request,
+      env
+    );
+
+  if (!isAdmin) {
+    return Response.json(
+      {
+        ok: false,
+        error: "Unauthorized"
+      },
+      {
+        status: 401
+      }
+    );
+  }
+
+  try {
+
+    const body =
+      await request.json();
+
+    const title =
+      String(
+        body.title || ""
+      ).trim();
+
+    const slug =
+      String(
+        body.slug || ""
+      ).trim();
+
+    const category =
+      String(
+        body.category || "CHIA SẺ"
+      ).trim();
+
+    const icon =
+      String(
+        body.icon || "📖"
+      ).trim();
+
+    const excerpt =
+      String(
+        body.excerpt || ""
+      ).trim();
+
+    const content =
+      String(
+        body.content || ""
+      );
+
+    const coverImage =
+      String(
+        body.cover_image || ""
+      ).trim();
+
+    const status =
+      String(
+        body.status || "draft"
+      ).trim();
+
+    const sortOrder =
+      Number(
+        body.sort_order || 0
+      );
+
+    if (!title) {
+      return Response.json(
+        {
+          ok: false,
+          error:
+            "Tiêu đề bài viết là bắt buộc"
+        },
+        {
+          status: 400
+        }
+      );
+    }
+
+    if (!slug) {
+      return Response.json(
+        {
+          ok: false,
+          error:
+            "Slug bài viết là bắt buộc"
+        },
+        {
+          status: 400
+        }
+      );
+    }
+
+    if (
+      !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(
+        slug
+      )
+    ) {
+      return Response.json(
+        {
+          ok: false,
+          error:
+            "Slug không hợp lệ. Chỉ dùng chữ thường, số và dấu gạch ngang."
+        },
+        {
+          status: 400
+        }
+      );
+    }
+
+    if (
+      status !== "draft" &&
+      status !== "published"
+    ) {
+      return Response.json(
+        {
+          ok: false,
+          error:
+            "Trạng thái bài viết không hợp lệ"
+        },
+        {
+          status: 400
+        }
+      );
+    }
+
+    const existingArticle =
+      await env
+        .trung_tu_te_robot_db
+        .prepare(
+          `
+          SELECT
+            id,
+            title
+          FROM articles
+          WHERE slug = ?
+          LIMIT 1
+          `
+        )
+        .bind(slug)
+        .first();
+
+    if (existingArticle) {
+      return Response.json(
+        {
+          ok: false,
+          error:
+            "Slug đã tồn tại",
+          articleId:
+            existingArticle.id
+        },
+        {
+          status: 409
+        }
+      );
+    }
+
+    let publishedAt =
+      null;
+
+    if (
+      status === "published"
+    ) {
+      publishedAt =
+        new Date().toISOString();
+    }
+
+    const article =
+      await env
+        .trung_tu_te_robot_db
+        .prepare(
+          `
+          INSERT INTO articles
+          (
+            title,
+            slug,
+            category,
+            icon,
+            excerpt,
+            content,
+            cover_image,
+            status,
+            sort_order,
+            published_at
+          )
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          RETURNING
+            id,
+            title,
+            slug,
+            category,
+            icon,
+            excerpt,
+            content,
+            cover_image,
+            status,
+            sort_order,
+            view_count,
+            created_at,
+            updated_at,
+            published_at
+          `
+        )
+        .bind(
+          title,
+          slug,
+          category,
+          icon,
+          excerpt,
+          content,
+          coverImage,
+          status,
+          Number.isFinite(
+            sortOrder
+          )
+            ? sortOrder
+            : 0,
+          publishedAt
+        )
+        .first();
+
+    if (!article) {
+      throw new Error(
+        "Không thể tạo bài viết"
+      );
+    }
+
+    return Response.json(
+      {
+        ok: true,
+        message:
+          "Đã tạo bài viết",
+        article
+      }
+    );
+
+  } catch (error) {
+
+    return Response.json(
+      {
+        ok: false,
+        error:
+          error.message
+      },
+      {
+        status: 500
+      }
+    );
+
+  }
+}
+// =========================================================
+// UPDATE ARTICLE - ADMIN
+// API PUT /api/admin/article/:id
+// =========================================================
+
+if (
+  url.pathname.startsWith(
+    "/api/admin/article/"
+  ) &&
+  request.method === "PUT"
+) {
+  const isAdmin =
+    await requireAdminSession(
+      request,
+      env
+    );
+
+  if (!isAdmin) {
+    return Response.json(
+      {
+        ok: false,
+        error: "Unauthorized"
+      },
+      {
+        status: 401
+      }
+    );
+  }
+
+  try {
+
+    const parts =
+      url.pathname
+        .split("/")
+        .filter(Boolean);
+
+    const articleId =
+      Number(
+        parts[parts.length - 1]
+      );
+
+    if (
+      !articleId ||
+      !Number.isInteger(articleId)
+    ) {
+      return Response.json(
+        {
+          ok: false,
+          error:
+            "ID bài viết không hợp lệ"
+        },
+        {
+          status: 400
+        }
+      );
+    }
+
+    const body =
+      await request.json();
+
+    const title =
+      String(
+        body.title || ""
+      ).trim();
+
+    const slug =
+      String(
+        body.slug || ""
+      ).trim();
+
+    const category =
+      String(
+        body.category || "CHIA SẺ"
+      ).trim();
+
+    const icon =
+      String(
+        body.icon || "📖"
+      ).trim();
+
+    const excerpt =
+      String(
+        body.excerpt || ""
+      ).trim();
+
+    const content =
+      String(
+        body.content || ""
+      );
+
+    const coverImage =
+      String(
+        body.cover_image || ""
+      ).trim();
+
+    const status =
+      String(
+        body.status || "draft"
+      ).trim();
+
+    const sortOrder =
+      Number(
+        body.sort_order || 0
+      );
+
+    if (!title) {
+      return Response.json(
+        {
+          ok: false,
+          error:
+            "Tiêu đề bài viết là bắt buộc"
+        },
+        {
+          status: 400
+        }
+      );
+    }
+
+    if (!slug) {
+      return Response.json(
+        {
+          ok: false,
+          error:
+            "Slug bài viết là bắt buộc"
+        },
+        {
+          status: 400
+        }
+      );
+    }
+
+    if (
+      !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(
+        slug
+      )
+    ) {
+      return Response.json(
+        {
+          ok: false,
+          error:
+            "Slug không hợp lệ. Chỉ dùng chữ thường, số và dấu gạch ngang."
+        },
+        {
+          status: 400
+        }
+      );
+    }
+
+    if (
+      status !== "draft" &&
+      status !== "published"
+    ) {
+      return Response.json(
+        {
+          ok: false,
+          error:
+            "Trạng thái bài viết không hợp lệ"
+        },
+        {
+          status: 400
+        }
+      );
+    }
+
+    const existingArticle =
+      await env
+        .trung_tu_te_robot_db
+        .prepare(
+          `
+          SELECT
+            id,
+            title,
+            slug,
+            status,
+            published_at
+          FROM articles
+          WHERE id = ?
+          LIMIT 1
+          `
+        )
+        .bind(articleId)
+        .first();
+
+    if (!existingArticle) {
+      return Response.json(
+        {
+          ok: false,
+          error:
+            "Không tìm thấy bài viết"
+        },
+        {
+          status: 404
+        }
+      );
+    }
+
+    const slugOwner =
+      await env
+        .trung_tu_te_robot_db
+        .prepare(
+          `
+          SELECT
+            id
+          FROM articles
+          WHERE slug = ?
+            AND id != ?
+          LIMIT 1
+          `
+        )
+        .bind(
+          slug,
+          articleId
+        )
+        .first();
+
+    if (slugOwner) {
+      return Response.json(
+        {
+          ok: false,
+          error:
+            "Slug đã được sử dụng bởi bài viết khác",
+          articleId:
+            slugOwner.id
+        },
+        {
+          status: 409
+        }
+      );
+    }
+
+    let publishedAt =
+      existingArticle.published_at ||
+      null;
+
+    if (
+      status === "published" &&
+      !publishedAt
+    ) {
+      publishedAt =
+        new Date().toISOString();
+    }
+
+    if (
+      status === "draft"
+    ) {
+      publishedAt = null;
+    }
+
+    const article =
+      await env
+        .trung_tu_te_robot_db
+        .prepare(
+          `
+          UPDATE articles
+          SET
+            title = ?,
+            slug = ?,
+            category = ?,
+            icon = ?,
+            excerpt = ?,
+            content = ?,
+            cover_image = ?,
+            status = ?,
+            sort_order = ?,
+            updated_at = CURRENT_TIMESTAMP,
+            published_at = ?
+          WHERE id = ?
+          RETURNING
+            id,
+            title,
+            slug,
+            category,
+            icon,
+            excerpt,
+            content,
+            cover_image,
+            status,
+            sort_order,
+            view_count,
+            created_at,
+            updated_at,
+            published_at
+          `
+        )
+        .bind(
+          title,
+          slug,
+          category,
+          icon,
+          excerpt,
+          content,
+          coverImage,
+          status,
+          Number.isFinite(
+            sortOrder
+          )
+            ? sortOrder
+            : 0,
+          publishedAt,
+          articleId
+        )
+        .first();
+
+    if (!article) {
+      throw new Error(
+        "Không thể cập nhật bài viết"
+      );
+    }
+
+    return Response.json(
+      {
+        ok: true,
+        message:
+          "Đã cập nhật bài viết",
+        article
+      }
+    );
+
+  } catch (error) {
+
+    return Response.json(
+      {
+        ok: false,
+        error:
+          error.message
+      },
+      {
+        status: 500
+      }
+    );
+
+  }
+}
+    // =========================================================
     // IMAGE API
     // =========================================================
 
@@ -3192,7 +4556,62 @@ return Response.json({
         );
       }
     }
-        // =========================================================
+// =========================================================
+// ARTICLE DYNAMIC PAGE
+// =========================================================
+
+if (
+  url.pathname.startsWith("/chia-se/") &&
+  url.pathname !== "/chia-se/"
+) {
+  const parts =
+    url.pathname
+      .split("/")
+      .filter(Boolean);
+
+  const slug =
+    parts[parts.length - 1];
+
+  if (slug) {
+
+    const article =
+      await env
+        .trung_tu_te_robot_db
+        .prepare(
+          `
+          SELECT id
+          FROM articles
+          WHERE slug = ?
+            AND status = 'published'
+          LIMIT 1
+          `
+        )
+        .bind(slug)
+        .first();
+
+    if (article) {
+
+      const templateUrl =
+        new URL(
+          "/chia-se/template/",
+          request.url
+        );
+
+      templateUrl.searchParams.set(
+        "slug",
+        slug
+      );
+
+      return env.ASSETS.fetch(
+        new Request(
+          templateUrl,
+          request
+        )
+      );
+    }
+  }
+}
+    // =========================================================
     // ROBOT DYNAMIC PAGE
     // =========================================================
 
@@ -3259,6 +4678,381 @@ return Response.json({
         );
       }
     }
+// =========================================================
+// SITE VISIT TRACKING
+// =========================================================
+
+if (
+  url.pathname === "/api/visit" &&
+  request.method === "POST"
+) {
+  try {
+    let body = {};
+
+    try {
+      body = await request.json();
+    } catch (error) {
+      body = {};
+    }
+
+    const pagePath =
+      String(
+        body.page_path ||
+        "/"
+      ).slice(0, 500);
+
+    const today =
+      new Date()
+        .toISOString()
+        .slice(0, 10);
+
+    const cookieHeader =
+      request.headers.get(
+        "Cookie"
+      ) || "";
+
+    const visitorMatch =
+      cookieHeader.match(
+        /(?:^|;\s*)visitor_id=([^;]+)/
+      );
+
+    let visitorId =
+      visitorMatch
+        ? visitorMatch[1]
+        : "";
+
+    let isNewVisitor = false;
+
+    if (!visitorId) {
+      visitorId =
+        crypto.randomUUID();
+
+      isNewVisitor = true;
+    }
+
+    await env
+      .trung_tu_te_robot_db
+      .prepare(
+        `
+        INSERT INTO site_visits (
+          visit_date,
+          visitor_id,
+          page_path
+        )
+        VALUES (?, ?, ?)
+        `
+      )
+      .bind(
+        today,
+        visitorId,
+        pagePath
+      )
+      .run();
+
+    const headers = {
+      "Content-Type":
+        "application/json; charset=utf-8",
+      "Cache-Control":
+        "no-store"
+    };
+
+    if (isNewVisitor) {
+      headers[
+        "Set-Cookie"
+      ] = [
+        "visitor_id=" +
+          visitorId,
+        "Max-Age=31536000",
+        "Path=/",
+        "SameSite=Lax"
+      ].join("; ");
+    }
+
+    return new Response(
+      JSON.stringify({
+        ok: true
+      }),
+      {
+        status: 200,
+        headers
+      }
+    );
+
+  } catch (error) {
+    console.error(
+      "SITE VISIT ERROR:",
+      error
+    );
+
+    return Response.json(
+      {
+        ok: false,
+        error:
+          "Không thể ghi nhận lượt truy cập"
+      },
+      {
+        status: 500
+      }
+    );
+  }
+}
+// =========================================================
+// PUBLIC SITE STATS
+// =========================================================
+
+if (
+  url.pathname === "/api/site-stats" &&
+  request.method === "GET"
+) {
+  try {
+    const result =
+      await env
+        .trung_tu_te_robot_db
+        .prepare(
+          `
+          SELECT COUNT(*) AS total_views
+          FROM site_visits
+          `
+        )
+        .first();
+
+    return Response.json(
+      {
+        ok: true,
+        total_views:
+          Number(
+            result?.total_views || 0
+          )
+      },
+      {
+        headers: {
+          "Content-Type":
+            "application/json; charset=utf-8",
+          "Cache-Control":
+            "public, max-age=300"
+        }
+      }
+    );
+
+  } catch (error) {
+    console.error(
+      "PUBLIC SITE STATS ERROR:",
+      error
+    );
+
+    return Response.json(
+      {
+        ok: false,
+        error:
+          "Không thể tải thống kê"
+      },
+      {
+        status: 500
+      }
+    );
+  }
+}
+// =========================================================
+// ADMIN ANALYTICS
+// =========================================================
+
+if (
+  url.pathname === "/api/admin/analytics" &&
+  request.method === "GET"
+) {
+  try {
+    const authorized =
+      await requireAdminSession(
+        request,
+        env
+      );
+
+    if (!authorized) {
+      return Response.json(
+        {
+          ok: false,
+          error: "Unauthorized"
+        },
+        {
+          status: 401
+        }
+      );
+    }
+
+    const today =
+      new Date()
+        .toISOString()
+        .slice(0, 10);
+
+    const result =
+      await env
+        .trung_tu_te_robot_db
+        .prepare(
+          `
+          SELECT
+            COUNT(*) AS total_views,
+            COUNT(
+              DISTINCT visitor_id
+            ) AS unique_visitors,
+
+            SUM(
+              CASE
+                WHEN visit_date = ?
+                THEN 1
+                ELSE 0
+              END
+            ) AS today_views,
+
+            COUNT(
+              DISTINCT CASE
+                WHEN visit_date = ?
+                THEN visitor_id
+              END
+            ) AS today_visitors,
+
+            SUM(
+              CASE
+                WHEN visit_date >= date(?, '-6 days')
+                THEN 1
+                ELSE 0
+              END
+            ) AS last_7_days_views,
+
+            COUNT(
+              DISTINCT CASE
+                WHEN visit_date >= date(?, '-6 days')
+                THEN visitor_id
+              END
+            ) AS last_7_days_visitors,
+
+            SUM(
+              CASE
+                WHEN visit_date >= date(?, '-29 days')
+                THEN 1
+                ELSE 0
+              END
+            ) AS last_30_days_views,
+
+            COUNT(
+              DISTINCT CASE
+                WHEN visit_date >= date(?, '-29 days')
+                THEN visitor_id
+              END
+            ) AS last_30_days_visitors
+
+          FROM site_visits
+          `
+        )
+        .bind(
+          today,
+          today,
+          today,
+          today,
+          today,
+          today
+        )
+        .first();
+
+    return Response.json(
+      {
+        ok: true,
+        analytics: {
+          today: {
+            views:
+              Number(
+                result?.today_views ||
+                0
+              ),
+            visitors:
+              Number(
+                result?.today_visitors ||
+                0
+              )
+          },
+
+          last_7_days: {
+            views:
+              Number(
+                result?.last_7_days_views ||
+                0
+              ),
+            visitors:
+              Number(
+                result?.last_7_days_visitors ||
+                0
+              )
+          },
+
+          last_30_days: {
+            views:
+              Number(
+                result?.last_30_days_views ||
+                0
+              ),
+            visitors:
+              Number(
+                result?.last_30_days_visitors ||
+                0
+              )
+          },
+
+          total: {
+            views:
+              Number(
+                result?.total_views ||
+                0
+              ),
+            visitors:
+              Number(
+                result?.unique_visitors ||
+                0
+              )
+          }
+        }
+      },
+      {
+        headers: {
+          "Content-Type":
+            "application/json; charset=utf-8",
+          "Cache-Control":
+            "no-store"
+        }
+      }
+    );
+
+  } catch (error) {
+    console.error(
+      "ADMIN ANALYTICS ERROR:",
+      error
+    );
+
+    return Response.json(
+      {
+        ok: false,
+        error:
+          "Không thể tải thống kê truy cập"
+      },
+      {
+        status: 500
+      }
+    );
+  }
+}
+    // =========================================================
+    // ADMIN PAGE
+    // =========================================================
+    // Trang Admin được mở trực tiếp.
+    // admin.js sẽ kiểm tra /api/admin/session
+    // và hiển thị màn hình đăng nhập nếu chưa xác thực.
+if (
+  url.pathname === "/admin" ||
+  url.pathname === "/admin/"
+) {
+  return env.ASSETS.fetch(
+    request
+  );
+}
+
     // =========================================================
     // STATIC WEBSITE
     // =========================================================

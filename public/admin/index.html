@@ -1,4 +1,32 @@
-<!DOCTYPE html> <html lang="vi"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Admin · Trung Tử Tế</title> <link rel="stylesheet" href="admin.css"> </head> <body> <div class="admin-layout"> <!-- SIDEBAR --> <aside class="sidebar">
+<!DOCTYPE html> <html lang="vi"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Admin · Trung Tử Tế</title> <link rel="stylesheet" href="admin.css"> </head> <body><div id="admin-login" style="display:none; min-height:100vh; align-items:center; justify-content:center; background:#f5f6f8; padding:20px;">
+  <div style="width:100%; max-width:400px; background:#fff; padding:32px; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.08);">
+    <div style="text-align:center; margin-bottom:24px;">
+      <img src="../logo.webp" alt="Trung Tử Tế" style="max-width:180px; max-height:80px; object-fit:contain;">
+      <h2 style="margin:16px 0 8px;">Đăng nhập quản trị</h2>
+      <p style="margin:0; color:#666;">Vui lòng nhập mật khẩu Admin</p>
+    </div>
+
+<form id="admin-login-form">
+  <input
+    id="admin-password"
+    type="password"
+    placeholder="Mật khẩu Admin"
+    autocomplete="current-password"
+    required
+    style="width:100%; box-sizing:border-box; padding:13px 14px; border:1px solid #ddd; border-radius:10px; font-size:16px; margin-bottom:12px;">
+
+  <button
+    type="submit"
+    id="admin-login-button"
+    style="width:100%; padding:13px; border:0; border-radius:10px; background:#222; color:#fff; font-size:16px; cursor:pointer;">
+    Đăng nhập
+  </button>
+
+  <div id="admin-login-error" style="display:none; margin-top:12px; color:#c62828; text-align:center;"></div>
+</form>
+
+  </div>
+</div> <div class="admin-layout" style="display:none;"> <!-- SIDEBAR --> <aside class="sidebar">
 <div class="brand">
 
   <img
@@ -36,13 +64,14 @@
   </a>
 
 
-  <a
-    href="#">
+  <a 
+  href="#articles-section"
+  data-section="articles"> 
 
-    <span>📝</span>
-    Chia sẻ
+  <span>📝</span> 
+  Chia sẻ 
 
-  </a>
+</a>
 
 
   <a
@@ -198,8 +227,242 @@
     </div>
 
   </section>
+<!-- ANALYTICS -->
+<section class="panel analytics-panel">
+
+  <div class="panel-header">
+
+    <div>
+
+      <p class="eyebrow">
+        THỐNG KÊ WEBSITE
+      </p>
+
+      <h2>
+        Lượt truy cập
+      </h2>
+
+      <p class="panel-description">
+        Theo dõi người truy cập và lượt xem website.
+      </p>
+
+    </div>
+
+  </div>
 
 
+  <div class="analytics-grid">
+
+    <div class="analytics-card">
+
+      <div class="analytics-card-top">
+
+        <span class="analytics-icon">
+          👤
+        </span>
+
+        <span class="analytics-period">
+          Hôm nay
+        </span>
+
+      </div>
+
+      <strong
+        id="analytics-today-visitors">
+        —
+      </strong>
+
+      <span>
+        Người truy cập
+      </span>
+
+    </div>
+
+
+    <div class="analytics-card">
+
+      <div class="analytics-card-top">
+
+        <span class="analytics-icon">
+          👁️
+        </span>
+
+        <span class="analytics-period">
+          Hôm nay
+        </span>
+
+      </div>
+
+      <strong
+        id="analytics-today-views">
+        —
+      </strong>
+
+      <span>
+        Lượt xem
+      </span>
+
+    </div>
+
+
+    <div class="analytics-card">
+
+      <div class="analytics-card-top">
+
+        <span class="analytics-icon">
+          👤
+        </span>
+
+        <span class="analytics-period">
+          7 ngày
+        </span>
+
+      </div>
+
+      <strong
+        id="analytics-7d-visitors">
+        —
+      </strong>
+
+      <span>
+        Người truy cập
+      </span>
+
+    </div>
+
+
+    <div class="analytics-card">
+
+      <div class="analytics-card-top">
+
+        <span class="analytics-icon">
+          👁️
+        </span>
+
+        <span class="analytics-period">
+          7 ngày
+        </span>
+
+      </div>
+
+      <strong
+        id="analytics-7d-views">
+        —
+      </strong>
+
+      <span>
+        Lượt xem
+      </span>
+
+    </div>
+
+
+    <div class="analytics-card">
+
+      <div class="analytics-card-top">
+
+        <span class="analytics-icon">
+          👤
+        </span>
+
+        <span class="analytics-period">
+          30 ngày
+        </span>
+
+      </div>
+
+      <strong
+        id="analytics-30d-visitors">
+        —
+      </strong>
+
+      <span>
+        Người truy cập
+      </span>
+
+    </div>
+
+
+    <div class="analytics-card">
+
+      <div class="analytics-card-top">
+
+        <span class="analytics-icon">
+          👁️
+        </span>
+
+        <span class="analytics-period">
+          30 ngày
+        </span>
+
+      </div>
+
+      <strong
+        id="analytics-30d-views">
+        —
+      </strong>
+
+      <span>
+        Lượt xem
+      </span>
+
+    </div>
+
+
+    <div class="analytics-card">
+
+      <div class="analytics-card-top">
+
+        <span class="analytics-icon">
+          👤
+        </span>
+
+        <span class="analytics-period">
+          Tổng
+        </span>
+
+      </div>
+
+      <strong
+        id="analytics-total-visitors">
+        —
+      </strong>
+
+      <span>
+        Người truy cập
+      </span>
+
+    </div>
+
+
+    <div class="analytics-card">
+
+      <div class="analytics-card-top">
+
+        <span class="analytics-icon">
+          👁️
+        </span>
+
+        <span class="analytics-period">
+          Tổng
+        </span>
+
+      </div>
+
+      <strong
+        id="analytics-total-views">
+        —
+      </strong>
+
+      <span>
+        Lượt xem
+      </span>
+
+    </div>
+
+  </div>
+
+</section>
   <!-- QUICK ACTIONS -->
 
   <section class="panel">
@@ -238,19 +501,20 @@
       </a>
 
 
-      <a href="#">
-
-        <span>📝</span>
-
-        <strong>
-          Quản lý bài chia sẻ
-        </strong>
-
-        <small>
-          Tạo và chỉnh sửa nội dung
-        </small>
-
-      </a>
+      <a
+      href="#"
+      data-section="articles"
+    >
+      <span>📝</span>
+    
+      <strong>
+        Quản lý bài chia sẻ
+      </strong>
+    
+      <small>
+        Tạo và chỉnh sửa nội dung
+      </small>
+    </a>
 
 
       <a href="#">
@@ -453,6 +717,92 @@
       </div>
 
     </section>
+<!-- =====================================================
+     BÀI CHIA SẺ
+     ===================================================== -->
+
+     <section
+  id="articles-section"
+  class="admin-section"
+>
+
+  <header class="admin-header">
+
+    <div>
+      <p class="eyebrow">
+        QUẢN LÝ NỘI DUNG
+      </p>
+
+      <h1>
+        Bài chia sẻ
+      </h1>
+
+      <p class="admin-header-description">
+        Quản lý các bài viết chia sẻ, hướng dẫn và kinh nghiệm kỹ thuật.
+      </p>
+    </div>
+
+    <a
+      class="view-site"
+      href="/chia-se/"
+      target="_blank"
+    >
+      Xem trang chia sẻ ↗
+    </a>
+
+  </header>
+
+
+  <section class="panel articles-panel">
+
+    <div class="panel-header">
+
+      <div>
+        <p class="eyebrow">
+          DANH SÁCH BÀI VIẾT
+        </p>
+
+        <h2>
+          Nội dung chia sẻ
+        </h2>
+
+        <p class="panel-description">
+          Tạo mới, chỉnh sửa và quản lý trạng thái bài viết.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        id="article-add-button"
+        class="button-primary"
+      >
+        ＋ Thêm bài viết
+      </button>
+
+    </div>
+
+
+    <div
+      id="article-list"
+      class="robot-list article-list"
+    >
+
+      <div class="robot-loading">
+        Đang tải bài viết...
+      </div>
+
+    </div>
+
+
+    <div
+      id="article-edit-panel"
+      class="article-edit-panel"
+      style="display:none;"
+    ></div>
+
+  </section>
+
+</section>   
   <!-- =====================================================
        FORM CHỈNH SỬA ROBOT
        ===================================================== -->

@@ -1,14 +1,12 @@
 const footer = document.querySelector("#site-footer");
-
 if (footer) {
-footer.innerHTML =
-'<footer>' +
-'<div class="wrap footer">' +
-    '<div class="footer-brand">' +
-      '<b>TRUNG TỬ TẾ</b>' +
-      '<span>Robot lau nhà · Chất lượng, tận tâm</span>' +
-    '</div>' +
-
+  footer.innerHTML =
+    '<footer>' +
+      '<div class="wrap footer">' +
+        '<div class="footer-brand">' +
+          '<b>TRUNG TỬ TẾ</b>' +
+          '<span>Robot lau nhà · Chất lượng, tận tâm</span>' +
+        '</div>' +
     '<div class="footer-contact">' +
       '<b>LIÊN HỆ</b>' +
 
@@ -23,4 +21,6 @@ footer.innerHTML =
     '</div>' +
 
   '</div>' +
-'</footer>';}
+'</footer>';
+
+}
