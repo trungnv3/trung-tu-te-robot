@@ -2544,6 +2544,8 @@ if (
                 mop_lift,
                 self_empty,
                 detergent,
+                robot_dimensions,
+                dock_dimensions,
                 updated_at
               FROM robot_specs
               WHERE robot_id = ?
@@ -3340,6 +3342,8 @@ ORDER BY
                 mop_lift = ?,
                 self_empty = ?,
                 detergent = ?,
+                robot_dimensions = ?,
+                dock_dimensions = ?,
                 updated_at = CURRENT_TIMESTAMP
               WHERE robot_id = ?
               `
@@ -3357,6 +3361,8 @@ ORDER BY
               specs.mop_lift || null,
               specs.self_empty || null,
               specs.detergent || null,
+              specs.robot_dimensions || null,
+              specs.dock_dimensions || null,
               robotId
             )
         );
@@ -4149,8 +4155,10 @@ ORDER BY
                 mop_lift,
                 self_empty,
                 detergent
+                robot_dimensions,
+                dock_dimensions
               )
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
               `
             )
             .bind(
@@ -4166,7 +4174,9 @@ ORDER BY
               specs.mop_dry || null,
               specs.mop_lift || null,
               specs.self_empty || null,
-              specs.detergent || null
+              specs.detergent || null,
+              specs.robot_dimensions || null,
+              specs.dock_dimensions || null
             )
         );
 

@@ -976,32 +976,71 @@ async function loadAIModelStatus() {
             '</td>' +
 
             '<td>' +
-              (
-                model.last_success_at ||
-                "—"
-              ) +
-            '</td>' +
+  (
+    model.last_success_at
+      ? new Date(
+          model.last_success_at
+        ).toLocaleString(
+          "vi-VN",
+          {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+          }
+        )
+      : "—"
+  ) +
+'</td>' +
 
-            '<td>' +
-              (
-                model.last_error_at ||
-                "—"
-              ) +
-            '</td>' +
+'<td>' +
+  (
+    model.last_error_at
+      ? new Date(
+          model.last_error_at
+        ).toLocaleString(
+          "vi-VN",
+          {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+          }
+        )
+      : "—"
+  ) +
+'</td>' +
 
-            '<td>' +
-              (
-                model.error_count ||
-                0
-              ) +
-            '</td>' +
+'<td>' +
+  (
+    model.error_count ||
+    0
+  ) +
+'</td>' +
 
-            '<td>' +
-              (
-                model.quota_reset_at ||
-                "—"
-              ) +
-            '</td>' +
+'<td>' +
+  (
+    model.quota_reset_at
+      ? new Date(
+          model.quota_reset_at
+        ).toLocaleString(
+          "vi-VN",
+          {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+          }
+        )
+      : "—"
+  ) +
+'</td>' +
 
           '</tr>';
 
@@ -1817,7 +1856,13 @@ document.addEventListener("click", async function (event) {
         getValue("#edit-self-empty"),
 
       detergent:
-        getValue("#edit-detergent")
+        getValue("#edit-detergent"),
+
+      robot_dimensions:
+        getValue("#edit-robot-dimensions"),
+      
+      dock_dimensions:
+        getValue("#edit-dock-dimensions")  
 
     };
 
@@ -2786,7 +2831,9 @@ function saveAddRobotStep2() {
     "mop-dry",
     "mop-lift",
     "self-empty",
-    "detergent"
+    "detergent",
+    "robot-dimensions",
+    "dock-dimensions"
   ];
 
   ids.forEach(function (id) {
@@ -2971,7 +3018,9 @@ function autoFillParseProductText(rawText) {
       mop_dry: "",
       mop_lift: "",
       self_empty: "",
-      detergent: ""
+      detergent: "",
+      robot_dimensions: "",
+      dock_dimensions: ""
     },
 
     features: []
@@ -3111,12 +3160,24 @@ function autoFillParseProductText(rawText) {
       /^[-•*]?\s*Bình nước(?:\s+robot)?\s*:\s*(.+)$/i,
       /^[-•*]?\s*Bình nước sạch.*:\s*(.+)$/i
     ]);
+// ==========================================================
+// KÍCH THƯỚC ROBOT
+// ==========================================================
 
+result.specs.robot_dimensions =
+  autoFillFindLine(lines, [
+    /^[-•*]?\s*(?:Kích thước\s+)?Robot\s*:\s*(.+)$/i
+  ]);
 
-  result.specs.navigation =
-    autoFillFindLine(lines, [
-      /^[-•*]?\s*Điều hướng\s*:\s*(.+)$/i
-    ]);
+// ==========================================================
+// KÍCH THƯỚC TRẠM SẠC
+// ==========================================================
+
+result.specs.dock_dimensions =
+  autoFillFindLine(lines, [
+    /^[-•*]?\s*(?:Kích thước\s+)?Trạm sạc\s*:\s*(.+)$/i,
+    /^[-•*]?\s*(?:Kích thước\s+)?Dock\s*:\s*(.+)$/i
+  ]);
 
 
   result.specs.noise =
@@ -3646,11 +3707,25 @@ function renderAddRobotStep2() {
         '</label>' +
 
         '<label>' +
-          '<span>Dung dịch vệ sinh</span>' +
-          '<input id="add-detergent" type="text" value="' +
-            escapeAddRobotHtml(specs.detergent) +
-            '" placeholder="Ví dụ: Có">' +
-        '</label>' +
+        '<span>Dung dịch vệ sinh</span>' +
+        '<input id="add-detergent" type="text" value="' +
+          escapeAddRobotHtml(specs.detergent) +
+          '" placeholder="Ví dụ: Có">' +
+      '</label>' +
+
+      '<label>' +
+        '<span>Kích thước Robot</span>' +
+        '<input id="add-robot-dimensions" type="text" value="' +
+          escapeAddRobotHtml(specs.robot_dimensions) +
+          '" placeholder="Ví dụ: 350 × 350 × 97mm">' +
+      '</label>' +
+
+      '<label>' +
+        '<span>Kích thước Trạm sạc</span>' +
+        '<input id="add-dock-dimensions" type="text" value="' +
+          escapeAddRobotHtml(specs.dock_dimensions) +
+          '" placeholder="Ví dụ: 340 × 457 × 590mm">' +
+      '</label>' +
 
       '</div>' +
     '</div>' +
