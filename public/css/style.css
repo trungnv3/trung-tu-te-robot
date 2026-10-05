@@ -424,7 +424,16 @@
   font-size: 13px;
   font-weight: 700;
   }
-  
+  /* ============================================================
+   ROBOT MODEL LIST
+   ============================================================ */
+
+#brand-models-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 180px);
+  gap: 18px;
+  justify-content: start;
+}
   /* =========================================================
   DỊCH VỤ
   ========================================================= */
@@ -1167,44 +1176,118 @@ footer {
    ROBOT MODEL CARDS
    ============================================================ */
 
-.article-model-card-image {
-  position: relative;
-  width: 100%;
-  height: 120px;
-  overflow: hidden;
-  background: #f5f5f5;
-}
-.article-model-card-image img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  transition: transform 0.3s ease;
-}
-.article-model-card:hover
-.article-model-card-image img {
-  transform: scale(1.04);
-}
-.article-model-card-image.no-image {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #888;
-  font-size: 14px;
-}
-/* Mobile */
-
-@media (max-width: 600px) {
-
-  .article-model-card-name {
-    font-size: 16px;
+   .article-model-card {
+    width: 180px;
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
-
+  
+  .article-model-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  }
+  
+  .article-model-card-image {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    margin: 12px auto 0;
+    overflow: hidden;
+    background: #f5f5f5;
+    border-radius: 10px;
+  }
+  
+  .article-model-card-image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+  }
+  
+  .article-model-card:hover
+  .article-model-card-image img {
+    transform: scale(1.04);
+  }
+  
+  .article-model-card-image.no-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    font-size: 13px;
+  }
+  
+  /* Nội dung */
+  
   .article-model-card-content {
-    padding-top: 10px;
+    padding: 10px 12px 12px;
+    text-align: center;
   }
-
-}
+  
+  .article-model-card-brand {
+    display: block;
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 3px;
+  }
+  
+  .article-model-card-name {
+    display: block;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: #222;
+    margin-bottom: 4px;
+  }
+  
+  .article-model-card-year {
+    display: block;
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 6px;
+  }
+  
+  .article-model-card-link {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: #333;
+  }
+  
+  /* Mobile */
+  
+  @media (max-width: 600px) {
+  
+    .article-model-card {
+      width: 160px;
+    }
+  
+    .article-model-card-image {
+      width: 100px;
+      height: 100px;
+    }
+  
+    .article-model-card-content {
+      padding: 9px 10px 11px;
+    }
+  
+    .article-model-card-name {
+      font-size: 14px;
+    }
+  
+    .article-model-card-brand,
+    .article-model-card-year,
+    .article-model-card-link {
+      font-size: 11px;
+    }
+  
+  }
 .visitor-counter {
   position: fixed;
   right: 8px;

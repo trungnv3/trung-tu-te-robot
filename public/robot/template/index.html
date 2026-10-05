@@ -389,13 +389,13 @@
           style="display:none;"
         >
 
-          <a
-            id="robot-back"
-            class="back robot-back"
-            href="/robot/dreame/"
-          >
-            ← Quay lại Dreame
-          </a>
+        <a
+        id="robot-back"
+        class="back robot-back"
+        href="/robot/"
+      >
+        ← Quay lại Robot
+      </a>
 
 
           <p
@@ -526,11 +526,12 @@
             <div class="article-bottom-back">
 
               <a
-                href="/robot/dreame/"
-                class="btn"
-              >
-                ← Quay lại Dreame
-              </a>
+  id="robot-bottom-back"
+  href="/robot/"
+  class="btn"
+>
+  ← Quay lại Robot
+</a>
 
             </div>
 
@@ -703,20 +704,30 @@
               : "ROBOT · MODEL";
 
 
-        document
-          .getElementById("robot-back")
-          .textContent =
-            brand.toLowerCase() === "dreame"
-              ? "← Quay lại Dreame"
-              : "← Quay lại Robot";
+              const robotBack =
+  document.getElementById("robot-back");
+
+const robotBottomBack =
+  document.getElementById("robot-bottom-back");
 
 
-        document
-          .getElementById("robot-back")
-          .href =
-            brand.toLowerCase() === "dreame"
-              ? "/robot/dreame/"
-              : "/";
+const brandUrl =
+  "/robot/brand.html?brand=" +
+  encodeURIComponent(brand);
+
+
+robotBack.textContent =
+  "← Quay lại " + brand;
+
+robotBack.href =
+  brandUrl;
+
+
+robotBottomBack.textContent =
+  "← Quay lại " + brand;
+
+robotBottomBack.href =
+  brandUrl;
 
 
         renderGallery(
@@ -745,7 +756,7 @@
           .style.display = "block";
 
 
-        loadDreameModels();
+      
 
       } catch (error) {
 
@@ -1579,299 +1590,6 @@
 
     }
 
-
-    async function loadDreameModels() {
-
-      const container =
-        document.getElementById(
-          "dreame-models-list"
-        );
-
-
-      if (!container) {
-        return;
-      }
-
-
-      try {
-
-        const response =
-          await fetch(
-            "/api/robots"
-          );
-
-
-        if (!response.ok) {
-
-          throw new Error(
-            "Không thể đọc API robot"
-          );
-
-        }
-
-
-        const data =
-          await response.json();
-
-
-        if (
-          !data.ok ||
-          !Array.isArray(
-            data.robots
-          )
-        ) {
-
-          throw new Error(
-            data.error ||
-            "API robot không đúng định dạng"
-          );
-
-        }
-
-
-        const robots =
-          data.robots.filter(
-            function(robot) {
-
-              return (
-                String(
-                  robot.brand || ""
-                ).toLowerCase() ===
-                "dreame"
-              );
-
-            }
-          );
-
-
-        container.innerHTML =
-          "";
-
-
-        robots.forEach(
-          function(robot) {
-
-            const link =
-              document.createElement(
-                "a"
-              );
-
-
-            link.href =
-              "/robot/template/index.html?slug=" +
-              encodeURIComponent(
-                robot.slug
-              );
-
-
-            link.className =
-              "article-model-card";
-
-
-            const primaryImage =
-              Array.isArray(
-                robot.images
-              )
-                ? (
-                    robot.images.find(
-                      function(image) {
-
-                        return (
-                          image.primary === true
-                        );
-
-                      }
-                    ) ||
-                    robot.images[0]
-                  )
-                : null;
-
-
-            const imageBox =
-              document.createElement(
-                "div"
-              );
-
-
-            imageBox.className =
-              "article-model-card-image";
-
-
-            if (
-              primaryImage &&
-              primaryImage.url
-            ) {
-
-              const image =
-                document.createElement(
-                  "img"
-                );
-
-
-              image.src =
-                primaryImage.url;
-
-
-              image.alt =
-                robot.model ||
-                "Robot lau nhà";
-
-
-              image.loading =
-                "lazy";
-
-
-              imageBox.appendChild(
-                image
-              );
-
-            } else {
-
-              imageBox.classList.add(
-                "no-image"
-              );
-
-
-              imageBox.textContent =
-                "Chưa có hình ảnh";
-
-            }
-
-
-            const content =
-              document.createElement(
-                "div"
-              );
-
-
-            content.className =
-              "article-model-card-content";
-
-
-            const brand =
-              document.createElement(
-                "span"
-              );
-
-
-            brand.className =
-              "article-model-card-brand";
-
-
-            brand.textContent =
-              robot.brand ||
-              "";
-
-
-            const name =
-              document.createElement(
-                "strong"
-              );
-
-
-            name.className =
-              "article-model-card-name";
-
-
-            name.textContent =
-              robot.model ||
-              "Robot lau nhà";
-
-
-            const year =
-              document.createElement(
-                "span"
-              );
-
-
-            year.className =
-              "article-model-card-year";
-
-
-            if (
-              robot.year !== null &&
-              robot.year !== undefined &&
-              robot.year !== ""
-            ) {
-
-              year.textContent =
-                "Năm " +
-                robot.year;
-
-            } else {
-
-              year.textContent =
-                "Đang cập nhật";
-
-            }
-
-
-            const detail =
-              document.createElement(
-                "span"
-              );
-
-
-            detail.className =
-              "article-model-card-link";
-
-
-            detail.textContent =
-              "Xem chi tiết →";
-
-
-            content.appendChild(
-              brand
-            );
-
-
-            content.appendChild(
-              name
-            );
-
-
-            content.appendChild(
-              year
-            );
-
-
-            content.appendChild(
-              detail
-            );
-
-
-            link.appendChild(
-              imageBox
-            );
-
-
-            link.appendChild(
-              content
-            );
-
-
-            container.appendChild(
-              link
-            );
-
-          }
-        );
-
-
-      } catch (error) {
-
-        console.error(
-          "Dreame Models:",
-          error
-        );
-
-
-        container.innerHTML =
-          "<span>Không thể tải danh sách Robot.</span>";
-
-      }
-
-    }
 
 
     loadRobot();

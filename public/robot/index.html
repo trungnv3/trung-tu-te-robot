@@ -140,139 +140,9 @@
 
 
 
-    <div class="brands-grid">
-
-
-      <!-- DREAME -->
-
-      <a href="dreame/index.html">
-
-        <b>
-          Dreame
-        </b>
-
-        <span>
-          Khám phá →
-        </span>
-
-      </a>
-
-
-
-      <!-- ROBOROCK -->
-
-      <a href="#">
-
-        <b>
-          Roborock
-        </b>
-
-        <span>
-          Đang cập nhật
-        </span>
-
-      </a>
-
-
-
-      <!-- ECOVACS -->
-
-      <a href="#">
-
-        <b>
-          Ecovacs
-        </b>
-
-        <span>
-          Đang cập nhật
-        </span>
-
-      </a>
-
-
-
-      <!-- XIAOMI -->
-
-      <a href="#">
-
-        <b>
-          Xiaomi
-        </b>
-
-        <span>
-          Đang cập nhật
-        </span>
-
-      </a>
-
-
-
-      <!-- MOVA -->
-
-      <a href="#">
-
-        <b>
-          Mova
-        </b>
-
-        <span>
-          Đang cập nhật
-        </span>
-
-      </a>
-
-
-
-      <!-- TINECO -->
-
-      <a href="#">
-
-        <b>
-          Tineco
-        </b>
-
-        <span>
-          Đang cập nhật
-        </span>
-
-      </a>
-
-
-
-      <!-- LUMIAS -->
-
-      <a href="#">
-
-        <b>
-          Lumias
-        </b>
-
-        <span>
-          Đang cập nhật
-        </span>
-
-      </a>
-
-
-
-      <!-- KHÁC -->
-
-      <a href="#">
-
-        <b>
-          Khác
-        </b>
-
-        <span>
-          Đang cập nhật
-        </span>
-
-      </a>
-
-
+    <div class="brands-grid" id="brands-list">
+      <span>Đang tải danh sách hãng...</span>
     </div>
-
-
 
     <div
       class="article-note"
@@ -316,9 +186,94 @@
 
 
 </main>
+
 <div id="site-footer"></div>
+
 <script src="../js/main.js"></script>
 <script src="../js/footer.js"></script>
+
+<script>
+async function loadBrands() {
+  const container = document.getElementById("brands-list");
+
+  if (!container) {
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/robots");
+
+    if (!response.ok) {
+      throw new Error("Không thể đọc API robot");
+    }
+
+    const data = await response.json();
+
+    if (!data.ok || !Array.isArray(data.robots)) {
+      throw new Error(
+        data.error || "API robot không đúng định dạng"
+      );
+    }
+
+    const brands = [];
+
+    data.robots.forEach(function(robot) {
+      const brand = String(robot.brand || "").trim();
+
+      if (!brand) {
+        return;
+      }
+
+      const exists = brands.some(function(item) {
+        return item.toLowerCase() === brand.toLowerCase();
+      });
+
+      if (!exists) {
+        brands.push(brand);
+      }
+    });
+
+    brands.sort(function(a, b) {
+      return a.localeCompare(b, "vi");
+    });
+
+    container.innerHTML = "";
+
+    if (brands.length === 0) {
+      container.innerHTML =
+        "<span>Chưa có hãng robot.</span>";
+      return;
+    }
+
+    brands.forEach(function(brand) {
+      const link = document.createElement("a");
+
+      link.href =
+        "brand.html?brand=" +
+        encodeURIComponent(brand);
+
+      const name = document.createElement("b");
+      name.textContent = brand;
+
+      const detail = document.createElement("span");
+      detail.textContent = "Khám phá →";
+
+      link.appendChild(name);
+      link.appendChild(detail);
+
+      container.appendChild(link);
+    });
+
+  } catch (error) {
+    console.error("Load brands:", error);
+
+    container.innerHTML =
+      "<span>Không thể tải danh sách hãng.</span>";
+  }
+}
+
+loadBrands();
+</script>
 
 </body>
 

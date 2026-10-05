@@ -572,6 +572,37 @@ export default {
       });
     }
     // =========================================================
+// ADMIN LOGOUT
+// =========================================================
+
+if (
+  url.pathname === "/api/admin/logout" &&
+  request.method === "POST"
+) {
+  return new Response(
+    JSON.stringify({
+      ok: true,
+      message: "Đã đăng xuất Admin"
+    }),
+    {
+      status: 200,
+      headers: {
+        "Content-Type":
+          "application/json",
+        "Set-Cookie":
+          [
+            "admin_session=",
+            "HttpOnly",
+            "Secure",
+            "SameSite=Strict",
+            "Path=/",
+            "Max-Age=0"
+          ].join("; ")
+      }
+    }
+  );
+}
+    // =========================================================
     // ARTICLES API - PUBLIC READ
     // =========================================================
     if (
@@ -1311,11 +1342,11 @@ const features =
   featuresResult.results || [];
 
 // ---------------------------------------------------------
-// L?Y N?I DUNG HI?N T?I
+// LẤY NỘI DUNG HIỆN TẠI
 // ---------------------------------------------------------
 const content = await env.trung_tu_te_robot_db.prepare("SELECT intro, highlights, pros, notes, suitable_for, ai_content FROM robot_content WHERE robot_id = ? LIMIT 1").bind(robotId).first();;
 // ---------------------------------------------------------
-// D? LI?U ??A CHO GEMINI
+// DỮ LIỆU ĐƯA CHO GEMINI
 // ---------------------------------------------------------
 
 const sourceData = {
@@ -1470,7 +1501,7 @@ const responseSchema = {
 // ---------------------------------------------------------
 const geminiModel =
   env.GEMINI_MODEL ||
-  "gemini-3.8-flash";
+  "gemini-3.6-flash";
 let geminiResponse = null;
 let lastGeminiErrorText = "";
 for (
@@ -1511,6 +1542,11 @@ for (
   }
   lastGeminiErrorText =
     await geminiResponse.text();
+    console.error(
+      "GEMINI ERROR:",
+      geminiResponse.status,
+      lastGeminiErrorText
+    );
   if (
     geminiResponse.status !== 503 ||
     attempt >= 3
@@ -1527,12 +1563,24 @@ for (
   );
 }
 if (!geminiResponse || !geminiResponse.ok) {
+  console.error(
+    "GEMINI FINAL ERROR:",
+    {
+      model: geminiModel,
+      status: geminiResponse?.status || 500,
+      details: lastGeminiErrorText
+    }
+  );
+
   return Response.json(
     {
       ok: false,
       error:
-      `Gemini API lỗi: ${geminiResponse?.status || 500}`,
-      details:        lastGeminiErrorText
+        `Gemini API lỗi: ${geminiResponse?.status || 500}`,
+      details:
+        lastGeminiErrorText,
+      model:
+        geminiModel
     },
     {
       status: 502
@@ -1573,24 +1621,7 @@ try {
     }
   );
 }
-// ---------------------------------------------------------
-// LƯU AI CONTENT VÀO D1
-// ---------------------------------------------------------
 
-await env.trung_tu_te_robot_db
-  .prepare(
-    `
-    UPDATE robot_content
-    SET ai_content = ?,
-        updated_at = CURRENT_TIMESTAMP
-    WHERE robot_id = ?
-    `
-  )
-  .bind(
-    JSON.stringify(aiContent),
-    robotId
-  )
-  .run();
 // ---------------------------------------------------------
 // KIỂM TRA CẤU TRÚC CƠ BẢN
 // ---------------------------------------------------------
@@ -1619,65 +1650,6 @@ if (
   );
 }
 
-// ---------------------------------------------------------
-// LƯU JSON AI VÀO D1
-// ---------------------------------------------------------
-
-const aiJson =
-  JSON.stringify(
-    aiContent
-  );
-
-const existingContent =
-  await env
-    .trung_tu_te_robot_db
-    .prepare(
-      `
-      SELECT id
-      FROM robot_content
-      WHERE robot_id = ?
-      LIMIT 1
-      `
-    )
-    .bind(robotId)
-    .first();
-
-if (existingContent) {
-  await env
-    .trung_tu_te_robot_db
-    .prepare(
-      `
-      UPDATE robot_content
-      SET
-        ai_content = ?,
-        updated_at =
-          CURRENT_TIMESTAMP
-      WHERE robot_id = ?
-      `
-    )
-    .bind(
-      aiJson,
-      robotId
-    )
-    .run();
-} else {
-  await env
-    .trung_tu_te_robot_db
-    .prepare(
-      `
-      INSERT INTO robot_content (
-        robot_id,
-        ai_content
-      )
-      VALUES (?, ?)
-      `
-    )
-    .bind(
-      robotId,
-      aiJson
-    )
-    .run();
-}
 
 return Response.json({
   ok: true,
@@ -1695,6 +1667,313 @@ return Response.json({
 
   aiContent
 });
+
+  } catch (error) {
+    return Response.json(
+      {
+        ok: false,
+        error:
+          error.message
+      },
+      {
+        status: 500
+      }
+    );
+  }
+}
+
+// =========================================================
+// TEST GEMINI API
+// =========================================================
+if (
+  url.pathname === "/api/ai/test-gemini" &&
+  request.method === "GET"
+) {
+  const isAdmin =
+    await requireAdminSession(
+      request,
+      env
+    );
+
+  if (!isAdmin) {
+    return Response.json(
+      {
+        ok: false,
+        error: "Chưa đăng nhập quản trị"
+      },
+      { status: 401 }
+    );
+  }
+
+  try {
+    if (!env.GEMINI_API_KEY) {
+      return Response.json(
+        {
+          ok: false,
+          error: "Thiếu GEMINI_API_KEY"
+        },
+        { status: 500 }
+      );
+    }
+  
+    const testModel =
+      env.GEMINI_MODEL ||
+      "gemini-3.6-flash";
+  
+    const response =
+      await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${testModel}:generateContent`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key":
+              env.GEMINI_API_KEY
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  {
+                    text:
+                      "Trả lời đúng một câu: Xin chào Trung Tử Tế."
+                  }
+                ]
+              }
+            ]
+          })
+        }
+      );
+  
+    const text =
+      await response.text();
+  
+    console.log(
+      "GEMINI GENERATE TEST:",
+      response.status,
+      text
+    );
+  
+    return Response.json(
+      {
+        ok: response.ok,
+        status: response.status,
+        model: testModel,
+        gemini: text
+      },
+      {
+        status: response.ok
+          ? 200
+          : 502
+      }
+    );
+  } catch (error) {
+    console.error(
+      "GEMINI GENERATE TEST ERROR:",
+      error
+    );
+  
+    return Response.json(
+      {
+        ok: false,
+        error: error.message
+      },
+      { status: 500 }
+    );
+  }
+}
+// =========================================================
+// ADMIN - SAVE AI ROBOT CONTENT
+// =========================================================
+
+const aiContentMatch =
+  url.pathname.match(
+    /^\/api\/admin\/robot\/(\d+)\/ai-content$/
+  );
+
+if (
+  aiContentMatch &&
+  request.method === "POST"
+) {
+  const isAdmin =
+    await requireAdminSession(
+      request,
+      env
+    );
+
+  if (!isAdmin) {
+    return Response.json(
+      {
+        ok: false,
+        error: "Chưa đăng nhập quản trị"
+      },
+      {
+        status: 401
+      }
+    );
+  }
+
+  try {
+    const robotId =
+      Number(
+        aiContentMatch[1]
+      );
+
+    if (
+      !Number.isInteger(robotId) ||
+      robotId <= 0
+    ) {
+      return Response.json(
+        {
+          ok: false,
+          error: "robotId không hợp lệ"
+        },
+        {
+          status: 400
+        }
+      );
+    }
+
+    const body =
+      await request.json();
+
+    const aiContent =
+      body?.aiContent;
+
+    if (
+      !aiContent ||
+      typeof aiContent.highlight_intro !== "string" ||
+      !Array.isArray(aiContent.sections) ||
+      typeof aiContent.technical_view !== "string" ||
+      typeof aiContent.suitable_for !== "string"
+    ) {
+      return Response.json(
+        {
+          ok: false,
+          error:
+            "Cấu trúc nội dung AI không hợp lệ"
+        },
+        {
+          status: 400
+        }
+      );
+    }
+
+    if (
+      aiContent.sections.length > 4
+    ) {
+      return Response.json(
+        {
+          ok: false,
+          error:
+            "Nội dung AI không được vượt quá 4 chủ đề"
+        },
+        {
+          status: 400
+        }
+      );
+    }
+
+    const robot =
+      await env
+        .trung_tu_te_robot_db
+        .prepare(
+          `
+          SELECT
+            id,
+            brand,
+            model,
+            slug
+          FROM robots
+          WHERE id = ?
+          LIMIT 1
+          `
+        )
+        .bind(robotId)
+        .first();
+
+    if (!robot) {
+      return Response.json(
+        {
+          ok: false,
+          error:
+            "Không tìm thấy Robot"
+        },
+        {
+          status: 404
+        }
+      );
+    }
+
+    const aiJson =
+      JSON.stringify(
+        aiContent
+      );
+
+    const existingContent =
+      await env
+        .trung_tu_te_robot_db
+        .prepare(
+          `
+          SELECT id
+          FROM robot_content
+          WHERE robot_id = ?
+          LIMIT 1
+          `
+        )
+        .bind(robotId)
+        .first();
+
+    if (existingContent) {
+      await env
+        .trung_tu_te_robot_db
+        .prepare(
+          `
+          UPDATE robot_content
+          SET
+            ai_content = ?,
+            updated_at =
+              CURRENT_TIMESTAMP
+          WHERE robot_id = ?
+          `
+        )
+        .bind(
+          aiJson,
+          robotId
+        )
+        .run();
+    } else {
+      await env
+        .trung_tu_te_robot_db
+        .prepare(
+          `
+          INSERT INTO robot_content
+          (
+            robot_id,
+            ai_content
+          )
+          VALUES (?, ?)
+          `
+        )
+        .bind(
+          robotId,
+          aiJson
+        )
+        .run();
+    }
+
+    return Response.json({
+      ok: true,
+      message:
+        "Đã lưu nội dung AI",
+      robot: {
+        id: robot.id,
+        brand: robot.brand,
+        model: robot.model,
+        slug: robot.slug
+      },
+      aiContent
+    });
 
   } catch (error) {
     return Response.json(
@@ -1985,15 +2264,23 @@ return Response.json({
             .prepare(
               `
               SELECT
-                id,
-                brand,
-                model,
-                slug,
-                year
-              FROM robots
-              ORDER BY
-                brand ASC,
-                model ASC
+  r.id,
+  r.brand,
+  r.model,
+  r.slug,
+  r.year,
+  CASE
+    WHEN rc.ai_content IS NOT NULL
+      AND TRIM(rc.ai_content) != ''
+    THEN 1
+    ELSE 0
+  END AS has_ai_content
+FROM robots r
+LEFT JOIN robot_content rc
+  ON rc.robot_id = r.id
+ORDER BY
+  r.brand ASC,
+  r.model ASC
               `
             )
             .all();
@@ -5052,7 +5339,38 @@ if (
     request
   );
 }
+// =========================================================
+// ADMIN - LOGOUT
+// =========================================================
 
+if (
+  url.pathname === "/api/admin/logout" &&
+  request.method === "POST"
+) {
+  return new Response(
+    JSON.stringify({
+      ok: true,
+      message: "Đã đăng xuất Admin"
+    }),
+    {
+      status: 200,
+      headers: {
+        "Content-Type":
+          "application/json",
+
+        "Set-Cookie":
+          [
+            "admin_session=",
+            "HttpOnly",
+            "Secure",
+            "SameSite=Strict",
+            "Path=/",
+            "Max-Age=0"
+          ].join("; ")
+      }
+    }
+  );
+}
     // =========================================================
     // STATIC WEBSITE
     // =========================================================

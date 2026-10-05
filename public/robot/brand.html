@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta
+  id="brand-description"
+  name="description"
+  content="Các dòng robot lau nhà – thông tin model và góc nhìn kỹ thuật từ Trung Tử Tế."
+>
+
+<title>Robot lau nhà | Trung Tử Tế</title>
+
+<link rel="stylesheet" href="../../css/style.css">
+</head>
+
+<body>
+
+<header class="header">
+  <div class="wrap nav-wrap">
+
+    <a class="logo" href="../../index.html">
+      <img
+        class="logo-image"
+        src="/api/image/11o8kadVPE6ZbWvYAlrf-pkSQGaTkVFf2"
+        alt="Trung Tử Tế - Robot lau nhà"
+      >
+
+      <span>
+        <b>TRUNG TỬ TẾ</b>
+        <small>Robot lau nhà</small>
+      </span>
+    </a>
+
+    <button class="menu" aria-label="Mở menu">
+      ☰
+    </button>
+
+    <nav>
+      <a href="../index.html">Robot</a>
+      <a href="../../chia-se/index.html">Chia sẻ</a>
+      <a href="../../index.html#dich-vu">Dịch vụ</a>
+      <a href="../../index.html#lien-he">Liên hệ</a>
+    </nav>
+
+  </div>
+</header>
+
+
+<main>
+
+<section class="section">
+
+  <div class="wrap">
+
+    <a class="back" href="../index.html">
+      ← Quay lại các thương hiệu
+    </a>
+
+
+    <div class="heading">
+
+      <div>
+        <p class="eyebrow" id="brand-eyebrow">
+          ROBOT
+        </p>
+
+        <h1 id="brand-title">
+          Các dòng robot lau nhà
+        </h1>
+      </div>
+
+      <p id="brand-intro">
+        Tổng hợp các model robot lau nhà mà Trung Tử Tế
+        đã tìm hiểu, trải nghiệm và hỗ trợ kỹ thuật.
+      </p>
+
+    </div>
+
+
+    <div class="article-note" style="margin:35px 0 40px;">
+
+      <b id="brand-note-title">
+        Robot lau nhà
+      </b>
+
+      <p id="brand-note-1">
+        Mỗi dòng robot có cách thiết kế, khả năng lau hút
+        và hệ thống trạm khác nhau.
+      </p>
+
+      <p id="brand-note-2">
+        Vì vậy, ngoài thông số trên giấy, tôi quan tâm nhiều
+        đến trải nghiệm sử dụng thực tế, khả năng bảo trì,
+        thay thế linh kiện và việc sử dụng lâu dài.
+      </p>
+
+    </div>
+
+
+    <div
+      class="brands-grid"
+      id="brand-models-list"
+    >
+      <span>Đang tải danh sách model...</span>
+    </div>
+
+
+    <div class="article-note" style="margin-top:40px;">
+
+      <b>Góc nhìn kỹ thuật</b>
+
+      <p>
+        Không phải model có thông số cao hơn lúc nào cũng
+        phù hợp hơn. Khi tư vấn, tôi thường xem cả diện tích,
+        loại sàn, nhu cầu lau hút, dock sạc và khả năng bảo trì
+        về sau.
+      </p>
+
+    </div>
+
+
+    <div class="article-bottom-back">
+
+      <a href="../index.html" class="btn">
+        ← Quay lại các thương hiệu
+      </a>
+
+    </div>
+
+  </div>
+
+</section>
+
+</main>
+
+<div id="site-footer"></div>
+
+<script src="../../js/main.js"></script>
+<script src="../../js/footer.js"></script>
+
+<script>
+async function loadBrandPage() {
+
+  const pageUrl = new URL(window.location.href);
+
+  const brandParam =
+    pageUrl.searchParams.get("brand") || "";
+
+  const brand =
+    brandParam.trim();
+
+  const eyebrow =
+    document.getElementById("brand-eyebrow");
+
+  const title =
+    document.getElementById("brand-title");
+
+  const intro =
+    document.getElementById("brand-intro");
+
+  const noteTitle =
+    document.getElementById("brand-note-title");
+
+  const note1 =
+    document.getElementById("brand-note-1");
+
+  const note2 =
+    document.getElementById("brand-note-2");
+
+  const description =
+    document.getElementById("brand-description");
+
+  const modelsList =
+    document.getElementById("brand-models-list");
+
+
+  if (!brand) {
+
+    eyebrow.textContent =
+      "ROBOT";
+
+    title.textContent =
+      "Các dòng robot lau nhà";
+
+    modelsList.innerHTML =
+      "<span>Thiếu thông tin hãng robot.</span>";
+
+    return;
+  }
+
+
+  document.title =
+    brand +
+    " – Robot lau nhà | Trung Tử Tế";
+
+
+  description.setAttribute(
+    "content",
+    "Các dòng robot lau nhà " +
+    brand +
+    " – thông tin model và góc nhìn kỹ thuật từ Trung Tử Tế."
+  );
+
+
+  eyebrow.textContent =
+    brand.toUpperCase();
+
+
+  title.textContent =
+    "Các dòng robot lau nhà " +
+    brand;
+
+
+  intro.textContent =
+    "Tổng hợp các model " +
+    brand +
+    " mà Trung Tử Tế đã tìm hiểu, trải nghiệm và hỗ trợ kỹ thuật.";
+
+
+  noteTitle.textContent =
+    brand +
+    " và robot lau nhà";
+
+
+  note1.textContent =
+    brand +
+    " có nhiều model với cách thiết kế, khả năng lau hút " +
+    "và hệ thống trạm khác nhau.";
+
+
+  note2.textContent =
+    "Vì vậy, ngoài thông số trên giấy, tôi quan tâm nhiều " +
+    "đến trải nghiệm sử dụng thực tế, khả năng bảo trì, " +
+    "thay thế linh kiện và việc sử dụng lâu dài.";
+
+
+  try {
+
+    const response =
+      await fetch("/api/robots");
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        "Không thể đọc API robot"
+      );
+
+    }
+
+
+    const data =
+      await response.json();
+
+
+    if (
+      !data.ok ||
+      !Array.isArray(data.robots)
+    ) {
+
+      throw new Error(
+        data.error ||
+        "API robot không đúng định dạng"
+      );
+
+    }
+
+
+    const robots =
+      data.robots.filter(function(robot) {
+
+        return (
+          String(robot.brand || "")
+            .trim()
+            .toLowerCase() ===
+          brand.toLowerCase()
+        );
+
+      });
+
+
+    modelsList.innerHTML = "";
+
+
+    if (robots.length === 0) {
+
+      modelsList.innerHTML =
+        "<span>Chưa có model thuộc hãng " +
+        brand +
+        ".</span>";
+
+      return;
+    }
+
+
+    robots.forEach(function(robot) {
+
+      const link =
+        document.createElement("a");
+
+
+      link.href =
+        "template/index.html?slug=" +
+        encodeURIComponent(
+          robot.slug
+        );
+
+
+      link.className =
+        "article-model-card";
+
+
+      const primaryImage =
+        Array.isArray(robot.images)
+          ? (
+              robot.images.find(
+                function(image) {
+
+                  return (
+                    image.isPrimary === true ||
+                    image.primary === true
+                  );
+
+                }
+              ) ||
+              robot.images[0]
+            )
+          : null;
+
+
+      const imageBox =
+        document.createElement("div");
+
+
+      imageBox.className =
+        "article-model-card-image";
+
+
+      if (
+        primaryImage &&
+        primaryImage.url
+      ) {
+
+        const image =
+          document.createElement("img");
+
+
+        image.src =
+          primaryImage.url;
+
+
+        image.alt =
+          robot.model ||
+          "Robot lau nhà";
+
+
+        image.loading =
+          "lazy";
+
+
+        imageBox.appendChild(
+          image
+        );
+
+      } else {
+
+        imageBox.classList.add(
+          "no-image"
+        );
+
+
+        imageBox.textContent =
+          "Chưa có hình ảnh";
+
+      }
+
+
+      const content =
+        document.createElement("div");
+
+
+      content.className =
+        "article-model-card-content";
+
+
+      const brandName =
+        document.createElement("span");
+
+
+      brandName.className =
+        "article-model-card-brand";
+
+
+      brandName.textContent =
+        robot.brand ||
+        brand;
+
+
+      const name =
+        document.createElement("strong");
+
+
+      name.className =
+        "article-model-card-name";
+
+
+      name.textContent =
+        robot.model ||
+        "Robot lau nhà";
+
+
+      const year =
+        document.createElement("span");
+
+
+      year.className =
+        "article-model-card-year";
+
+
+      if (
+        robot.year !== null &&
+        robot.year !== undefined &&
+        robot.year !== ""
+      ) {
+
+        year.textContent =
+          "Năm " +
+          robot.year;
+
+      } else {
+
+        year.textContent =
+          "Đang cập nhật";
+
+      }
+
+
+      const detail =
+        document.createElement("span");
+
+
+      detail.className =
+        "article-model-card-link";
+
+
+      detail.textContent =
+        "Xem chi tiết →";
+
+
+      content.appendChild(
+        brandName
+      );
+
+
+      content.appendChild(
+        name
+      );
+
+
+      content.appendChild(
+        year
+      );
+
+
+      content.appendChild(
+        detail
+      );
+
+
+      link.appendChild(
+        imageBox
+      );
+
+
+      link.appendChild(
+        content
+      );
+
+
+      modelsList.appendChild(
+        link
+      );
+
+    });
+
+
+  } catch (error) {
+
+    console.error(
+      "Load brand page:",
+      error
+    );
+
+
+    modelsList.innerHTML =
+      "<span>Không thể tải danh sách model.</span>";
+
+  }
+
+}
+
+
+loadBrandPage();
+</script>
+
+</body>
+</html>

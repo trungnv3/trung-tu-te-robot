@@ -4,6 +4,10 @@ const adminLoginForm = document.getElementById("admin-login-form");
 const adminPassword = document.getElementById("admin-password");
 const adminLoginButton = document.getElementById("admin-login-button");
 const adminLoginError = document.getElementById("admin-login-error");
+const adminLogoutButton =
+  document.getElementById(
+    "admin-logout-button"
+  );
 function showAdminLogin() {
   if (adminLogin) {
     adminLogin.style.display = "flex";
@@ -23,6 +27,71 @@ function showAdminPanel() {
     adminLayout.style.display = "";
   }
 }
+// ============================================================
+// ADMIN - ĐĂNG XUẤT
+// ============================================================
+
+if (adminLogoutButton) {
+  adminLogoutButton.addEventListener(
+    "click",
+    async function () {
+
+      adminLogoutButton.disabled = true;
+
+      adminLogoutButton.textContent =
+        "Đang đăng xuất...";
+
+      try {
+
+        const response =
+          await fetch(
+            "/api/admin/logout",
+            {
+              method: "POST",
+              credentials: "same-origin"
+            }
+          );
+
+        const data =
+          await response.json();
+
+        if (
+          !response.ok ||
+          !data.ok
+        ) {
+          throw new Error(
+            data.error ||
+            "Không thể đăng xuất."
+          );
+        }
+
+        showAdminLogin();
+
+      } catch (error) {
+
+        console.error(
+          "Logout error:",
+          error
+        );
+
+        alert(
+          error.message ||
+          "Không thể đăng xuất."
+        );
+
+      } finally {
+
+        adminLogoutButton.disabled =
+          false;
+
+        adminLogoutButton.textContent =
+          "🚪 Đăng xuất";
+
+      }
+
+    }
+  );
+}
 async function checkAdminSession() {
   try {
     const response = await fetch("/api/admin/session", {
@@ -33,6 +102,10 @@ const data = await response.json();
 
 if (data.ok && data.authenticated === true) {
   showAdminPanel();
+
+  await loadRobots();
+  await loadAnalytics();
+
   return true;
 }
 
@@ -89,7 +162,8 @@ try {
 
   showAdminPanel();
 
-  await loadRobots();
+await loadRobots();
+await loadAnalytics();
 
 } catch (error) {
   if (adminLoginError) {
@@ -323,25 +397,34 @@ function renderRobotList() {
       '</p>' +
 
       '<button class="robot-edit-button" data-robot-id="' +
+  robot.id +
+'">' +
+  'Sửa' +
+'</button>' +
 
-        robot.id +
+'<button ' +
+    'type="button" ' +
+    'class="robot-ai-button" ' +
+    'data-robot-id="' +
+    robot.id +
+  '">' +
+    (
+      Number(robot.has_ai_content) === 1
+        ? '🔄 Tạo lại AI'
+        : '🤖 Tạo nội dung AI'
+    ) +
+  '</button>' +
 
-      '">' +
+'<button ' +
+    'type="button" ' +
+    'class="robot-delete-button" ' +
+    'data-robot-id="' +
+    robot.id +
+  '">' +
+    'Xóa' +
+  '</button>' +
 
-        'Sửa' +
-
-      '</button>' +
-      '<button ' +
-          'type="button" ' +
-          'class="robot-delete-button" ' +
-          'data-robot-id="' +
-          robot.id +
-        '">' +
-          'Xóa' +
-        '</button>' +
-        '</div>' +
-
-    '</div>' +
+'</div>' +
 
   '</article>'
   });
@@ -500,6 +583,114 @@ document.addEventListener("click", async function (event) {
 
     return;
   }
+
+  // ======================================================
+  // TẠO / TẠO LẠI NỘI DUNG AI
+  // ======================================================
+  const aiButton =
+    event.target.closest(".robot-ai-button");
+
+  if (aiButton) {
+    const robotId =
+      aiButton.dataset.robotId;
+
+    if (!robotId) {
+      return;
+    }
+
+    const confirmed =
+      window.confirm(
+        "Bạn có muốn tạo nội dung AI cho Robot này không?\n\n" +
+        "Nội dung AI sẽ được tạo thành bản nháp để bạn kiểm tra và chỉnh sửa trước khi lưu."
+      );
+
+    if (!confirmed) {
+      return;
+    }
+
+    const originalText =
+      aiButton.textContent;
+
+    aiButton.disabled = true;
+    aiButton.textContent =
+      "Đang tạo AI...";
+
+    try {
+      const response =
+        await fetch(
+          "/api/ai/generate-robot-content",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+            credentials:
+              "same-origin",
+            body: JSON.stringify({
+              robotId:
+                Number(robotId)
+            })
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (
+        !response.ok ||
+        !data.ok
+      ) {
+        throw new Error(
+          data.error ||
+          "Không thể tạo nội dung AI."
+        );
+      }
+
+      console.log(
+        "AI draft:",
+        data.aiContent
+      );
+
+      window.currentAIContent =
+        data.aiContent;
+
+      window.currentAIRobotId =
+        Number(robotId);
+
+      window.currentAIRobotModel =
+        data.robot?.model ||
+        "Robot";
+
+      renderAddRobotAIReview(
+        data.aiContent,
+        Number(robotId),
+        data.robot?.model ||
+          "Robot"
+      );
+
+    } catch (error) {
+      console.error(
+        "Generate AI content error:",
+        error
+      );
+
+      window.alert(
+        "Không thể tạo nội dung AI.\n\n" +
+        (
+          error.message ||
+          "Đã xảy ra lỗi không xác định."
+        )
+      );
+
+      aiButton.disabled = false;
+      aiButton.textContent =
+        originalText;
+    }
+
+    return;
+  }
+
   const editButton =
     event.target.closest(".robot-edit-button");
 
@@ -3162,7 +3353,251 @@ function renderAddRobotStep5() {
   scrollAddRobotPanel();
 }
 
+// ============================================================
+// DUYỆT NỘI DUNG AI
+// ============================================================
 
+function renderAddRobotAIReview(
+  aiContent,
+  robotId,
+  robotModel
+) {
+  const panel =
+    getAddRobotPanel();
+
+  if (!panel) {
+    return;
+  }
+
+  const content =
+    aiContent || {};
+
+  const sections =
+    Array.isArray(content.sections)
+      ? content.sections
+      : [];
+
+  let sectionsHtml = "";
+
+  sections.forEach(
+    function (section, index) {
+
+      const paragraphs =
+        Array.isArray(
+          section.paragraphs
+        )
+          ? section.paragraphs
+          : [];
+
+      let paragraphsHtml = "";
+
+      paragraphs.forEach(
+        function (paragraph) {
+
+          paragraphsHtml +=
+            '<textarea ' +
+              'class="robot-ai-section-paragraph" ' +
+              'rows="4" ' +
+              'placeholder="Nội dung diễn giải..."' +
+            '>' +
+              escapeAddRobotHtml(
+                paragraph || ""
+              ) +
+            '</textarea>';
+        }
+      );
+
+      sectionsHtml +=
+        '<div class="robot-ai-section">' +
+
+          '<div class="robot-ai-section-header">' +
+            '<strong>Chủ đề ' +
+              (index + 1) +
+            '</strong>' +
+
+            '<button ' +
+              'type="button" ' +
+              'class="button-secondary robot-ai-remove-section"' +
+              ' data-index="' +
+                index +
+              '"' +
+            '>' +
+              'Xóa chủ đề' +
+            '</button>' +
+          '</div>' +
+
+          '<label>' +
+            '<span>Tiêu đề</span>' +
+            '<input ' +
+              'type="text" ' +
+              'class="robot-ai-section-title" ' +
+              'value="' +
+                escapeAddRobotHtml(
+                  section.title || ""
+                ) +
+              '"' +
+            '>' +
+          '</label>' +
+
+          '<div class="robot-ai-paragraphs">' +
+            paragraphsHtml +
+          '</div>' +
+
+        '</div>';
+    }
+  );
+
+  panel.innerHTML =
+    '<div class="panel-header">' +
+
+      '<div>' +
+        '<p class="eyebrow">NỘI DUNG AI</p>' +
+
+        '<h2>Kiểm tra nội dung AI</h2>' +
+
+        '<p class="panel-description">' +
+          escapeAddRobotHtml(
+            robotModel ||
+            "Robot"
+          ) +
+          ' · ID: ' +
+          escapeAddRobotHtml(
+            String(robotId)
+          ) +
+        '</p>' +
+
+      '</div>' +
+
+      '<button ' +
+        'type="button" ' +
+        'id="robot-ai-close" ' +
+        'class="button-secondary"' +
+      '>' +
+        'Đóng' +
+      '</button>' +
+
+    '</div>' +
+
+    '<div class="admin-form-section">' +
+
+      '<div class="robot-ai-review-note">' +
+        '<strong>AI đã tạo bản nháp.</strong>' +
+        '<p>' +
+          'Hãy kiểm tra và chỉnh sửa nội dung trước khi lưu chính thức.' +
+        '</p>' +
+      '</div>' +
+
+    '</div>' +
+
+    '<div class="admin-form-section">' +
+
+      '<label>' +
+        '<span>Giới thiệu ngắn</span>' +
+
+        '<textarea ' +
+          'id="robot-ai-highlight-intro" ' +
+          'rows="4" ' +
+          'placeholder="Giới thiệu ngắn về robot..."' +
+        '>' +
+          escapeAddRobotHtml(
+            content.highlight_intro ||
+            ""
+          ) +
+        '</textarea>' +
+
+      '</label>' +
+
+    '</div>' +
+
+    '<div class="admin-form-section">' +
+
+      '<div class="robot-add-feature-header">' +
+        '<div>' +
+          '<h3>Các chủ đề nội dung</h3>' +
+          '<p class="robot-add-feature-note">' +
+            'Tối đa 4 chủ đề. Có thể chỉnh sửa hoặc xóa chủ đề.' +
+          '</p>' +
+        '</div>' +
+
+        '<button ' +
+          'type="button" ' +
+          'id="robot-ai-add-section" ' +
+          'class="button-secondary"' +
+        '>' +
+          '+ Thêm chủ đề' +
+        '</button>' +
+
+      '</div>' +
+
+      '<div id="robot-ai-sections">' +
+        sectionsHtml +
+      '</div>' +
+
+    '</div>' +
+
+    '<div class="admin-form-section">' +
+
+      '<label>' +
+        '<span>Góc nhìn kỹ thuật Trung Tử Tế</span>' +
+
+        '<textarea ' +
+          'id="robot-ai-technical-view" ' +
+          'rows="5" ' +
+          'placeholder="Nhận xét dưới góc nhìn kỹ thuật..."' +
+        '>' +
+          escapeAddRobotHtml(
+            content.technical_view ||
+            ""
+          ) +
+        '</textarea>' +
+
+      '</label>' +
+
+    '</div>' +
+
+    '<div class="admin-form-section">' +
+
+      '<label>' +
+        '<span>Phù hợp với</span>' +
+
+        '<textarea ' +
+          'id="robot-ai-suitable-for" ' +
+          'rows="5" ' +
+          'placeholder="Robot phù hợp với nhóm người dùng nào..."' +
+        '>' +
+          escapeAddRobotHtml(
+            content.suitable_for ||
+            ""
+          ) +
+        '</textarea>' +
+
+      '</label>' +
+
+    '</div>' +
+
+    '<div class="admin-form-actions">' +
+
+      '<button ' +
+        'type="button" ' +
+        'id="robot-ai-save" ' +
+        'class="button-primary"' +
+      '>' +
+        'Lưu nội dung AI' +
+      '</button>' +
+
+    '</div>';
+
+  window.currentAIContent =
+    content;
+
+  window.currentAIRobotId =
+    robotId;
+
+  window.currentAIRobotModel =
+    robotModel;
+
+  scrollAddRobotPanel();
+}
 // ============================================================
 // HIỂN THỊ DANH SÁCH ẢNH ĐÃ CHỌN
 // ============================================================
@@ -6683,30 +7118,69 @@ document.addEventListener(
         );
       }
 
-      alert(
-        "Đã tạo Robot thành công.\n\n" +
-        data.robot.model +
-        "\n\n" +
-        "ID: " +
-        data.robotId
-      );
+            // ======================================================
+      // TẠO NỘI DUNG AI SAU KHI TẠO ROBOT
+      // ======================================================
 
-      addRobotImages =
-        [];
+      createButton.disabled = true;
+      createButton.textContent =
+        "Đang tạo nội dung AI...";
 
-      addRobotState.step =
-        1;
+      const aiResponse =
+        await fetch(
+          "/api/ai/generate-robot-content",
+          {
+            method: "POST",
 
-      panel.remove();
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            credentials:
+              "same-origin",
+
+            body:
+              JSON.stringify({
+                robotId:
+                  data.robotId
+              })
+          }
+        );
+
+      const aiData =
+        await aiResponse.json();
 
       if (
-        typeof loadRobots ===
-        "function"
+        !aiResponse.ok ||
+        !aiData.ok
       ) {
-        await loadRobots();
-      } else {
-        window.location.reload();
+        throw new Error(
+          aiData.error ||
+          "Không thể tạo nội dung AI."
+        );
       }
+
+      console.log(
+        "AI draft:",
+        aiData.aiContent
+      );
+
+      window.currentAIContent =
+        aiData.aiContent;
+
+      window.currentAIRobotId =
+        data.robotId;
+
+      window.currentAIRobotModel =
+        data.robot.model;
+
+      // Hiển thị bản nháp AI để kiểm tra
+      renderAddRobotAIReview(
+        aiData.aiContent,
+        data.robotId,
+        data.robot.model
+      );
 
     } catch (error) {
 
@@ -6727,6 +7201,398 @@ document.addEventListener(
 
       createButton.textContent =
         "Tạo Robot";
+
+    }
+
+  }
+);
+// ============================================================
+// QUẢN LÝ CHỦ ĐỀ NỘI DUNG AI
+// ============================================================
+
+document.addEventListener(
+  "click",
+  function (event) {
+
+    // --------------------------------------------------------
+    // THÊM CHỦ ĐỀ
+    // --------------------------------------------------------
+
+    const addSectionButton =
+      event.target.closest(
+        "#robot-ai-add-section"
+      );
+
+    if (addSectionButton) {
+
+      const container =
+        document.querySelector(
+          "#robot-ai-sections"
+        );
+
+      if (!container) {
+        return;
+      }
+
+      const currentSections =
+        container.querySelectorAll(
+          ".robot-ai-section"
+        );
+
+      if (
+        currentSections.length >= 4
+      ) {
+        alert(
+          "Nội dung AI chỉ được tối đa 4 chủ đề."
+        );
+        return;
+      }
+
+      const index =
+        currentSections.length;
+
+      const section =
+        document.createElement(
+          "div"
+        );
+
+      section.className =
+        "robot-ai-section";
+
+      section.innerHTML =
+        '<div class="robot-ai-section-header">' +
+
+          '<strong>Chủ đề ' +
+            (index + 1) +
+          '</strong>' +
+
+          '<button ' +
+            'type="button" ' +
+            'class="button-secondary robot-ai-remove-section"' +
+          '>' +
+            'Xóa chủ đề' +
+          '</button>' +
+
+        '</div>' +
+
+        '<label>' +
+          '<span>Tiêu đề</span>' +
+
+          '<input ' +
+            'type="text" ' +
+            'class="robot-ai-section-title"' +
+            'placeholder="Tên chủ đề kỹ thuật"' +
+          '>' +
+
+        '</label>' +
+
+        '<div class="robot-ai-paragraphs">' +
+
+          '<textarea ' +
+            'class="robot-ai-section-paragraph"' +
+            'rows="4"' +
+            'placeholder="Nội dung diễn giải..."' +
+          '></textarea>' +
+
+        '</div>';
+
+      container.appendChild(
+        section
+      );
+
+      updateAIRobotSectionNumbers();
+
+      return;
+    }
+
+
+    // --------------------------------------------------------
+    // XÓA CHỦ ĐỀ
+    // --------------------------------------------------------
+
+    const removeSectionButton =
+      event.target.closest(
+        ".robot-ai-remove-section"
+      );
+
+    if (removeSectionButton) {
+
+      const section =
+        removeSectionButton.closest(
+          ".robot-ai-section"
+        );
+
+      if (!section) {
+        return;
+      }
+
+      section.remove();
+
+      updateAIRobotSectionNumbers();
+
+    }
+
+  }
+);
+
+
+// ============================================================
+// CẬP NHẬT SỐ THỨ TỰ CHỦ ĐỀ AI
+// ============================================================
+
+function updateAIRobotSectionNumbers() {
+
+  const sections =
+    document.querySelectorAll(
+      "#robot-ai-sections .robot-ai-section"
+    );
+
+  sections.forEach(
+    function (section, index) {
+
+      const title =
+        section.querySelector(
+          ".robot-ai-section-header strong"
+        );
+
+      if (title) {
+        title.textContent =
+          "Chủ đề " +
+          (index + 1);
+      }
+
+    }
+  );
+
+}
+// ============================================================
+// LƯU NỘI DUNG AI
+// ============================================================
+
+document.addEventListener(
+  "click",
+  async function (event) {
+
+    const saveButton =
+      event.target.closest(
+        "#robot-ai-save"
+      );
+
+    if (!saveButton) {
+      return;
+    }
+
+    const robotId =
+      window.currentAIRobotId;
+
+    if (!robotId) {
+      alert(
+        "Không xác định được Robot cần lưu."
+      );
+      return;
+    }
+
+    try {
+
+      saveButton.disabled =
+        true;
+
+      saveButton.textContent =
+        "Đang lưu...";
+
+      const highlightIntro =
+        document.querySelector(
+          "#robot-ai-highlight-intro"
+        )?.value?.trim() ||
+        "";
+
+      const technicalView =
+        document.querySelector(
+          "#robot-ai-technical-view"
+        )?.value?.trim() ||
+        "";
+
+      const suitableFor =
+        document.querySelector(
+          "#robot-ai-suitable-for"
+        )?.value?.trim() ||
+        "";
+
+      const sectionElements =
+        document.querySelectorAll(
+          "#robot-ai-sections .robot-ai-section"
+        );
+
+      const sections = [];
+
+      sectionElements.forEach(
+        function (sectionElement) {
+
+          const title =
+            sectionElement
+              .querySelector(
+                ".robot-ai-section-title"
+              )
+              ?.value
+              ?.trim() ||
+              "";
+
+          const paragraphElements =
+            sectionElement.querySelectorAll(
+              ".robot-ai-section-paragraph"
+            );
+
+          const paragraphs = [];
+
+          paragraphElements.forEach(
+            function (paragraphElement) {
+
+              const text =
+                paragraphElement
+                  .value
+                  .trim();
+
+              if (text) {
+                paragraphs.push(
+                  text
+                );
+              }
+
+            }
+          );
+
+          if (
+            title ||
+            paragraphs.length > 0
+          ) {
+            sections.push({
+              title:
+                title,
+
+              paragraphs:
+                paragraphs
+            });
+          }
+
+        }
+      );
+
+      if (
+        sections.length > 4
+      ) {
+        throw new Error(
+          "Nội dung AI không được vượt quá 4 chủ đề."
+        );
+      }
+
+      const aiContent = {
+        highlight_intro:
+          highlightIntro,
+
+        sections:
+          sections,
+
+        technical_view:
+          technicalView,
+
+        suitable_for:
+          suitableFor
+      };
+
+      const response =
+        await fetch(
+          "/api/admin/robot/" +
+            encodeURIComponent(
+              robotId
+            ) +
+            "/ai-content",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            credentials:
+              "same-origin",
+
+            body:
+              JSON.stringify({
+                aiContent:
+                  aiContent
+              })
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (
+        !response.ok ||
+        !data.ok
+      ) {
+        throw new Error(
+          data.error ||
+          "Không thể lưu nội dung AI."
+        );
+      }
+
+      alert(
+        "Đã lưu nội dung AI thành công."
+      );
+
+      // Reset trạng thái tạo Robot
+      addRobotImages =
+        [];
+
+      addRobotState.step =
+        1;
+
+      window.currentAIContent =
+        null;
+
+      window.currentAIRobotId =
+        null;
+
+      window.currentAIRobotModel =
+        null;
+
+      const panel =
+        getAddRobotPanel();
+
+      if (panel) {
+        panel.remove();
+      }
+
+      if (
+        typeof loadRobots ===
+        "function"
+      ) {
+        await loadRobots();
+      } else {
+        window.location.reload();
+      }
+
+    } catch (error) {
+
+      console.error(
+        "Save AI content error:",
+        error
+      );
+
+      alert(
+        "Không thể lưu nội dung AI:\n\n" +
+        error.message
+      );
+
+    } finally {
+
+      saveButton.disabled =
+        false;
+
+      saveButton.textContent =
+        "Lưu nội dung AI";
 
     }
 
