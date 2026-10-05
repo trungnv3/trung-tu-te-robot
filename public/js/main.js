@@ -211,10 +211,13 @@ if (galleryThumbs && galleryMainImage) {
 // ROBOT MODELS - TỰ ĐỘNG TẠO DANH SÁCH TỪ D1
 // ============================================================
 
-const dreameModelsList =
+const ModelsList =
   document.querySelector("#dreame-models-list");
-
-if (dreameModelsList) {
+  const modelsTitle =
+  document.querySelector(
+    "#article-models-title"
+  );
+if (ModelsList) {
 
   fetch("/api/robots")
     .then((response) => {
@@ -242,11 +245,77 @@ if (dreameModelsList) {
       }
 
       const robots =
-        data.robots;
+  data.robots;
 
-      dreameModelsList.innerHTML = "";
+// ========================================================
+// XÁC ĐỊNH ROBOT HIỆN TẠI TỪ SLUG TRÊN URL
+// ========================================================
 
-      robots.forEach((robot) => {
+const currentSlug =
+  new URLSearchParams(
+    window.location.search
+  ).get("slug");
+
+const currentRobot =
+  robots.find(
+    (robot) =>
+      robot.slug === currentSlug
+  );
+
+// ========================================================
+// LỌC MODEL THEO THƯƠNG HIỆU
+// ========================================================
+
+const currentBrand =
+  currentRobot &&
+  currentRobot.brand
+    ? currentRobot.brand
+    : null;
+    if (modelsTitle) {
+
+      modelsTitle.textContent =
+  currentBrand
+    ? "Các dòng robot " +
+      currentBrand +
+      " khác"
+    : "Các dòng robot khác";
+    
+    }
+    const filteredRobots =
+    currentBrand
+      ? robots.filter(
+          (robot) =>
+            String(robot.brand || "")
+              .trim()
+              .toLowerCase() ===
+            String(currentBrand)
+              .trim()
+              .toLowerCase() &&
+            robot.slug !== currentSlug
+        )
+      : robots.filter(
+          (robot) =>
+            robot.slug !== currentSlug
+        );
+
+console.log(
+  "Robot hiện tại:",
+  currentRobot
+);
+
+console.log(
+  "Brand hiện tại:",
+  currentBrand
+);
+
+console.log(
+  "Model cùng thương hiệu:",
+  filteredRobots
+);
+
+ModelsList.innerHTML = "";
+
+filteredRobots.forEach((robot) => {
 
         const link =
           document.createElement("a");
@@ -421,7 +490,7 @@ if (dreameModelsList) {
           content
         );
 
-        dreameModelsList.appendChild(
+        ModelsList.appendChild(
           link
         );
 

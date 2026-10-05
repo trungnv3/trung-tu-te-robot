@@ -1039,9 +1039,13 @@ footer {
   }
   
   .article-models-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+    display: grid;
+    grid-template-columns: repeat(
+      4,
+      minmax(0, 280px)
+    );
+    gap: 12px;
+    justify-content: start;
   }
   
   .article-model-card {

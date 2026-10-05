@@ -3036,3 +3036,250 @@ body {
       width: 100%;
     }
   }
+ /* ============================================================
+   AI REVIEW PANEL - DUYỆT NỘI DUNG AI
+   ============================================================ */
+
+.robot-ai-review-panel {
+  margin-top: 24px;
+  overflow: hidden;
+}
+
+.robot-ai-review-panel[hidden] {
+  display: none;
+}
+
+/* HEADER */
+
+.robot-ai-review-panel .panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.robot-ai-review-panel .panel-header h2 {
+  margin: 4px 0 6px;
+  font-size: 22px;
+  line-height: 1.3;
+}
+
+.robot-ai-review-panel .panel-description {
+  margin: 0;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+/* CÁC KHỐI NỘI DUNG */
+
+.robot-ai-review-panel .admin-form-section {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fafbfc;
+}
+
+.robot-ai-review-panel .admin-form-section > label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+}
+
+.robot-ai-review-panel .admin-form-section > label > span {
+  color: #374151;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* INPUT + TEXTAREA */
+
+.robot-ai-review-panel input,
+.robot-ai-review-panel textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #d9dee7;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #172033;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.6;
+  outline: none;
+}
+
+.robot-ai-review-panel input {
+  min-height: 42px;
+  padding: 0 12px;
+}
+
+.robot-ai-review-panel textarea {
+  min-height: 120px;
+  padding: 12px;
+  resize: vertical;
+}
+
+.robot-ai-review-panel input:focus,
+.robot-ai-review-panel textarea:focus {
+  border-color: #94a3b8;
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.14);
+}
+
+/* GHI CHÚ BẢN NHÁP */
+
+.robot-ai-review-panel .robot-ai-review-note {
+  padding: 16px 18px;
+  border: 1px solid #f0c36d;
+  border-radius: 10px;
+  background: #fff9ed;
+  color: #5f4a1f;
+}
+
+.robot-ai-review-panel .robot-ai-review-note > strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.robot-ai-review-panel .robot-ai-review-note p {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* CÁC CHỦ ĐỀ */
+
+.robot-ai-review-panel #robot-ai-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.robot-ai-review-panel .robot-add-feature-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.robot-ai-review-panel .robot-add-feature-header h3 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.robot-ai-review-panel .robot-add-feature-note {
+  margin: 5px 0 0;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+/* CARD TỪNG CHỦ ĐỀ */
+
+.robot-ai-review-panel .robot-ai-section {
+  padding: 18px;
+  border: 1px solid #dfe4ea;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.robot-ai-review-panel .robot-ai-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.robot-ai-review-panel .robot-ai-section-header strong {
+  color: #26352f;
+  font-size: 14px;
+}
+
+.robot-ai-review-panel .robot-ai-section > label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.robot-ai-review-panel .robot-ai-section > label > span {
+  color: #4b5563;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.robot-ai-review-panel .robot-ai-paragraphs {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.robot-ai-review-panel .robot-ai-section-paragraph {
+  min-height: 105px;
+}
+
+/* NÚT XÓA CHỦ ĐỀ */
+
+.robot-ai-review-panel .robot-ai-remove-section {
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+/* NÚT THÊM CHỦ ĐỀ */
+
+.robot-ai-review-panel #robot-ai-add-section {
+  white-space: nowrap;
+}
+
+/* KHU VỰC NÚT LƯU */
+
+.robot-ai-review-panel .admin-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.robot-ai-review-panel #robot-ai-save {
+  min-height: 44px;
+  padding: 0 20px;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* MOBILE */
+
+@media (max-width: 700px) {
+  .robot-ai-review-panel .panel-header {
+    flex-direction: column;
+  }
+
+  .robot-ai-review-panel .admin-form-section {
+    padding: 16px;
+  }
+
+  .robot-ai-review-panel .robot-add-feature-header {
+    flex-direction: column;
+  }
+
+  .robot-ai-review-panel .robot-ai-section {
+    padding: 14px;
+  }
+
+  .robot-ai-review-panel .admin-form-actions {
+    flex-direction: column;
+  }
+
+  .robot-ai-review-panel #robot-ai-save {
+    width: 100%;
+  }
+}

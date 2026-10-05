@@ -1497,78 +1497,535 @@ const responseSchema = {
   ]
 };
 // ---------------------------------------------------------
-// GỌI GEMINI
+// GỌI GEMINI - MODEL ROUTER + MEMORY
 // ---------------------------------------------------------
-const geminiModel =
+
+const primaryGeminiModel =
   env.GEMINI_MODEL ||
-  "gemini-3.6-flash";
+  "gemini-3.8-flash";
+
+const defaultGeminiModels = [
+  primaryGeminiModel,
+  "gemini-3.8-flash",
+  "gemini-3.7-flash",
+  "gemini-3.1-flash-lite",
+  "gemini-3.5-flash-lite"
+].filter(
+  (model, index, arr) =>
+    model &&
+    arr.indexOf(model) === index
+);
+
+// ---------------------------------------------------------
+// ĐỌC MODEL ĐÃ THÀNH CÔNG GẦN NHẤT TỪ D1
+// ---------------------------------------------------------
+
+let rememberedGeminiModel = null;
+
+try {
+  const rememberedResult =
+    await env.trung_tu_te_robot_db
+      .prepare(
+        `
+        SELECT model
+        FROM ai_model_status
+        WHERE last_success_at IS NOT NULL
+          AND (
+            quota_reset_at IS NULL
+            OR quota_reset_at <= ?
+          )
+        ORDER BY last_success_at DESC
+        LIMIT 1
+        `
+      )
+      .bind(
+        new Date().toISOString()
+      )
+      .first();
+
+  if (
+    rememberedResult &&
+    rememberedResult.model
+  ) {
+    rememberedGeminiModel =
+      rememberedResult.model;
+
+    console.log(
+      "GEMINI REMEMBERED MODEL:",
+      rememberedGeminiModel
+    );
+  }
+} catch (memoryError) {
+  console.error(
+    "GEMINI MEMORY READ ERROR:",
+    memoryError
+  );
+}
+
+// ---------------------------------------------------------
+// TẠO THỨ TỰ MODEL
+//
+// Ưu tiên:
+// 1. Model thành công gần nhất
+// 2. Model trong GEMINI_MODEL
+// 3. Các model fallback
+// ---------------------------------------------------------
+
+const geminiModels = [
+  rememberedGeminiModel,
+  ...defaultGeminiModels
+].filter(
+  (model, index, arr) =>
+    model &&
+    arr.indexOf(model) === index
+);
+
+console.log(
+  "GEMINI MODEL ORDER:",
+  geminiModels
+);
+
 let geminiResponse = null;
 let lastGeminiErrorText = "";
+let usedGeminiModel =
+  rememberedGeminiModel ||
+  primaryGeminiModel;
+
+// ---------------------------------------------------------
+// DUYỆT QUA CÁC MODEL
+// ---------------------------------------------------------
+
 for (
-  let attempt = 1;
-  attempt <= 3;
-  attempt++
+  let modelIndex = 0;
+  modelIndex < geminiModels.length;
+  modelIndex++
 ) {
-  const geminiUrl =
-`https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent`;
-  geminiResponse = await fetch(
-    geminiUrl,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-goog-api-key": env.GEMINI_API_KEY
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              {
-                text: prompt
-              }
-            ]
-          }
-        ],
-        generationConfig: {
-          temperature: 0.4,
-          responseMimeType: "application/json",
-          responseSchema
+  const geminiModel =
+    geminiModels[modelIndex];
+
+  // -------------------------------------------------------
+  // KIỂM TRA MODEL CÓ ĐANG BỊ QUOTA BLOCK KHÔNG
+  // -------------------------------------------------------
+
+  try {
+    const modelStatus =
+      await env.trung_tu_te_robot_db
+        .prepare(
+          `
+          SELECT
+            status,
+            quota_reset_at
+          FROM ai_model_status
+          WHERE model = ?
+          LIMIT 1
+          `
+        )
+        .bind(geminiModel)
+        .first();
+
+    if (
+      modelStatus &&
+      modelStatus.status ===
+        "quota_exceeded" &&
+      modelStatus.quota_reset_at &&
+      new Date(
+        modelStatus.quota_reset_at
+      ).getTime() >
+        Date.now()
+    ) {
+      console.warn(
+        "GEMINI SKIP QUOTA MODEL:",
+        {
+          model: geminiModel,
+          quota_reset_at:
+            modelStatus.quota_reset_at
         }
-      })
+      );
+
+      continue;
     }
-  );
-  if (geminiResponse.ok) {
-    break;
+
+    // Nếu thời gian quota đã hết
+    // thì mở lại model
+    if (
+      modelStatus &&
+      modelStatus.status ===
+        "quota_exceeded" &&
+      modelStatus.quota_reset_at &&
+      new Date(
+        modelStatus.quota_reset_at
+      ).getTime() <=
+        Date.now()
+    ) {
+      await env.trung_tu_te_robot_db
+        .prepare(
+          `
+          UPDATE ai_model_status
+          SET
+            status = 'available',
+            quota_reset_at = NULL,
+            updated_at = CURRENT_TIMESTAMP
+          WHERE model = ?
+          `
+        )
+        .bind(geminiModel)
+        .run();
+
+      console.log(
+        "GEMINI QUOTA RESET:",
+        geminiModel
+      );
+    }
+  } catch (statusError) {
+    console.error(
+      "GEMINI MODEL STATUS ERROR:",
+      statusError
+    );
   }
-  lastGeminiErrorText =
-    await geminiResponse.text();
+
+  console.log(
+    "GEMINI TRY MODEL:",
+    geminiModel
+  );
+
+  // -------------------------------------------------------
+  // THỬ CÙNG MODEL TỐI ĐA 2 LẦN
+  // -------------------------------------------------------
+
+  for (
+    let attempt = 1;
+    attempt <= 2;
+    attempt++
+  ) {
+    const geminiUrl =
+      `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent`;
+
+    geminiResponse =
+      await fetch(
+        geminiUrl,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+            "x-goog-api-key":
+              env.GEMINI_API_KEY
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  {
+                    text: prompt
+                  }
+                ]
+              }
+            ],
+            generationConfig: {
+              temperature: 0.4,
+              responseMimeType:
+                "application/json",
+              responseSchema
+            }
+          })
+        }
+      );
+
+    // -----------------------------------------------------
+    // THÀNH CÔNG
+    // -----------------------------------------------------
+
+    if (geminiResponse.ok) {
+      usedGeminiModel =
+        geminiModel;
+
+      console.log(
+        "GEMINI SUCCESS:",
+        geminiModel
+      );
+
+      // ---------------------------------------------------
+      // GHI NHỚ MODEL THÀNH CÔNG
+      // ---------------------------------------------------
+
+      try {
+        await env.trung_tu_te_robot_db
+          .prepare(
+            `
+            UPDATE ai_model_status
+            SET
+              status = 'active',
+              last_success_at = ?,
+              quota_reset_at = NULL,
+              last_error_status = NULL,
+              updated_at = CURRENT_TIMESTAMP
+            WHERE model = ?
+            `
+          )
+          .bind(
+            new Date().toISOString(),
+            geminiModel
+          )
+          .run();
+
+        console.log(
+          "GEMINI MEMORY SAVED:",
+          geminiModel
+        );
+      } catch (memorySaveError) {
+        console.error(
+          "GEMINI MEMORY SAVE ERROR:",
+          memorySaveError
+        );
+      }
+
+      break;
+    }
+
+    // -----------------------------------------------------
+    // ĐỌC RESPONSE ERROR
+    // -----------------------------------------------------
+
+    lastGeminiErrorText =
+      await geminiResponse.text();
+
     console.error(
       "GEMINI ERROR:",
-      geminiResponse.status,
-      lastGeminiErrorText
+      {
+        model: geminiModel,
+        attempt,
+        status:
+          geminiResponse.status,
+        details:
+          lastGeminiErrorText
+      }
     );
+
+    // -----------------------------------------------------
+    // 429 - QUOTA / RATE LIMIT
+    // -----------------------------------------------------
+
+    if (
+      geminiResponse.status ===
+      429
+    ) {
+      let quotaResetAt =
+        null;
+
+      // Gemini thường trả về retryDelay
+      // trong JSON error response.
+      try {
+        const errorData =
+          JSON.parse(
+            lastGeminiErrorText
+          );
+
+        const retryInfo =
+          errorData?.error?.details?.find(
+            (detail) =>
+              detail["@type"] ===
+              "type.googleapis.com/google.rpc.RetryInfo"
+          );
+
+        const retryDelay =
+          retryInfo?.retryDelay;
+
+        if (retryDelay) {
+          let delaySeconds = 0;
+
+          const secondsMatch =
+            String(
+              retryDelay
+            ).match(
+              /([\d.]+)s/
+            );
+
+          if (
+            secondsMatch
+          ) {
+            delaySeconds =
+              Number(
+                secondsMatch[1]
+              );
+          }
+
+          if (
+            delaySeconds > 0
+          ) {
+            quotaResetAt =
+              new Date(
+                Date.now() +
+                  delaySeconds *
+                    1000
+              ).toISOString();
+          }
+        }
+      } catch (parseError) {
+        console.warn(
+          "GEMINI RETRY INFO PARSE ERROR:",
+          parseError
+        );
+      }
+
+      // ---------------------------------------------------
+      // LƯU TRẠNG THÁI QUOTA
+      // ---------------------------------------------------
+
+      try {
+        await env.trung_tu_te_robot_db
+          .prepare(
+            `
+            UPDATE ai_model_status
+            SET
+              status = 'quota_exceeded',
+              last_error_at = ?,
+              quota_reset_at = ?,
+              error_count =
+                error_count + 1,
+              last_error_status = 429,
+              updated_at =
+                CURRENT_TIMESTAMP
+            WHERE model = ?
+            `
+          )
+          .bind(
+            new Date().toISOString(),
+            quotaResetAt,
+            geminiModel
+          )
+          .run();
+
+        console.log(
+          "GEMINI QUOTA SAVED:",
+          {
+            model: geminiModel,
+            quota_reset_at:
+              quotaResetAt
+          }
+        );
+      } catch (quotaSaveError) {
+        console.error(
+          "GEMINI QUOTA SAVE ERROR:",
+          quotaSaveError
+        );
+      }
+
+      console.warn(
+        "GEMINI QUOTA/RATE LIMIT - FALLBACK:",
+        geminiModel
+      );
+
+      break;
+    }
+
+    // -----------------------------------------------------
+    // 503 - SERVER OVERLOAD
+    // -----------------------------------------------------
+
+    if (
+      geminiResponse.status ===
+        503 &&
+      attempt < 2
+    ) {
+      const retryDelay =
+        attempt === 1
+          ? 1000
+          : 2000;
+
+      await new Promise(
+        (resolve) =>
+          setTimeout(
+            resolve,
+            retryDelay
+          )
+      );
+
+      continue;
+    }
+
+    break;
+  }
+
+  // -------------------------------------------------------
+  // MODEL HIỆN TẠI THÀNH CÔNG
+  // -------------------------------------------------------
+
   if (
-    geminiResponse.status !== 503 ||
-    attempt >= 3
+    geminiResponse &&
+    geminiResponse.ok
   ) {
     break;
   }
-  const retryDelay =
-    attempt === 1
-      ? 1000
-      : 2000;
-  await new Promise(
-    (resolve) =>
-      setTimeout(resolve, retryDelay)
-  );
+
+  // -------------------------------------------------------
+  // 503 SAU KHI RETRY
+  // -------------------------------------------------------
+
+  if (
+    geminiResponse?.status ===
+    503
+  ) {
+    try {
+      await env.trung_tu_te_robot_db
+        .prepare(
+          `
+          UPDATE ai_model_status
+          SET
+            status = 'temporary_error',
+            last_error_at = ?,
+            error_count =
+              error_count + 1,
+            last_error_status = 503,
+            updated_at =
+              CURRENT_TIMESTAMP
+          WHERE model = ?
+          `
+        )
+        .bind(
+          new Date().toISOString(),
+          geminiModel
+        )
+        .run();
+    } catch (statusSaveError) {
+      console.error(
+        "GEMINI 503 STATUS SAVE ERROR:",
+        statusSaveError
+      );
+    }
+
+    console.warn(
+      "GEMINI 503 - FALLBACK:",
+      geminiModel
+    );
+
+    continue;
+  }
+
+  // -------------------------------------------------------
+  // CÁC LỖI KHÁC: DỪNG NGAY
+  // -------------------------------------------------------
+
+  break;
 }
-if (!geminiResponse || !geminiResponse.ok) {
+
+// ---------------------------------------------------------
+// KHÔNG CÓ MODEL NÀO THÀNH CÔNG
+// ---------------------------------------------------------
+
+if (
+  !geminiResponse ||
+  !geminiResponse.ok
+) {
   console.error(
     "GEMINI FINAL ERROR:",
     {
-      model: geminiModel,
-      status: geminiResponse?.status || 500,
-      details: lastGeminiErrorText
+      model:
+        usedGeminiModel,
+      status:
+        geminiResponse?.status ||
+        500,
+      details:
+        lastGeminiErrorText
     }
   );
 
@@ -1576,17 +2033,25 @@ if (!geminiResponse || !geminiResponse.ok) {
     {
       ok: false,
       error:
-        `Gemini API lỗi: ${geminiResponse?.status || 500}`,
+        `Gemini API lỗi: ${
+          geminiResponse?.status ||
+          500
+        }`,
       details:
         lastGeminiErrorText,
       model:
-        geminiModel
+        usedGeminiModel
     },
     {
       status: 502
     }
   );
 }
+
+console.log(
+  "GEMINI FINAL MODEL:",
+  usedGeminiModel
+);
 const geminiData =
   await geminiResponse.json();
 const generatedText =

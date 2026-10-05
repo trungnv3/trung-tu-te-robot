@@ -331,106 +331,335 @@ function updateDashboardStats() {
     imageNumber.textContent = imageCount;
   }
 }
-
-
 function renderRobotList() {
-  const container = document.querySelector("#robot-list");
+  const container =
+    document.querySelector("#robot-list");
 
   if (!container) {
     return;
   }
 
-  if (state.robots.length === 0) {
+  if (
+    !Array.isArray(state.robots) ||
+    state.robots.length === 0
+  ) {
     container.innerHTML =
       '<div class="robot-loading">Chưa có Robot nào.</div>';
 
     return;
   }
 
-  let html = "";
+  // ---------------------------------------------------------
+  // NHÓM ROBOT THEO THƯƠNG HIỆU → MODEL
+  // ---------------------------------------------------------
 
-  state.robots.forEach(function(robot) {
-    const images = Array.isArray(robot.images)
-      ? robot.images
-      : [];
+  const brandGroups = {};
 
-    let imageHtml = '<span>🤖</span>';
+  state.robots.forEach(function (robot) {
+    const brand =
+      (robot.brand || "Khác").trim() ||
+      "Khác";
 
-    if (images.length > 0) {
-      imageHtml =
-        '<img src="/api/image/' +
-        images[0].id +
-        '" alt="' +
-        (robot.model || "Robot") +
-        '">';
+    const model =
+      (robot.model || "Chưa có Model").trim() ||
+      "Chưa có Model";
+
+    if (!brandGroups[brand]) {
+      brandGroups[brand] = {};
     }
 
-    html +=
-    '<article class="robot-card">' +
+    if (!brandGroups[brand][model]) {
+      brandGroups[brand][model] = [];
+    }
 
-    '<div class="robot-card-image">' +
-
-      imageHtml +
-
-    '</div>' +
-
-    '<div class="robot-card-content">' +
-
-      '<span class="robot-brand">' +
-
-        (robot.brand || "") +
-
-      '</span>' +
-
-      '<h3>' +
-
-        (robot.model || "") +
-
-      '</h3>' +
-
-      '<p>' +
-
-        images.length +
-
-        ' hình ảnh' +
-
-      '</p>' +
-
-      '<button class="robot-edit-button" data-robot-id="' +
-  robot.id +
-'">' +
-  'Sửa' +
-'</button>' +
-
-'<button ' +
-    'type="button" ' +
-    'class="robot-ai-button" ' +
-    'data-robot-id="' +
-    robot.id +
-  '">' +
-    (
-      Number(robot.has_ai_content) === 1
-        ? '🔄 Tạo lại AI'
-        : '🤖 Tạo nội dung AI'
-    ) +
-  '</button>' +
-
-'<button ' +
-    'type="button" ' +
-    'class="robot-delete-button" ' +
-    'data-robot-id="' +
-    robot.id +
-  '">' +
-    'Xóa' +
-  '</button>' +
-
-'</div>' +
-
-  '</article>'
+    brandGroups[brand][model].push(robot);
   });
 
-  container.innerHTML = html;
+  // ---------------------------------------------------------
+  // SẮP XẾP THƯƠNG HIỆU VÀ MODEL
+  // ---------------------------------------------------------
+
+  const sortedBrands =
+    Object.keys(brandGroups).sort(
+      function (a, b) {
+        return a.localeCompare(
+          b,
+          "vi",
+          {
+            sensitivity: "base"
+          }
+        );
+      }
+    );
+
+  let html = "";
+
+  sortedBrands.forEach(
+    function (brand) {
+      const models =
+        brandGroups[brand];
+
+      const modelNames =
+        Object.keys(models).sort(
+          function (a, b) {
+            return a.localeCompare(
+              b,
+              "vi",
+              {
+                sensitivity: "base"
+              }
+            );
+          }
+        );
+
+      const totalRobots =
+        modelNames.reduce(
+          function (total, model) {
+            return (
+              total +
+              models[model].length
+            );
+          },
+          0
+        );
+
+      // -----------------------------------------------------
+      // THƯƠNG HIỆU
+      // -----------------------------------------------------
+
+      html +=
+        '<section class="robot-brand-group">' +
+
+          '<div class="robot-brand-group-header">' +
+
+            '<div class="robot-brand-group-title">' +
+
+              '<span class="robot-brand-group-toggle">' +
+                '▼' +
+              '</span>' +
+
+              '<strong>' +
+                brand +
+              '</strong>' +
+
+              '<span class="robot-brand-group-count">' +
+                modelNames.length +
+                ' model · ' +
+                totalRobots +
+                ' robot' +
+              '</span>' +
+
+            '</div>' +
+
+          '</div>' +
+
+          '<div class="robot-brand-group-content">';
+
+      // -----------------------------------------------------
+      // MODEL
+      // -----------------------------------------------------
+
+      modelNames.forEach(
+        function (model) {
+          const robots =
+            models[model];
+
+          html +=
+            '<section class="robot-model-group">' +
+
+              '<button ' +
+                'type="button" ' +
+                'class="robot-model-header" ' +
+                'data-robot-model-toggle="1"' +
+              '>' +
+
+                '<span class="robot-model-toggle-icon">' +
+                  '▶' +
+                '</span>' +
+
+                '<span class="robot-model-name">' +
+                  model +
+                '</span>' +
+
+                '<span class="robot-model-count">' +
+                  robots.length +
+                '</span>' +
+
+              '</button>' +
+
+              '<div class="robot-model-content" hidden>';
+
+          // -------------------------------------------------
+          // ROBOT TRONG MODEL
+          // -------------------------------------------------
+
+          robots.forEach(
+            function (robot) {
+              const images =
+                Array.isArray(
+                  robot.images
+                )
+                  ? robot.images
+                  : [];
+
+              let imageHtml =
+                '<span>🤖</span>';
+
+              if (
+                images.length > 0
+              ) {
+                imageHtml =
+                  '<img src="/api/image/' +
+                  images[0].id +
+                  '" alt="' +
+                  (
+                    robot.model ||
+                    "Robot"
+                  ) +
+                  '">';
+              }
+
+              html +=
+                '<article class="robot-card">' +
+
+                  '<div class="robot-card-image">' +
+
+                    imageHtml +
+
+                  '</div>' +
+
+                  '<div class="robot-card-content">' +
+
+                    '<span class="robot-brand">' +
+
+                      (
+                        robot.brand ||
+                        ""
+                      ) +
+
+                    '</span>' +
+
+                    '<h3>' +
+
+                      (
+                        robot.model ||
+                        ""
+                      ) +
+
+                    '</h3>' +
+
+                    '<p>' +
+
+                      images.length +
+
+                      ' hình ảnh' +
+
+                    '</p>' +
+
+                    '<button ' +
+                      'type="button" ' +
+                      'class="robot-edit-button" ' +
+                      'data-robot-id="' +
+                      robot.id +
+                    '">' +
+                      'Sửa' +
+                    '</button>' +
+
+                    '<button ' +
+                      'type="button" ' +
+                      'class="robot-ai-button" ' +
+                      'data-robot-id="' +
+                      robot.id +
+                    '">' +
+                      (
+                        Number(
+                          robot.has_ai_content
+                        ) === 1
+                          ? '🔄 Tạo lại AI'
+                          : '🤖 Tạo nội dung AI'
+                      ) +
+                    '</button>' +
+
+                    '<button ' +
+                      'type="button" ' +
+                      'class="robot-delete-button" ' +
+                      'data-robot-id="' +
+                      robot.id +
+                    '">' +
+                      'Xóa' +
+                    '</button>' +
+
+                  '</div>' +
+
+                '</article>';
+            }
+          );
+
+          html +=
+              '</div>' +
+            '</section>';
+        }
+      );
+
+      html +=
+          '</div>' +
+        '</section>';
+    }
+  );
+
+  container.innerHTML =
+    html;
 }
+document.addEventListener(
+  "click",
+  function (event) {
+    const modelButton =
+      event.target.closest(
+        "[data-robot-model-toggle]"
+      );
+
+    if (!modelButton) {
+      return;
+    }
+
+    const modelGroup =
+      modelButton.closest(
+        ".robot-model-group"
+      );
+
+    if (!modelGroup) {
+      return;
+    }
+
+    const content =
+      modelGroup.querySelector(
+        ".robot-model-content"
+      );
+
+    const icon =
+      modelButton.querySelector(
+        ".robot-model-toggle-icon"
+      );
+
+    if (!content) {
+      return;
+    }
+
+    const isHidden =
+      content.hidden;
+
+    content.hidden =
+      !isHidden;
+
+    if (icon) {
+      icon.textContent =
+        isHidden
+          ? "▼"
+          : "▶";
+    }
+  }
+);
+
 function showSection(sectionName) {
   const sections = document.querySelectorAll(".admin-section");
 
@@ -668,6 +897,10 @@ document.addEventListener("click", async function (event) {
         data.robot?.model ||
           "Robot"
       );
+
+// AI tạo thành công → cập nhật trạng thái nút
+        aiButton.disabled = false;
+        aiButton.textContent = "🔄 Tạo lại AI";
 
     } catch (error) {
       console.error(
@@ -3358,19 +3591,46 @@ function renderAddRobotStep5() {
 // ============================================================
 
 function renderAddRobotAIReview(
-  aiContent,
+  content,
   robotId,
   robotModel
 ) {
-  const panel =
-    getAddRobotPanel();
+  let panel =
+    document.querySelector(
+      "#robot-ai-review-panel"
+    );
 
   if (!panel) {
-    return;
+    panel =
+      document.createElement(
+        "section"
+      );
+
+    panel.id =
+      "robot-ai-review-panel";
+
+    panel.className =
+      "panel robot-ai-review-panel";
+
+    const robotSection =
+      document.querySelector(
+        "#robots-section"
+      );
+
+    if (!robotSection) {
+      alert(
+        "Không tìm thấy khu vực danh sách Robot."
+      );
+
+      return;
+    }
+
+    robotSection.appendChild(
+      panel
+    );
   }
 
-  const content =
-    aiContent || {};
+  panel.hidden = false;
 
   const sections =
     Array.isArray(content.sections)
@@ -3481,11 +3741,25 @@ function renderAddRobotAIReview(
     '<div class="admin-form-section">' +
 
       '<div class="robot-ai-review-note">' +
-        '<strong>AI đã tạo bản nháp.</strong>' +
-        '<p>' +
-          'Hãy kiểm tra và chỉnh sửa nội dung trước khi lưu chính thức.' +
-        '</p>' +
-      '</div>' +
+
+  '<strong>⚠️ BẢN NHÁP – CHƯA LƯU VÀO D1</strong>' +
+
+  '<p>' +
+    'AI đã tạo nội dung cho Robot này.' +
+    '<br>' +
+    'Hãy kiểm tra và chỉnh sửa nội dung bên dưới trước khi lưu.' +
+  '</p>' +
+
+  '<p>' +
+    '<strong>👉 Lưu ý:</strong> ' +
+    'Nội dung hiện tại chưa được ghi vào D1.' +
+    '<br>' +
+    'Chỉ khi bạn bấm ' +
+    '<strong>“💾 Xác nhận & Lưu vào D1”</strong> ' +
+    'thì nội dung mới được lưu chính thức.' +
+  '</p>' +
+
+'</div>' +
 
     '</div>' +
 
@@ -3582,7 +3856,7 @@ function renderAddRobotAIReview(
         'id="robot-ai-save" ' +
         'class="button-primary"' +
       '>' +
-        'Lưu nội dung AI' +
+        '💾 Xác nhận & Lưu vào D1' +
       '</button>' +
 
     '</div>';
@@ -3596,7 +3870,10 @@ function renderAddRobotAIReview(
   window.currentAIRobotModel =
     robotModel;
 
-  scrollAddRobotPanel();
+    panel.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
 }
 // ============================================================
 // HIỂN THỊ DANH SÁCH ẢNH ĐÃ CHỌN
@@ -3787,8 +4064,8 @@ document.addEventListener(
     panel.id =
       "robot-add-panel";
 
-    panel.className =
-      "panel robot-add-panel";
+      panel.className =
+      "panel robot-ai-review-panel";
 
     const robotSection =
       document.querySelector(
@@ -7391,7 +7668,16 @@ document.addEventListener(
       );
       return;
     }
-
+    const confirmed = window.confirm(
+      "Xác nhận lưu nội dung AI?\n\n" +
+      "Nội dung hiện tại sẽ được lưu vào D1 " +
+      "và trở thành nội dung AI chính thức của Robot này.\n\n" +
+      "Bạn đã kiểm tra nội dung chưa?"
+    );
+    
+    if (!confirmed) {
+      return;
+    }
     try {
 
       saveButton.disabled =
@@ -7558,11 +7844,13 @@ document.addEventListener(
       window.currentAIRobotModel =
         null;
 
-      const panel =
-        getAddRobotPanel();
-
-      if (panel) {
-        panel.remove();
+        const aiReviewPanel =
+        document.querySelector(
+          "#robot-ai-review-panel"
+        );
+      
+      if (aiReviewPanel) {
+        aiReviewPanel.remove();
       }
 
       if (
@@ -7591,8 +7879,8 @@ document.addEventListener(
       saveButton.disabled =
         false;
 
-      saveButton.textContent =
-        "Lưu nội dung AI";
+        saveButton.textContent =
+        "💾 Xác nhận & Lưu vào D1";
 
     }
 
