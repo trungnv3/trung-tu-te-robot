@@ -5836,6 +5836,86 @@ if (
     }
   );
 }
+// =========================================================
+// ADMIN - AI MODEL STATUS
+// =========================================================
+
+if (
+  url.pathname === "/api/admin/ai-model-status" &&
+  request.method === "GET"
+) {
+  const isAdmin =
+    await requireAdminSession(
+      request,
+      env
+    );
+
+  if (!isAdmin) {
+    return Response.json(
+      {
+        ok: false,
+        error: "Không có quyền truy cập"
+      },
+      {
+        status: 401
+      }
+    );
+  }
+
+  try {
+    const result =
+      await env.trung_tu_te_robot_db
+        .prepare(
+          `
+          SELECT
+            id,
+            model,
+            status,
+            last_success_at,
+            last_error_at,
+            quota_reset_at,
+            error_count,
+            last_error_status,
+            updated_at
+          FROM ai_model_status
+          ORDER BY
+            CASE status
+              WHEN 'active' THEN 1
+              WHEN 'available' THEN 2
+              WHEN 'quota_exceeded' THEN 3
+              WHEN 'temporary_error' THEN 4
+              ELSE 5
+            END,
+            model ASC
+          `
+        )
+        .all();
+
+    return Response.json({
+      ok: true,
+      models:
+        result.results || []
+    });
+
+  } catch (error) {
+
+    console.error(
+      "AI MODEL STATUS ERROR:",
+      error
+    );
+
+    return Response.json(
+      {
+        ok: false,
+        error:
+          "Không thể đọc trạng thái Model AI"
+      },
+      {
+        status: 500
+      }
+    );
+  }
+}
     // =========================================================
     // STATIC WEBSITE
     // =========================================================

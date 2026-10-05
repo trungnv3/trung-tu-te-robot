@@ -289,8 +289,10 @@ async function loadRobots() {
 
     state.robots = data.robots;
 
-    updateDashboardStats();
-    renderRobotList();
+updateDashboardStats();
+
+renderRobotBrands();
+renderRobotList();
 
     console.log("Admin Robot API:", data);
   } catch (error) {
@@ -331,7 +333,114 @@ function updateDashboardStats() {
     imageNumber.textContent = imageCount;
   }
 }
-function renderRobotList() {
+function renderRobotBrands() {
+  const container =
+    document.querySelector(
+      "#admin-robot-brands"
+    );
+
+  if (!container) {
+    return;
+  }
+
+  if (
+    !Array.isArray(state.robots) ||
+    state.robots.length === 0
+  ) {
+    container.innerHTML = "";
+    return;
+  }
+
+  const brands = [];
+
+  state.robots.forEach(
+    function (robot) {
+
+      const brand =
+        (robot.brand || "").trim();
+
+      if (!brand) {
+        return;
+      }
+
+      const exists =
+        brands.some(
+          function (item) {
+            return (
+              item.toLowerCase() ===
+              brand.toLowerCase()
+            );
+          }
+        );
+
+      if (!exists) {
+        brands.push(brand);
+      }
+
+    }
+  );
+
+  brands.sort(
+    function (a, b) {
+      return a.localeCompare(
+        b,
+        "vi",
+        {
+          sensitivity: "base"
+        }
+      );
+    }
+  );
+
+  let html = "";
+
+  brands.forEach(
+    function (brand) {
+
+      const count =
+        state.robots.filter(
+          function (robot) {
+            return (
+              String(
+                robot.brand || ""
+              )
+                .trim()
+                .toLowerCase() ===
+              brand
+                .trim()
+                .toLowerCase()
+            );
+          }
+        ).length;
+
+      html +=
+        '<button ' +
+          'type="button" ' +
+          'class="admin-nav-robot-brand" ' +
+          'data-robot-brand-select="' +
+          brand.replace(
+            /"/g,
+            "&quot;"
+          ) +
+        '">' +
+
+          '<span>' +
+            brand +
+          '</span>' +
+
+          '<small>' +
+            count +
+          '</small>' +
+
+        '</button>';
+    }
+  );
+
+  container.innerHTML =
+    html;
+}
+function renderRobotList(selectedBrand) {
+
   const container =
     document.querySelector("#robot-list");
 
@@ -344,268 +453,189 @@ function renderRobotList() {
     state.robots.length === 0
   ) {
     container.innerHTML =
-      '<div class="robot-loading">Chưa có Robot nào.</div>';
+      '<div class="robot-loading">' +
+        'Chưa có Robot nào.' +
+      '</div>';
 
     return;
   }
 
-  // ---------------------------------------------------------
-  // NHÓM ROBOT THEO THƯƠNG HIỆU → MODEL
-  // ---------------------------------------------------------
+  // =========================================================
+  // CHƯA CHỌN BRAND
+  // =========================================================
 
-  const brandGroups = {};
+  if (!selectedBrand) {
 
-  state.robots.forEach(function (robot) {
-    const brand =
-      (robot.brand || "Khác").trim() ||
-      "Khác";
+    container.innerHTML =
+      '<div class="robot-loading">' +
+        '👉 Hãy chọn một thương hiệu Robot ở menu bên trái.' +
+      '</div>';
 
-    const model =
-      (robot.model || "Chưa có Model").trim() ||
-      "Chưa có Model";
+    return;
+  }
 
-    if (!brandGroups[brand]) {
-      brandGroups[brand] = {};
-    }
+  // =========================================================
+  // LỌC ROBOT THEO BRAND
+  // =========================================================
 
-    if (!brandGroups[brand][model]) {
-      brandGroups[brand][model] = [];
-    }
+  const selectedRobots =
+    state.robots.filter(
+      function (robot) {
 
-    brandGroups[brand][model].push(robot);
-  });
+        const brand =
+          (robot.brand || "").trim();
 
-  // ---------------------------------------------------------
-  // SẮP XẾP THƯƠNG HIỆU VÀ MODEL
-  // ---------------------------------------------------------
-
-  const sortedBrands =
-    Object.keys(brandGroups).sort(
-      function (a, b) {
-        return a.localeCompare(
-          b,
-          "vi",
-          {
-            sensitivity: "base"
-          }
+        return (
+          brand.toLowerCase() ===
+          selectedBrand.trim().toLowerCase()
         );
+
       }
     );
 
-  let html = "";
+  // =========================================================
+  // KHÔNG CÓ ROBOT THUỘC BRAND
+  // =========================================================
 
-  sortedBrands.forEach(
-    function (brand) {
-      const models =
-        brandGroups[brand];
+  if (selectedRobots.length === 0) {
 
-      const modelNames =
-        Object.keys(models).sort(
-          function (a, b) {
-            return a.localeCompare(
-              b,
-              "vi",
-              {
-                sensitivity: "base"
-              }
-            );
-          }
-        );
+    container.innerHTML =
+      '<div class="robot-loading">' +
+        'Không có Robot nào thuộc thương hiệu ' +
+        selectedBrand +
+        '.' +
+      '</div>';
 
-      const totalRobots =
-        modelNames.reduce(
-          function (total, model) {
-            return (
-              total +
-              models[model].length
-            );
-          },
-          0
-        );
+    return;
+  }
 
-      // -----------------------------------------------------
-      // THƯƠNG HIỆU
-      // -----------------------------------------------------
+// =========================================================
+// DANH SÁCH ROBOT
+// =========================================================
+
+let html = "";
+  // =========================================================
+  // DANH SÁCH ROBOT
+  // =========================================================
+
+  html +=
+    '<div class="robot-list">';
+
+  selectedRobots.forEach(
+    function (robot) {
+
+      const images =
+        Array.isArray(
+          robot.images
+        )
+          ? robot.images
+          : [];
+
+      let imageHtml =
+        '<span>🤖</span>';
+
+      if (
+        images.length > 0
+      ) {
+
+        imageHtml =
+          '<img src="/api/image/' +
+          images[0].id +
+          '" alt="' +
+          (
+            robot.model ||
+            "Robot"
+          ) +
+          '">';
+      }
 
       html +=
-        '<section class="robot-brand-group">' +
+        '<article class="robot-card">' +
 
-          '<div class="robot-brand-group-header">' +
+          '<div class="robot-card-image">' +
 
-            '<div class="robot-brand-group-title">' +
-
-              '<span class="robot-brand-group-toggle">' +
-                '▼' +
-              '</span>' +
-
-              '<strong>' +
-                brand +
-              '</strong>' +
-
-              '<span class="robot-brand-group-count">' +
-                modelNames.length +
-                ' model · ' +
-                totalRobots +
-                ' robot' +
-              '</span>' +
-
-            '</div>' +
+            imageHtml +
 
           '</div>' +
 
-          '<div class="robot-brand-group-content">';
+          '<div class="robot-card-content">' +
 
-      // -----------------------------------------------------
-      // MODEL
-      // -----------------------------------------------------
+            '<span class="robot-brand">' +
 
-      modelNames.forEach(
-        function (model) {
-          const robots =
-            models[model];
+              (
+                robot.brand ||
+                ""
+              ) +
 
-          html +=
-            '<section class="robot-model-group">' +
+            '</span>' +
 
-              '<button ' +
-                'type="button" ' +
-                'class="robot-model-header" ' +
-                'data-robot-model-toggle="1"' +
-              '>' +
+            '<h3>' +
 
-                '<span class="robot-model-toggle-icon">' +
-                  '▶' +
-                '</span>' +
+              (
+                robot.model ||
+                ""
+              ) +
 
-                '<span class="robot-model-name">' +
-                  model +
-                '</span>' +
+            '</h3>' +
 
-                '<span class="robot-model-count">' +
-                  robots.length +
-                '</span>' +
+            '<p>' +
 
-              '</button>' +
+              images.length +
 
-              '<div class="robot-model-content" hidden>';
+              ' hình ảnh' +
 
-          // -------------------------------------------------
-          // ROBOT TRONG MODEL
-          // -------------------------------------------------
+            '</p>' +
 
-          robots.forEach(
-            function (robot) {
-              const images =
-                Array.isArray(
-                  robot.images
-                )
-                  ? robot.images
-                  : [];
+            '<button ' +
+              'type="button" ' +
+              'class="robot-edit-button" ' +
+              'data-robot-id="' +
+              robot.id +
+            '">' +
 
-              let imageHtml =
-                '<span>🤖</span>';
+              'Sửa' +
 
-              if (
-                images.length > 0
-              ) {
-                imageHtml =
-                  '<img src="/api/image/' +
-                  images[0].id +
-                  '" alt="' +
-                  (
-                    robot.model ||
-                    "Robot"
-                  ) +
-                  '">';
-              }
+            '</button>' +
 
-              html +=
-                '<article class="robot-card">' +
+            '<button ' +
+              'type="button" ' +
+              'class="robot-ai-button" ' +
+              'data-robot-id="' +
+              robot.id +
+            '">' +
 
-                  '<div class="robot-card-image">' +
+              (
+                Number(
+                  robot.has_ai_content
+                ) === 1
 
-                    imageHtml +
+                  ? '🔄 Tạo lại AI'
 
-                  '</div>' +
+                  : '🤖 Tạo nội dung AI'
+              ) +
 
-                  '<div class="robot-card-content">' +
+            '</button>' +
 
-                    '<span class="robot-brand">' +
+            '<button ' +
+              'type="button" ' +
+              'class="robot-delete-button" ' +
+              'data-robot-id="' +
+              robot.id +
+            '">' +
 
-                      (
-                        robot.brand ||
-                        ""
-                      ) +
+              'Xóa' +
 
-                    '</span>' +
+            '</button>' +
 
-                    '<h3>' +
-
-                      (
-                        robot.model ||
-                        ""
-                      ) +
-
-                    '</h3>' +
-
-                    '<p>' +
-
-                      images.length +
-
-                      ' hình ảnh' +
-
-                    '</p>' +
-
-                    '<button ' +
-                      'type="button" ' +
-                      'class="robot-edit-button" ' +
-                      'data-robot-id="' +
-                      robot.id +
-                    '">' +
-                      'Sửa' +
-                    '</button>' +
-
-                    '<button ' +
-                      'type="button" ' +
-                      'class="robot-ai-button" ' +
-                      'data-robot-id="' +
-                      robot.id +
-                    '">' +
-                      (
-                        Number(
-                          robot.has_ai_content
-                        ) === 1
-                          ? '🔄 Tạo lại AI'
-                          : '🤖 Tạo nội dung AI'
-                      ) +
-                    '</button>' +
-
-                    '<button ' +
-                      'type="button" ' +
-                      'class="robot-delete-button" ' +
-                      'data-robot-id="' +
-                      robot.id +
-                    '">' +
-                      'Xóa' +
-                    '</button>' +
-
-                  '</div>' +
-
-                '</article>';
-            }
-          );
-
-          html +=
-              '</div>' +
-            '</section>';
-        }
-      );
-
-      html +=
           '</div>' +
-        '</section>';
+
+        '</article>';
+
     }
   );
+
+  html +=
+    '</div>';
 
   container.innerHTML =
     html;
@@ -613,89 +643,400 @@ function renderRobotList() {
 document.addEventListener(
   "click",
   function (event) {
-    const modelButton =
+
+    // =========================================================
+    // ROBOT - MỞ / ĐÓNG DANH SÁCH BRAND
+    // =========================================================
+
+    const robotMenuToggle =
       event.target.closest(
-        "[data-robot-model-toggle]"
+        ".admin-nav-robot-toggle"
       );
 
-    if (!modelButton) {
+    if (
+      robotMenuToggle
+    ) {
+
+      const robotBrands =
+        document.querySelector(
+          "#admin-robot-brands"
+        );
+
+      const robotArrow =
+        robotMenuToggle.querySelector(
+          ".admin-nav-robot-arrow"
+        );
+
+      if (!robotBrands) {
+        return;
+      }
+
+      const isOpen =
+        robotBrands.classList.contains(
+          "open"
+        );
+
+      robotBrands.classList.toggle(
+        "open",
+        !isOpen
+      );
+
+      if (robotArrow) {
+        robotArrow.textContent =
+          isOpen
+            ? "▾"
+            : "▴";
+      }
+
       return;
     }
 
-    const modelGroup =
-      modelButton.closest(
-        ".robot-model-group"
+    // =========================================================
+    // ROBOT - CHỌN BRAND
+    // =========================================================
+
+    const brandButton =
+      event.target.closest(
+        "[data-robot-brand-select]"
       );
 
-    if (!modelGroup) {
+    if (!brandButton) {
       return;
     }
 
-    const content =
-      modelGroup.querySelector(
-        ".robot-model-content"
+    const selectedBrand =
+      brandButton.getAttribute(
+        "data-robot-brand-select"
       );
 
-    const icon =
-      modelButton.querySelector(
-        ".robot-model-toggle-icon"
-      );
-
-    if (!content) {
+    if (!selectedBrand) {
       return;
     }
 
-    const isHidden =
-      content.hidden;
+    // =========================================================
+    // ACTIVE BRAND
+    // =========================================================
 
-    content.hidden =
-      !isHidden;
+    document
+      .querySelectorAll(
+        ".admin-nav-robot-brand"
+      )
+      .forEach(
+        function (button) {
 
-    if (icon) {
-      icon.textContent =
-        isHidden
-          ? "▼"
-          : "▶";
-    }
+          button.classList.toggle(
+            "active",
+            button === brandButton
+          );
+
+        }
+      );
+
+    // =========================================================
+// MỞ KHU VỰC ROBOT
+// =========================================================
+
+showSection(
+  "robots"
+);
+
+// =========================================================
+// HIỂN THỊ ROBOT CỦA BRAND
+// =========================================================
+
+renderRobotList(
+  selectedBrand
+);
+
   }
 );
 
 function showSection(sectionName) {
-  const sections = document.querySelectorAll(".admin-section");
 
-  const navLinks = document.querySelectorAll(
-    ".admin-nav a[data-section]"
+  const sections =
+    document.querySelectorAll(
+      ".admin-section"
+    );
+
+  const navLinks =
+    document.querySelectorAll(
+      ".admin-nav a[data-section]"
+    );
+
+  sections.forEach(
+    function (section) {
+
+      section.classList.remove(
+        "active-section"
+      );
+
+    }
   );
 
-  sections.forEach(function(section) {
-    section.classList.remove("active-section");
-  });
+  navLinks.forEach(
+    function (link) {
 
-  navLinks.forEach(function(link) {
-    link.classList.remove("active");
-  });
+      link.classList.remove(
+        "active"
+      );
 
-  const targetSection = document.querySelector(
-    "#" + sectionName + "-section"
+    }
   );
+
+  const targetSection =
+    document.querySelector(
+      "#" +
+      sectionName +
+      "-section"
+    );
 
   if (targetSection) {
-    targetSection.classList.add("active-section");
+
+    targetSection.classList.add(
+      "active-section"
+    );
+
   }
 
-  navLinks.forEach(function(link) {
-    if (link.dataset.section === sectionName) {
-      link.classList.add("active");
+  navLinks.forEach(
+    function (link) {
+
+      if (
+        link.dataset.section ===
+        sectionName
+      ) {
+
+        link.classList.add(
+          "active"
+        );
+
+      }
+
     }
-  });
+  );
 
-  if (sectionName === "robots") {
+  // =========================================================
+  // ROBOT
+  // =========================================================
+
+  if (
+    sectionName === "robots"
+  ) {
+
     renderRobotList();
+
   }
-}  
 
+  // =========================================================
+  // MODEL AI
+  // =========================================================
 
+  if (
+    sectionName === "ai-models"
+  ) {
 
+    loadAIModelStatus();
+
+  }
+}
+async function loadAIModelStatus() {
+
+  const container =
+    document.querySelector(
+      "#ai-model-status-content"
+    );
+
+  if (!container) {
+    return;
+  }
+
+  container.innerHTML =
+    '<div class="robot-loading">' +
+      '⏳ Đang tải trạng thái Model AI...' +
+    '</div>';
+
+  try {
+
+    const response =
+      await fetch(
+        "/api/admin/ai-model-status",
+        {
+          method: "GET",
+          credentials: "same-origin"
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !data.ok
+    ) {
+      throw new Error(
+        data.error ||
+        "Không thể tải trạng thái Model AI"
+      );
+    }
+
+    const models =
+      Array.isArray(data.models)
+        ? data.models
+        : [];
+
+    if (
+      models.length === 0
+    ) {
+
+      container.innerHTML =
+        '<div class="robot-loading">' +
+          'Chưa có Model AI nào.' +
+        '</div>';
+
+      return;
+    }
+
+    let html = "";
+
+    html +=
+      '<div class="ai-model-table-wrap">';
+
+    html +=
+      '<table class="ai-model-table">';
+
+    html +=
+      '<thead>' +
+        '<tr>' +
+          '<th>Model</th>' +
+          '<th>Trạng thái</th>' +
+          '<th>Lần thành công</th>' +
+          '<th>Lần lỗi</th>' +
+          '<th>Số lỗi</th>' +
+          '<th>Quota reset</th>' +
+        '</tr>' +
+      '</thead>';
+
+    html +=
+      '<tbody>';
+
+    models.forEach(
+      function (model) {
+
+        let statusText =
+          "⚪ Chưa dùng";
+
+        if (
+          model.status ===
+          "active"
+        ) {
+
+          statusText =
+            "🟢 Hoạt động";
+
+        } else if (
+          model.status ===
+          "available"
+        ) {
+
+          statusText =
+            "🟢 Sẵn sàng";
+
+        } else if (
+          model.status ===
+          "quota_exceeded"
+        ) {
+
+          statusText =
+            "🔴 Hết quota";
+
+        } else if (
+          model.status ===
+          "temporary_error"
+        ) {
+
+          statusText =
+            "🟠 Lỗi tạm thời";
+
+        }
+
+        html +=
+          '<tr>' +
+
+            '<td>' +
+              '<strong>' +
+                (
+                  model.model ||
+                  ""
+                ) +
+              '</strong>' +
+            '</td>' +
+
+            '<td>' +
+              statusText +
+            '</td>' +
+
+            '<td>' +
+              (
+                model.last_success_at ||
+                "—"
+              ) +
+            '</td>' +
+
+            '<td>' +
+              (
+                model.last_error_at ||
+                "—"
+              ) +
+            '</td>' +
+
+            '<td>' +
+              (
+                model.error_count ||
+                0
+              ) +
+            '</td>' +
+
+            '<td>' +
+              (
+                model.quota_reset_at ||
+                "—"
+              ) +
+            '</td>' +
+
+          '</tr>';
+
+      }
+    );
+
+    html +=
+      '</tbody>';
+
+    html +=
+      '</table>';
+
+    html +=
+      '</div>';
+
+    container.innerHTML =
+      html;
+
+  } catch (error) {
+
+    console.error(
+      "LOAD AI MODEL STATUS ERROR:",
+      error
+    );
+
+    container.innerHTML =
+      '<div class="robot-loading">' +
+        '❌ ' +
+        (
+          error.message ||
+          "Không thể tải trạng thái Model AI"
+        ) +
+      '</div>';
+  }
+}
 function setupNavigation() {
   const links = document.querySelectorAll("[data-section]");
 

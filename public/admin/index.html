@@ -54,16 +54,40 @@
   </a>
 
 
-  <a
-    href="#robots"
-    data-section="robots">
+  <div class="admin-nav-robot">
 
-    <span>🤖</span>
-    Robot
+    <a
+      href="#robots"
+      data-section="robots"
+      class="admin-nav-robot-toggle">
+  
+      <span>🤖</span>
+  
+      <span class="admin-nav-robot-label">
+        Robot
+      </span>
+  
+      <span class="admin-nav-robot-arrow">
+        ▾
+      </span>
+  
+    </a>
+  
+    <div
+      id="admin-robot-brands"
+      class="admin-nav-robot-brands">
+    </div>
+  
+  </div>
+
+  <a
+    href="#ai-models"
+    data-section="ai-models">
+
+    <span>🧠</span>
+    Model AI
 
   </a>
-
-
   <a 
   href="#articles-section"
   data-section="articles"> 
@@ -731,6 +755,67 @@
       </div>
 
     </section>
+    <section
+    id="ai-models-section"
+    class="admin-section">
+  
+    <header class="admin-header">
+  
+      <div>
+  
+        <p class="eyebrow">
+          HỆ THỐNG AI
+        </p>
+  
+        <h1>
+          Model AI
+        </h1>
+  
+      </div>
+  
+      <button
+        type="button"
+        class="button-primary"
+        onclick="loadAIModelStatus()">
+  
+        🔄 Làm mới
+  
+      </button>
+  
+    </header>
+  
+  
+    <section class="panel">
+  
+      <div class="panel-header">
+  
+        <div>
+  
+          <p class="eyebrow">
+            THEO DÕI
+          </p>
+  
+          <h2>
+            Trạng thái Model AI
+          </h2>
+  
+        </div>
+  
+      </div>
+  
+      <div
+        id="ai-model-status-content"
+        class="ai-model-status-content">
+  
+        <div class="robot-loading">
+          Đang tải trạng thái Model AI...
+        </div>
+  
+      </div>
+  
+    </section>
+  
+  </section>    
 <!-- =====================================================
      BÀI CHIA SẺ
      ===================================================== -->

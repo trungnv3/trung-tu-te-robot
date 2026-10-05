@@ -322,7 +322,130 @@ body {
   color: #427158;
   font-size: 11px;
 }
+/* =========================================================
+   ROBOT - CHỌN THƯƠNG HIỆU → HIỂN THỊ ROBOT
+   ========================================================= */
 
+   .robot-brand-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  
+  .robot-brand-tab {
+    min-width: 120px;
+    min-height: 46px;
+    padding: 8px 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border: 1px solid #d8dfdb;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #294238;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease,
+      box-shadow 0.15s ease,
+      transform 0.15s ease;
+  }
+  
+  .robot-brand-tab:hover {
+    background: #f4f8f5;
+    border-color: #b8c8c0;
+    transform: translateY(-1px);
+  }
+  
+  .robot-brand-tab.active {
+    background: #294238;
+    border-color: #294238;
+    color: #ffffff;
+    box-shadow: 0 3px 10px rgba(24, 35, 30, 0.12);
+  }
+  
+  .robot-brand-tab small {
+    font-size: 11px;
+    font-weight: 500;
+    opacity: 0.75;
+  }
+  
+  .robot-brand-content {
+    width: 100%;
+  }
+  
+  .robot-brand-panel {
+    display: none;
+  }
+  
+  .robot-brand-panel.active {
+    display: block;
+  }
+  
+  .robot-brand-panel-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e2e7e4;
+  }
+  
+  .robot-brand-panel-title strong {
+    color: #294238;
+    font-size: 18px;
+  }
+  
+  .robot-brand-panel-title span {
+    color: #7b8781;
+    font-size: 11px;
+  }
+  
+  .robot-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(
+      2,
+      minmax(0, 1fr)
+    );
+    gap: 16px;
+  }
+  
+  
+  /* =========================================================
+     ROBOT CARD
+     ========================================================= */
+  
+  .robot-cards-grid .robot-card {
+    min-width: 0;
+  }
+  
+  
+  /* =========================================================
+     MOBILE
+     ========================================================= */
+  
+  @media (max-width: 700px) {
+  
+    .robot-brand-tabs {
+      gap: 8px;
+    }
+  
+    .robot-brand-tab {
+      min-width: 0;
+      flex: 1 1 calc(50% - 8px);
+    }
+  
+    .robot-cards-grid {
+      grid-template-columns: 1fr;
+    }
+  
+  }
 /* ROBOT LIST */
 
 .robot-list {
@@ -3282,4 +3405,141 @@ body {
   .robot-ai-review-panel #robot-ai-save {
     width: 100%;
   }
+}
+/* =========================================================
+   SIDEBAR ROBOT - BRAND SUBMENU
+   ========================================================= */
+
+   .admin-nav-robot {
+    width: 100%;
+  }
+  
+  .admin-nav-robot-toggle {
+    position: relative;
+  }
+  
+  .admin-nav-robot-arrow {
+    margin-left: auto;
+    font-size: 11px;
+    opacity: 0.7;
+  }
+  
+  .admin-nav-robot-brands {
+    display: none;
+    padding: 4px 0 6px 38px;
+  }
+  
+  .admin-nav-robot-brands.open {
+    display: block;
+  }
+  
+  .admin-nav-robot-brand {
+    width: 100%;
+    min-height: 34px;
+    padding: 7px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: inherit;
+    font-family: inherit;
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+  }
+  
+  .admin-nav-robot-brand:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+  
+  .admin-nav-robot-brand.active {
+    background: rgba(255, 255, 255, 0.12);
+    font-weight: 600;
+  }
+  
+  .admin-nav-robot-brand small {
+    font-size: 10px;
+    opacity: 0.6;
+  }
+  /* =========================================================
+   AI MODEL STATUS
+   ========================================================= */
+
+.ai-model-status-content {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.ai-model-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 12px;
+}
+
+.ai-model-table {
+  width: 100%;
+  min-width: 860px;
+  border-collapse: collapse;
+  background: var(--panel-bg, #ffffff);
+}
+
+.ai-model-table th,
+.ai-model-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.ai-model-table th {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted-color, #6b7280);
+  background: var(--table-head-bg, #f8fafc);
+}
+
+.ai-model-table td {
+  font-size: 13px;
+}
+
+.ai-model-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.ai-model-table tbody tr:hover {
+  background: rgba(0, 0, 0, 0.025);
+}
+
+.ai-model-table td:first-child {
+  min-width: 220px;
+}
+
+.ai-model-table td:first-child strong {
+  font-weight: 600;
+}
+
+.ai-model-table td:nth-child(2) {
+  min-width: 130px;
+}
+
+.ai-model-table td:nth-child(3),
+.ai-model-table td:nth-child(4),
+.ai-model-table td:nth-child(6) {
+  color: var(--muted-color, #6b7280);
+  font-size: 12px;
+}
+
+.ai-model-table td:nth-child(5) {
+  text-align: center;
+  font-weight: 600;
+}
+
+.ai-model-status-content .robot-loading {
+  padding: 30px 20px;
+  text-align: center;
 }
