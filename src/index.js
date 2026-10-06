@@ -1415,6 +1415,18 @@ Robot đơn giản không có trạm:
 → Không tạo phần về trạm đa chức năng.
 
 Không tạo tiêu đề chỉ để đủ số lượng.
+PHẦN "ƯU ĐIỂM":
+Hãy viết một đoạn ngắn tóm tắt những ưu điểm thực tế của robot dựa trên dữ liệu kỹ thuật được cung cấp.
+
+Yêu cầu:
+- Chỉ nêu những ưu điểm có cơ sở trực tiếp từ dữ liệu robot.
+- Tập trung vào giá trị sử dụng thực tế đối với người dùng.
+- Không lặp lại nguyên văn phần "CHỨC NĂNG NỔI BẬT".
+- Không biến thành danh sách thông số kỹ thuật.
+- Không tự thêm tính năng, công nghệ hoặc thông số không có trong dữ liệu.
+- Không sử dụng các cụm từ quảng cáo quá mức như "tốt nhất", "đỉnh cao", "vượt trội tuyệt đối".
+- Có thể nêu từ 2 đến 4 ưu điểm nổi bật nếu dữ liệu đủ cơ sở.
+- Nếu dữ liệu không đủ cơ sở để nêu một ưu điểm thì không được tự suy đoán.
 "GÓC NHÌN KỸ THUẬT TRUNG TỬ TẾ":
 Viết một phần nhận xét kỹ thuật thực tế.
 Có thể đề cập đến việc vệ sinh, bảo trì, môi trường sử dụng hoặc những điểm người dùng nên lưu ý.
@@ -1476,6 +1488,12 @@ const responseSchema = {
       }
     },
 
+    pros: {
+      type: "string",
+      description:
+        "Tóm tắt những ưu điểm thực tế của robot dựa trên các tính năng và dữ liệu kỹ thuật đã được cung cấp. Không lặp lại máy móc phần Điểm nổi bật và không tự thêm thông số."
+    },
+    
     technical_view: {
       type: "string",
       description:
@@ -1492,6 +1510,7 @@ const responseSchema = {
   required: [
     "highlight_intro",
     "sections",
+    "pros",
     "technical_view",
     "suitable_for"
   ]
@@ -2305,13 +2324,14 @@ if (
     const aiContent =
       body?.aiContent;
 
-    if (
-      !aiContent ||
-      typeof aiContent.highlight_intro !== "string" ||
-      !Array.isArray(aiContent.sections) ||
-      typeof aiContent.technical_view !== "string" ||
-      typeof aiContent.suitable_for !== "string"
-    ) {
+      if (
+        !aiContent ||
+        typeof aiContent.highlight_intro !== "string" ||
+        !Array.isArray(aiContent.sections) ||
+        typeof aiContent.pros !== "string" ||
+        typeof aiContent.technical_view !== "string" ||
+        typeof aiContent.suitable_for !== "string"
+      ) {
       return Response.json(
         {
           ok: false,

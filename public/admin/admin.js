@@ -1492,33 +1492,78 @@ document.addEventListener("click", async function (event) {
     ).value =
       specs.detergent || "";
 
-    const content =
+      const content =
       selectedRobot.content || {};
-
+    
+    let aiContent = {};
+    
+    if (content.ai_content) {
+      try {
+        aiContent =
+          typeof content.ai_content === "string"
+            ? JSON.parse(content.ai_content)
+            : content.ai_content;
+      } catch (error) {
+        console.warn(
+          "Không thể đọc ai_content:",
+          error
+        );
+        aiContent = {};
+      }
+    }
+    
     document.querySelector(
       "#edit-intro"
     ).value =
-      content.intro || "";
-
+      content.intro ||
+      aiContent.highlight_intro ||
+      "";
+    
     document.querySelector(
       "#edit-highlights"
     ).value =
-      content.highlights || "";
-
+      content.highlights ||
+      (
+        Array.isArray(aiContent.sections)
+          ? aiContent.sections
+              .map(section => {
+                const title =
+                  section.title || "";
+    
+                const paragraphs =
+                  Array.isArray(section.paragraphs)
+                    ? section.paragraphs.join("\n")
+                    : "";
+    
+                return [
+                  title,
+                  paragraphs
+                ]
+                  .filter(Boolean)
+                  .join("\n");
+              })
+              .join("\n\n")
+          : ""
+      );
+    
     document.querySelector(
       "#edit-pros"
     ).value =
       content.pros || "";
-
+    
     document.querySelector(
       "#edit-notes"
     ).value =
-      content.notes || "";
-
+      content.notes ||
+      aiContent.technical_view ||
+      "";
+    
     document.querySelector(
       "#edit-suitable-for"
     ).value =
-      content.suitable_for || "";
+      content.suitable_for ||
+      aiContent.suitable_for ||
+      "";
       const featuresContainer =
       document.querySelector(
         "#edit-features"
