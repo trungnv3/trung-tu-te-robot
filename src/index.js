@@ -1766,19 +1766,26 @@ for (
         await env.trung_tu_te_robot_db
           .prepare(
             `
-            UPDATE ai_model_status
-            SET
-              status = 'active',
-              last_success_at = ?,
-              quota_reset_at = NULL,
-              last_error_status = NULL,
-              updated_at = CURRENT_TIMESTAMP
-            WHERE model = ?
+            INSERT INTO ai_model_status (
+            model,
+            status,
+            last_success_at,
+            quota_reset_at,
+            last_error_status,
+            updated_at
+            )
+            VALUES (?, 'active', ?, NULL, NULL, CURRENT_TIMESTAMP)
+            ON CONFLICT(model) DO UPDATE SET
+            status = 'active',
+            last_success_at = excluded.last_success_at,
+            quota_reset_at = NULL,
+            last_error_status = NULL,
+            updated_at = CURRENT_TIMESTAMP
             `
           )
           .bind(
-            new Date().toISOString(),
-            geminiModel
+            geminiModel,
+            new Date().toISOString()
           )
           .run();
 
@@ -5925,7 +5932,6 @@ if (
         .prepare(
           `
           SELECT
-            id,
             model,
             status,
             last_success_at,
