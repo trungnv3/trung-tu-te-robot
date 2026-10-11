@@ -4,22 +4,22 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  
+
   <title>Trung Tử Tế – Robot lau nhà | Tư vấn, sửa chữa tại Đắk Lắk</title>
-  
+
   <meta name="description"
   content="Trung Tử Tế – chuyên robot lau nhà, tư vấn, mua bán, sửa chữa và hỗ trợ kỹ thuật tại Đắk Lắk. Chia sẻ kinh nghiệm sử dụng và sửa chữa robot lau nhà thực tế.">
-  
+
   <meta name="robots" content="index, follow">
-  
+
   <meta name="author" content="Trung Tử Tế">
-  
+
   <meta property="og:type" content="website">
   <meta property="og:title" content="Trung Tử Tế – Robot lau nhà">
   <meta property="og:description"
   content="Tư vấn, mua bán, sửa chữa và hỗ trợ kỹ thuật robot lau nhà tại Đắk Lắk.">
   <meta property="og:site_name" content="Trung Tử Tế – Robot lau nhà">
-  
+
   <link rel="stylesheet" href="css/style.css">
   </head>
 
@@ -56,7 +56,9 @@
       <a href="robot/index.html">
         Robot
       </a>
-
+      <a href="so-sanh/index.html">
+        So sánh
+      </a>
       <a href="chia-se/index.html">
         Chia sẻ
       </a>
@@ -551,28 +553,28 @@
      <script src="../js/footer.js"></script>
      <script>
       async function loadHomeBrands() {
-      
+
         const container =
           document.getElementById("home-brands-list");
-      
+
         if (!container) {
           return;
         }
-      
+
         try {
-      
+
           const response =
             await fetch("/api/robots");
-      
+
           if (!response.ok) {
             throw new Error(
               "Không thể đọc API robot"
             );
           }
-      
+
           const data =
             await response.json();
-      
+
           if (
             !data.ok ||
             !Array.isArray(data.robots)
@@ -582,111 +584,111 @@
               "API robot không đúng định dạng"
             );
           }
-      
-      
+
+
           const brands = [];
-      
-      
+
+
           data.robots.forEach(function(robot) {
-      
+
             const brand =
               String(robot.brand || "").trim();
-      
+
             if (!brand) {
               return;
             }
-      
+
             const exists =
               brands.some(function(item) {
-      
+
                 return (
                   item.toLowerCase() ===
                   brand.toLowerCase()
                 );
-      
+
               });
-      
+
             if (!exists) {
               brands.push(brand);
             }
-      
+
           });
-      
-      
+
+
           brands.sort(function(a, b) {
-      
+
             return a.localeCompare(
               b,
               "vi"
             );
-      
+
           });
-      
-      
+
+
           container.innerHTML = "";
-      
-      
+
+
           if (brands.length === 0) {
-      
+
             container.innerHTML =
               "<span>Chưa có hãng robot.</span>";
-      
+
             return;
           }
-      
-      
+
+
           brands.forEach(function(brand) {
-      
+
             const link =
               document.createElement("a");
-      
-      
+
+
             link.href =
               "robot/brand.html?brand=" +
               encodeURIComponent(brand);
-      
-      
+
+
             const name =
               document.createElement("b");
-      
-      
+
+
             name.textContent =
               brand;
-      
-      
+
+
             const detail =
               document.createElement("span");
-      
-      
+
+
             detail.textContent =
               "Khám phá →";
-      
-      
+
+
             link.appendChild(name);
-      
+
             link.appendChild(detail);
-      
+
             container.appendChild(link);
-      
+
           });
-      
-      
+
+
         } catch (error) {
-      
+
           console.error(
             "Load home brands:",
             error
           );
-      
-      
+
+
           container.innerHTML =
             "<span>Không thể tải danh sách hãng.</span>";
-      
+
         }
-      
+
       }
-      
-      
+
+
       loadHomeBrands();
       </script>
      <script src="/js/visitor.js"></script>
@@ -699,8 +701,8 @@
      <span id="visitor-counter-number">—</span>
      <span>lượt truy cập</span>
    </div>
-   
+
    <script src="/js/visitor-counter.js"></script>
-   
+
 </body>
 </html>

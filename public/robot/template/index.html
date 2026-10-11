@@ -58,7 +58,26 @@
       font-size: 42px;
       line-height: 1.15;
     }
+    .robot-compare-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 0 20px;
+      padding: 5px 10px;
+      border: 1px solid #0f766e;
+      border-radius: 5px;
+      color: #0f766e;
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.4;
+      text-decoration: none;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
 
+    .robot-compare-link:hover {
+      background-color: #0f766e;
+      color: #ffffff;
+    }
     .product-gallery {
       margin-bottom: 30px;
     }
@@ -298,29 +317,29 @@
   <header class="header">
 
     <div class="wrap nav-wrap">
-  
+
       <a
         class="logo"
         href="../../index.html"
       >
-  
+
         <img class="logo-image" src="/api/image/11o8kadVPE6ZbWvYAlrf-pkSQGaTkVFf2" alt="Trung Tử Tế - Robot lau nhà">
-  
+
         <span>
-  
+
           <b>
             TRUNG TỬ TẾ
           </b>
-  
+
           <small>
             Robot lau nhà
           </small>
-  
+
         </span>
-  
+
       </a>
-  
-  
+
+
       <button
         class="menu"
         aria-label="Mở menu"
@@ -328,35 +347,35 @@
       >
         ☰
       </button>
-  
-  
+
+
       <nav>
-  
+
         <a href="../../index.html">
           Trang chủ
         </a>
-  
+
         <a href="../index.html">
           Robot
         </a>
-  
+
         <a href="../../chia-se/index.html">
           Chia sẻ
         </a>
-  
+
         <a href="../../index.html#dich-vu">
           Dịch vụ
         </a>
-  
+
         <a href="../../index.html#lien-he">
           Liên hệ
         </a>
-  
+
       </nav>
-  
-  
+
+
     </div>
-  
+
   </header>
 
 
@@ -410,7 +429,13 @@
             id="robot-title"
             class="robot-title"
           ></h1>
-
+          <a
+          id="robot-compare-link"
+          class="robot-compare-link"
+          href="/so-sanh/"
+        >
+          So sánh robot này
+        </a>
 
           <div class="product-gallery">
 
@@ -513,7 +538,7 @@
               <h2 id="article-models-title">
                 Các model
               </h2>
-            
+
             </div>
 
             <div
@@ -607,7 +632,16 @@
         "Robot slug:",
         slug
       );
+      const compareLink =
+        document.getElementById(
+          "robot-compare-link"
+        );
 
+      if (compareLink) {
+        compareLink.href =
+          "/so-sanh/?a=" +
+          encodeURIComponent(slug);
+      }
 
       if (!slug) {
 
@@ -755,7 +789,7 @@ robotBottomBack.href =
           .style.display = "block";
 
 
-      
+
 
       } catch (error) {
 
@@ -928,22 +962,19 @@ robotBottomBack.href =
     ) {
 
       const suction =
-        specs.suction ||
+        specs.suction_power ||
         "—";
-
 
       const battery =
-        specs.battery ||
+        specs.battery_capacity ||
         "—";
-
 
       const hotWater =
-        specs.hot_water ||
+        specs.automatic_mop_washing ||
         "—";
 
-
       const mopLift =
-        specs.mop_lift ||
+        specs.carpet_mop_lift ||
         "—";
 
 
@@ -1354,110 +1385,40 @@ robotBottomBack.href =
       );
 
 
-      const specList =
-        document.createElement(
-          "div"
-        );
 
+      const specList =
+        document.createElement("div");
 
       specList.className =
         "robot-spec-list";
 
+      addArticleSpec(specList, "Lực hút", specs.suction_power);
+      addArticleSpec(specList, "Nhận diện vật cản", specs.obstacle_recognition);
+      addArticleSpec(specList, "Công nghệ lau", specs.mopping_technology);
+      addArticleSpec(specList, "Mở rộng cây lau", specs.mop_extension);
+      addArticleSpec(specList, "Chổi cạnh mở rộng", specs.side_brush_extension);
+      addArticleSpec(specList, "Tự động giặt giẻ", specs.automatic_mop_washing);
+      addArticleSpec(specList, "Sấy khô giẻ lau", specs.mop_drying);
+      addArticleSpec(specList, "Tự làm sạch khay giặt", specs.wash_tray_self_cleaning);
+      addArticleSpec(specList, "Tự động đổ rác", specs.automatic_dust_emptying);
+      addArticleSpec(specList, "Tự pha nước lau sàn", specs.automatic_detergent_dispensing);
+      addArticleSpec(specList, "Nâng giẻ khi gặp thảm", specs.carpet_mop_lift);
+      addArticleSpec(specList, "Dung tích túi bụi", specs.dust_bag_capacity);
+      addArticleSpec(specList, "Dung tích bình nước sạch/bẩn", specs.clean_dirty_water_capacity);
+      addArticleSpec(specList, "Dung lượng pin", specs.battery_capacity);
+      addArticleSpec(specList, "Diện tích làm sạch", specs.cleaning_area);
+      addArticleSpec(specList, "Kích thước robot", specs.robot_dimensions);
+      addArticleSpec(specList, "Kích thước trạm sạc", specs.dock_dimensions);
 
-      addArticleSpec(
-        specList,
-        "Lực hút",
-        specs.suction
-      );
+      const referencePrice = Number(specs.reference_price);
 
-
-      addArticleSpec(
-        specList,
-        "Pin",
-        specs.battery
-      );
-
-
-      addArticleSpec(
-        specList,
-        "Hộp bụi robot",
-        specs.dustbin
-      );
-
-
-      addArticleSpec(
-        specList,
-        "Bình nước",
-        specs.water_tank
-      );
-
-
-      addArticleSpec(
-        specList,
-        "Hệ thống điều hướng",
-        specs.navigation
-      );
-
-
-      addArticleSpec(
-        specList,
-        "Độ ồn",
-        specs.noise
-      );
-
-
-      addArticleSpec(
-        specList,
-        "Nhiệt độ nước nóng",
-        specs.hot_water
-      );
-
-
-      addArticleSpec(
-        specList,
-        "Giặt khăn",
-        specs.mop_wash
-      );
-
-
-      addArticleSpec(
-        specList,
-        "Sấy khăn",
-        specs.mop_dry
-      );
-
-
-      addArticleSpec(
-        specList,
-        "Nâng khăn lau",
-        specs.mop_lift
-      );
-
-
-      addArticleSpec(
-        specList,
-        "Túi bụi của trạm",
-        specs.self_empty
-      );
-
-
-      addArticleSpec(
-  specList,
-  "Dung dịch vệ sinh",
-  specs.detergent
-);
-
-addArticleSpec(
-  specList,
-  "Kích thước Robot",
-  specs.robot_dimensions
-);
-
-addArticleSpec(
-  specList,
-  "Kích thước Trạm sạc",
-  specs.dock_dimensions
-);
+      if (Number.isFinite(referencePrice) && referencePrice > 0) {
+        addArticleSpec(
+          specList,
+          "Giá tham khảo",
+          `Giá khoảng ${Math.floor(referencePrice / 1000000)} triệu`
+        );
+      }
 
 
       container.appendChild(

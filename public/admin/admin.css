@@ -3184,9 +3184,11 @@ body {
 }
 
 .robot-ai-review-panel .panel-header h2 {
-  margin: 4px 0 6px;
-  font-size: 22px;
-  line-height: 1.3;
+  margin: 4px 0 8px;
+  font-size: 24px;
+  line-height: 1.35;
+  font-weight: 700;
+  color: #1f2937;
 }
 
 .robot-ai-review-panel .panel-description {
@@ -3198,11 +3200,18 @@ body {
 /* CÁC KHỐI NỘI DUNG */
 
 .robot-ai-review-panel .admin-form-section {
-  margin-top: 20px;
-  padding: 20px;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  background: #fafbfc;
+  margin-top: 24px;
+  padding: 24px 0 0;
+  border: 0;
+  border-top: 1px solid #e5e7eb;
+  border-radius: 0;
+  background: transparent;
+}
+
+.robot-ai-review-panel .admin-form-section:first-of-type {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
 }
 
 .robot-ai-review-panel .admin-form-section > label {
@@ -3302,7 +3311,18 @@ body {
 
 /* CARD TỪNG CHỦ ĐỀ */
 
+.robot-ai-review-panel #robot-ai-sections {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  width: 100%;
+  min-width: 0;
+}
+
 .robot-ai-review-panel .robot-ai-section {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
   padding: 18px;
   border: 1px solid #dfe4ea;
   border-radius: 10px;
@@ -3313,6 +3333,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 12px;
   margin-bottom: 14px;
 }
@@ -3326,6 +3347,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 7px;
+  min-width: 0;
 }
 
 .robot-ai-review-panel .robot-ai-section > label > span {
@@ -3334,15 +3356,27 @@ body {
   font-weight: 600;
 }
 
+.robot-ai-review-panel .robot-ai-section input,
+.robot-ai-review-panel .robot-ai-section textarea {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
 .robot-ai-review-panel .robot-ai-paragraphs {
   display: flex;
   flex-direction: column;
   gap: 10px;
   margin-top: 12px;
+  min-width: 0;
 }
 
 .robot-ai-review-panel .robot-ai-section-paragraph {
+  width: 100%;
   min-height: 105px;
+  resize: vertical;
 }
 
 /* NÚT XÓA CHỦ ĐỀ */

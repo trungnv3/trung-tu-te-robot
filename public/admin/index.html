@@ -60,24 +60,24 @@
       href="#robots"
       data-section="robots"
       class="admin-nav-robot-toggle">
-  
+
       <span>🤖</span>
-  
+
       <span class="admin-nav-robot-label">
         Robot
       </span>
-  
+
       <span class="admin-nav-robot-arrow">
         ▾
       </span>
-  
+
     </a>
-  
+
     <div
       id="admin-robot-brands"
       class="admin-nav-robot-brands">
     </div>
-  
+
   </div>
 
   <a
@@ -88,12 +88,12 @@
     Model AI
 
   </a>
-  <a 
+  <a
   href="#articles-section"
-  data-section="articles"> 
+  data-section="articles">
 
-  <span>📝</span> 
-  Chia sẻ 
+  <span>📝</span>
+  Chia sẻ
 
 </a>
 
@@ -157,21 +157,21 @@
         class="view-site"
         href="/"
         target="_blank">
-    
+
         Xem website ↗
-    
+
       </a>
-    
+
       <button
         type="button"
         id="admin-logout-button"
         class="view-site"
         style="border:0; cursor:pointer;">
-    
+
         🚪 Đăng xuất
-    
+
       </button>
-    
+
     </div>
 
   </header>
@@ -544,11 +544,11 @@
       data-section="articles"
     >
       <span>📝</span>
-    
+
       <strong>
         Quản lý bài chia sẻ
       </strong>
-    
+
       <small>
         Tạo và chỉnh sửa nội dung
       </small>
@@ -725,25 +725,25 @@
        <div></div>
 
        <section class="panel">
-       
+
          <div class="panel-header">
           <div>
             <p class="eyebrow">
               DANH SÁCH
             </p>
-          
+
             <h2>
               Robot hiện có
             </h2>
           </div>
-          
+
           <button
             type="button"
             id="robot-add-button"
             class="button-primary">
             ＋ Thêm Robot
           </button>
-          
+
         </div>
 
       </section>
@@ -758,64 +758,64 @@
     <section
     id="ai-models-section"
     class="admin-section">
-  
+
     <header class="admin-header">
-  
+
       <div>
-  
+
         <p class="eyebrow">
           HỆ THỐNG AI
         </p>
-  
+
         <h1>
           Model AI
         </h1>
-  
+
       </div>
-  
+
       <button
         type="button"
         class="button-primary"
         onclick="loadAIModelStatus()">
-  
+
         🔄 Làm mới
-  
+
       </button>
-  
+
     </header>
-  
-  
+
+
     <section class="panel">
-  
+
       <div class="panel-header">
-  
+
         <div>
-  
+
           <p class="eyebrow">
             THEO DÕI
           </p>
-  
+
           <h2>
             Trạng thái Model AI
           </h2>
-  
+
         </div>
-  
+
       </div>
-  
+
       <div
         id="ai-model-status-content"
         class="ai-model-status-content">
-  
+
         <div class="robot-loading">
           Đang tải trạng thái Model AI...
         </div>
-  
+
       </div>
-  
+
     </section>
-  
-  </section>    
+
+  </section>
 <!-- =====================================================
      BÀI CHIA SẺ
      ===================================================== -->
@@ -901,7 +901,7 @@
 
   </section>
 
-</section>   
+</section>
   <!-- =====================================================
        FORM CHỈNH SỬA ROBOT
        ===================================================== -->
@@ -1029,78 +1029,99 @@
 
         <label>
           <span>Lực hút</span>
-          <input id="edit-suction" type="text">
+          <input id="edit-suction-power" type="text">
         </label>
 
         <label>
-          <span>Pin</span>
-          <input id="edit-battery" type="text">
+          <span>Nhận diện vật cản</span>
+          <input id="edit-obstacle-recognition" type="text">
         </label>
 
         <label>
-          <span>Hộp bụi</span>
-          <input id="edit-dustbin" type="text">
+          <span>Công nghệ lau</span>
+          <input id="edit-mopping-technology" type="text">
         </label>
 
         <label>
-          <span>Bình nước</span>
-          <input id="edit-water-tank" type="text">
+          <span>Mở rộng cây lau</span>
+          <input id="edit-mop-extension" type="text">
         </label>
 
         <label>
-          <span>Điều hướng</span>
-          <input id="edit-navigation" type="text">
+          <span>Chổi cạnh mở rộng</span>
+          <input id="edit-side-brush-extension" type="text">
         </label>
 
         <label>
-          <span>Độ ồn</span>
-          <input id="edit-noise" type="text">
+          <span>Tự động giặt giẻ</span>
+          <input id="edit-automatic-mop-washing" type="text">
         </label>
 
         <label>
-          <span>Nước nóng</span>
-          <input id="edit-hot-water" type="text">
+          <span>Sấy khô giẻ lau</span>
+          <input id="edit-mop-drying" type="text">
         </label>
 
         <label>
-          <span>Giặt khăn</span>
-          <input id="edit-mop-wash" type="text">
+          <span>Tự làm sạch khay giặt</span>
+          <input id="edit-wash-tray-self-cleaning" type="text">
         </label>
 
         <label>
-          <span>Sấy khăn</span>
-          <input id="edit-mop-dry" type="text">
+          <span>Tự động đổ rác</span>
+          <input id="edit-automatic-dust-emptying" type="text">
         </label>
 
         <label>
-          <span>Nâng khăn</span>
-          <input id="edit-mop-lift" type="text">
+          <span>Tự pha nước lau sàn</span>
+          <input id="edit-automatic-detergent-dispensing" type="text">
         </label>
 
         <label>
-          <span>Tự đổ bụi</span>
-          <input id="edit-self-empty" type="text">
+          <span>Nâng giẻ khi gặp thảm</span>
+          <input id="edit-carpet-mop-lift" type="text">
         </label>
 
         <label>
-          <span>Dung dịch vệ sinh</span>
-          <input id="edit-detergent" type="text">
+          <span>Dung tích túi bụi</span>
+          <input id="edit-dust-bag-capacity" type="text">
         </label>
+
         <label>
-          <span>Kích thước Robot</span>
+          <span>Dung tích bình nước sạch/bẩn</span>
+          <input id="edit-clean-dirty-water-capacity" type="text">
+        </label>
+
+        <label>
+          <span>Dung lượng pin</span>
+          <input id="edit-battery-capacity" type="text">
+        </label>
+
+        <label>
+          <span>Diện tích làm sạch</span>
+          <input id="edit-cleaning-area" type="text">
+        </label>
+
+        <label>
+          <span>Kích thước robot</span>
+          <input id="edit-robot-dimensions" type="text">
+        </label>
+
+        <label>
+          <span>Kích thước trạm sạc</span>
+          <input id="edit-dock-dimensions" type="text">
+        </label>
+
+        <label>
+          <span>Giá tham khảo (VNĐ)</span>
           <input
-            id="edit-robot-dimensions"
-            type="text"
-            placeholder="Ví dụ: 350 × 350 × 97mm">
+            id="edit-reference-price"
+            type="number"
+            min="0"
+            step="1000"
+            placeholder="Ví dụ: 9200000">
         </label>
-        
-        <label>
-          <span>Kích thước Trạm sạc</span>
-          <input
-            id="edit-dock-dimensions"
-            type="text"
-            placeholder="Ví dụ: 340 × 457 × 590mm">
-        </label>
+
 
       </div>
 
@@ -1217,9 +1238,9 @@
           class="button-secondary">
           ＋ Thêm hình ảnh
         </button>
-      
+
       </div>
-      
+
       <div
         id="edit-images"
         class="robot-edit-images">

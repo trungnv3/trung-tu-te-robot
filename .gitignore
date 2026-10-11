@@ -1,4 +1,19 @@
 .wrangler/
+.wrangler-local-check/
 node_modules/
 .dev.vars
 .env
+.env.*
+!.env.example
+
+# Local configuration
+wrangler.local.jsonc
+
+# Backups and temporary files
+backups/
+*.bak
+*.before-*.bak
+article-views-remote.sql
+backup-remote-before-sync.sql
+replace-remote.sql
+local-d1.sql

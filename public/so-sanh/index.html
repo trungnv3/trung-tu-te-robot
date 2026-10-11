@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>So sánh robot lau nhà | Trung Tử Tế</title>
+  <meta name="description" content="So sánh thông số kỹ thuật và tính năng robot lau nhà tại Trung Tử Tế. Chọn hai model để xem sự khác biệt dựa trên dữ liệu sản phẩm.">
+  <meta name="robots" content="index, follow">
+
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/so-sanh/compare.css">
+</head>
+<body>
+
+<header class="header">
+  <div class="wrap nav-wrap">
+    <a class="logo" href="/">
+      <img
+        class="logo-image"
+        src="/api/image/11o8kadVPE6ZbWvYAlrf-pkSQGaTkVFf2"
+        alt="Trung Tử Tế - Robot lau nhà"
+      >
+      <span>
+        <b>TRUNG TỬ TẾ</b>
+        <small>Robot lau nhà</small>
+      </span>
+    </a>
+
+    <button class="menu" aria-label="Mở menu" aria-expanded="false">
+      ☰
+    </button>
+
+    <nav>
+      <a href="/">Trang chủ</a>
+      <a href="/robot/">Robot</a>
+      <a href="/so-sanh/" aria-current="page">So sánh</a>
+      <a href="/chia-se/">Chia sẻ</a>
+      <a href="/#dich-vu">Dịch vụ</a>
+      <a href="/#lien-he">Liên hệ</a>
+    </nav>
+  </div>
+</header>
+
+<main class="compare-page">
+  <section class="compare-hero">
+    <div class="wrap">
+      <p class="compare-eyebrow">TRUNG TỬ TẾ · GÓC NHÌN KỸ THUẬT</p>
+      <h1>So sánh robot lau nhà</h1>
+      <p class="compare-intro">
+        Chọn tối đa 3 model để đối chiếu thông số và tính năng dựa trên dữ liệu
+        sản phẩm hiện có. Thông tin chưa được cập nhật sẽ được ghi rõ.
+      </p>
+    </div>
+  </section>
+
+  <section class="wrap compare-selector-section">
+    <div class="compare-selector">
+
+      <div class="compare-field compare-search-field">
+        <label for="compare-search-a">Robot thứ nhất</label>
+
+        <input
+          type="search"
+          id="compare-search-a"
+          placeholder="Nhập tên robot, ví dụ Dreame X50..."
+          autocomplete="off"
+          aria-controls="compare-suggestions-a"
+          aria-expanded="false"
+        >
+
+        <input type="hidden" id="compare-robot-a">
+
+        <div
+          id="compare-suggestions-a"
+          class="compare-suggestions"
+          role="listbox"
+          hidden
+        ></div>
+
+        <div
+          id="compare-selected-a"
+          class="compare-selected"
+          aria-live="polite"
+        >Chưa chọn robot</div>
+      </div>
+
+      <div class="compare-vs" aria-hidden="true">VS</div>
+
+      <div class="compare-field compare-search-field">
+        <label for="compare-search-b">Robot thứ hai</label>
+
+        <input
+          type="search"
+          id="compare-search-b"
+          placeholder="Nhập tên robot cần so sánh..."
+          autocomplete="off"
+          aria-controls="compare-suggestions-b"
+          aria-expanded="false"
+        >
+
+        <input type="hidden" id="compare-robot-b">
+
+        <div
+          id="compare-suggestions-b"
+          class="compare-suggestions"
+          role="listbox"
+          hidden
+        ></div>
+
+        <div
+          id="compare-selected-b"
+          class="compare-selected"
+          aria-live="polite"
+        >Chưa chọn robot</div>
+      </div>
+
+      <div class="compare-field compare-search-field">
+        <label for="compare-search-c">Robot thứ ba</label>
+
+        <input
+          type="search"
+          id="compare-search-c"
+          placeholder="Nhập tên robot thứ ba..."
+          autocomplete="off"
+          aria-controls="compare-suggestions-c"
+          aria-expanded="false"
+        >
+
+        <input type="hidden" id="compare-robot-c">
+
+        <div
+          id="compare-suggestions-c"
+          class="compare-suggestions"
+          role="listbox"
+          hidden
+        ></div>
+
+        <div
+          id="compare-selected-c"
+          class="compare-selected"
+          aria-live="polite"
+        >Chưa chọn robot</div>
+      </div>
+
+      <button id="compare-submit" class="btn primary" type="button">
+        So sánh
+      </button>
+
+    </div>
+
+    <p
+    id="compare-status"
+    class="compare-status"
+    role="status"
+    aria-live="polite"
+    hidden
+  ></p>
+  </section>
+
+  <section id="compare-results" class="wrap compare-results" hidden>
+    <div class="compare-result-heading">
+      <h2>Kết quả so sánh</h2>
+      <button id="compare-share" class="btn" type="button">
+        Sao chép đường dẫn
+      </button>
+    </div>
+
+    <div id="compare-product-grid" class="compare-product-grid"></div>
+
+<section class="compare-table-section compare-differences-section">
+  <h3>Khác biệt đáng chú ý</h3>
+  <p class="compare-differences-intro">
+    Những điểm khác nhau nổi bật dựa trên dữ liệu hiện có của hai model.
+  </p>
+  <div id="compare-differences" class="compare-differences-grid"></div>
+</section>
+
+    <section class="compare-table-section">
+      <h3>Thông số kỹ thuật</h3>
+      <div id="compare-specs" class="compare-table-wrap"></div>
+    </section>
+
+
+<section class="compare-table-section">
+  <h3>Ưu điểm và lưu ý kỹ thuật</h3>
+  <div id="compare-analysis" class="compare-features-grid"></div>
+</section>
+
+<section class="compare-table-section compare-advice-section">
+  <h3>Tư vấn của Trung Tử Tế</h3>
+  <p class="compare-advice-intro">
+    Chọn robot theo nhu cầu sử dụng thực tế, dựa trên thông số và
+    tính năng đã có dữ liệu. Những thông tin chưa được xác minh
+    sẽ không được dùng để kết luận.
+  </p>
+  <div id="compare-advice" class="compare-features-grid"></div>
+</section>
+
+
+    <section class="compare-table-section">
+      <h3>Tính năng nổi bật</h3>
+      <div id="compare-features" class="compare-features-grid"></div>
+    </section>
+
+    <p class="compare-disclaimer">
+      Thông tin được tổng hợp từ dữ liệu sản phẩm hiện có trên website.
+      Giá trị chưa có dữ liệu sẽ không được suy đoán.
+    </p>
+  </section>
+
+  <section class="wrap compare-empty" id="compare-empty">
+    <div class="compare-empty-mark" aria-hidden="true">↔</div>
+    <h2>Chọn hai robot bạn đang quan tâm</h2>
+    <p>
+      Bảng so sánh sẽ hiển thị thông số kỹ thuật và tính năng của từng model
+      để bạn dễ đối chiếu trước khi lựa chọn.
+    </p>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="/js/main.js"></script>
+<script src="/js/footer.js"></script>
+<script src="/so-sanh/compare.js" defer></script>
+<script src="/js/visitor.js"></script>
+</body>
+</html>

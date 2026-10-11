@@ -525,11 +525,14 @@ let html = "";
     function (robot) {
 
       const images =
-        Array.isArray(
-          robot.images
-        )
-          ? robot.images
-          : [];
+      Array.isArray(robot.images)
+        ? robot.images
+        : [];
+
+    const primaryImage =
+      images.find(function(image) {
+        return image.primary === true;
+      }) || images[0];
 
       let imageHtml =
         '<span>🤖</span>';
@@ -540,7 +543,7 @@ let html = "";
 
         imageHtml =
           '<img src="/api/image/' +
-          images[0].id +
+          primaryImage.id +
           '" alt="' +
           (
             robot.model ||
@@ -1401,7 +1404,7 @@ document.addEventListener("click", async function (event) {
     document.querySelector(
       "#robot-edit-title"
     ).textContent =
-      "Chỉnh sửa " +
+
       (selectedRobot.model || "Robot");
 
     document.querySelector(
@@ -1429,74 +1432,68 @@ document.addEventListener("click", async function (event) {
     ).value =
       selectedRobot.status || "active";
 
-    const specs =
+      const specs =
       selectedRobot.specs || {};
 
-    document.querySelector(
-      "#edit-suction"
-    ).value =
-      specs.suction || "";
+    document.querySelector("#edit-suction-power").value =
+      specs.suction_power || "";
 
-    document.querySelector(
-      "#edit-battery"
-    ).value =
-      specs.battery || "";
+    document.querySelector("#edit-obstacle-recognition").value =
+      specs.obstacle_recognition || "";
 
-    document.querySelector(
-      "#edit-dustbin"
-    ).value =
-      specs.dustbin || "";
+    document.querySelector("#edit-mopping-technology").value =
+      specs.mopping_technology || "";
 
-    document.querySelector(
-      "#edit-water-tank"
-    ).value =
-      specs.water_tank || "";
+    document.querySelector("#edit-mop-extension").value =
+      specs.mop_extension || "";
 
-    document.querySelector(
-      "#edit-navigation"
-    ).value =
-      specs.navigation || "";
+    document.querySelector("#edit-side-brush-extension").value =
+      specs.side_brush_extension || "";
 
-    document.querySelector(
-      "#edit-noise"
-    ).value =
-      specs.noise || "";
+    document.querySelector("#edit-automatic-mop-washing").value =
+      specs.automatic_mop_washing || "";
 
-    document.querySelector(
-      "#edit-hot-water"
-    ).value =
-      specs.hot_water || "";
+    document.querySelector("#edit-mop-drying").value =
+      specs.mop_drying || "";
 
-    document.querySelector(
-      "#edit-mop-wash"
-    ).value =
-      specs.mop_wash || "";
+    document.querySelector("#edit-wash-tray-self-cleaning").value =
+      specs.wash_tray_self_cleaning || "";
 
-    document.querySelector(
-      "#edit-mop-dry"
-    ).value =
-      specs.mop_dry || "";
+    document.querySelector("#edit-automatic-dust-emptying").value =
+      specs.automatic_dust_emptying || "";
 
-    document.querySelector(
-      "#edit-mop-lift"
-    ).value =
-      specs.mop_lift || "";
+    document.querySelector("#edit-automatic-detergent-dispensing").value =
+      specs.automatic_detergent_dispensing || "";
 
-    document.querySelector(
-      "#edit-self-empty"
-    ).value =
-      specs.self_empty || "";
+    document.querySelector("#edit-carpet-mop-lift").value =
+      specs.carpet_mop_lift || "";
 
-    document.querySelector(
-      "#edit-detergent"
-    ).value =
-      specs.detergent || "";
+    document.querySelector("#edit-dust-bag-capacity").value =
+      specs.dust_bag_capacity || "";
+
+    document.querySelector("#edit-clean-dirty-water-capacity").value =
+      specs.clean_dirty_water_capacity || "";
+
+    document.querySelector("#edit-battery-capacity").value =
+      specs.battery_capacity || "";
+
+    document.querySelector("#edit-cleaning-area").value =
+      specs.cleaning_area || "";
+
+    document.querySelector("#edit-robot-dimensions").value =
+      specs.robot_dimensions || "";
+
+    document.querySelector("#edit-dock-dimensions").value =
+      specs.dock_dimensions || "";
+
+    document.querySelector("#edit-reference-price").value =
+      specs.reference_price ?? "";
 
       const content =
       selectedRobot.content || {};
-    
+
     let aiContent = {};
-    
+
     if (content.ai_content) {
       try {
         aiContent =
@@ -1511,14 +1508,14 @@ document.addEventListener("click", async function (event) {
         aiContent = {};
       }
     }
-    
+
     document.querySelector(
       "#edit-intro"
     ).value =
       content.intro ||
       aiContent.highlight_intro ||
       "";
-    
+
     document.querySelector(
       "#edit-highlights"
     ).value =
@@ -1529,12 +1526,12 @@ document.addEventListener("click", async function (event) {
               .map(section => {
                 const title =
                   section.title || "";
-    
+
                 const paragraphs =
                   Array.isArray(section.paragraphs)
                     ? section.paragraphs.join("\n")
                     : "";
-    
+
                 return [
                   title,
                   paragraphs
@@ -1545,19 +1542,21 @@ document.addEventListener("click", async function (event) {
               .join("\n\n")
           : ""
       );
-    
-    document.querySelector(
-      "#edit-pros"
-    ).value =
-      content.pros || "";
-    
+
+      document.querySelector(
+        "#edit-pros"
+      ).value =
+        content.pros ||
+        aiContent.pros ||
+        "";
+
     document.querySelector(
       "#edit-notes"
     ).value =
       content.notes ||
       aiContent.technical_view ||
       "";
-    
+
     document.querySelector(
       "#edit-suitable-for"
     ).value =
@@ -1639,23 +1638,23 @@ currentRobotImages =
       return {
         driveId:
           image.driveId,
-    
+
         fileName:
           image.fileName || "",
-    
+
         mimeType:
           image.mimeType || null,
-    
+
         sortOrder:
           Number(
             image.sortOrder || 0
           ),
-    
+
         isPrimary:
           Boolean(
             image.isPrimary
           ),
-    
+
         url:
           image.url || ""
       };
@@ -1867,47 +1866,59 @@ document.addEventListener("click", async function (event) {
 
     const specs = {
 
-      suction:
-        getValue("#edit-suction"),
+      suction_power:
+        getValue("#edit-suction-power"),
 
-      battery:
-        getValue("#edit-battery"),
+      obstacle_recognition:
+        getValue("#edit-obstacle-recognition"),
 
-      dustbin:
-        getValue("#edit-dustbin"),
+      mopping_technology:
+        getValue("#edit-mopping-technology"),
 
-      water_tank:
-        getValue("#edit-water-tank"),
+      mop_extension:
+        getValue("#edit-mop-extension"),
 
-      navigation:
-        getValue("#edit-navigation"),
+      side_brush_extension:
+        getValue("#edit-side-brush-extension"),
 
-      noise:
-        getValue("#edit-noise"),
+      automatic_mop_washing:
+        getValue("#edit-automatic-mop-washing"),
 
-      hot_water:
-        getValue("#edit-hot-water"),
+      mop_drying:
+        getValue("#edit-mop-drying"),
 
-      mop_wash:
-        getValue("#edit-mop-wash"),
+      wash_tray_self_cleaning:
+        getValue("#edit-wash-tray-self-cleaning"),
 
-      mop_dry:
-        getValue("#edit-mop-dry"),
+      automatic_dust_emptying:
+        getValue("#edit-automatic-dust-emptying"),
 
-      mop_lift:
-        getValue("#edit-mop-lift"),
+      automatic_detergent_dispensing:
+        getValue("#edit-automatic-detergent-dispensing"),
 
-      self_empty:
-        getValue("#edit-self-empty"),
+      carpet_mop_lift:
+        getValue("#edit-carpet-mop-lift"),
 
-      detergent:
-        getValue("#edit-detergent"),
+      dust_bag_capacity:
+        getValue("#edit-dust-bag-capacity"),
+
+      clean_dirty_water_capacity:
+        getValue("#edit-clean-dirty-water-capacity"),
+
+      battery_capacity:
+        getValue("#edit-battery-capacity"),
+
+      cleaning_area:
+        getValue("#edit-cleaning-area"),
 
       robot_dimensions:
         getValue("#edit-robot-dimensions"),
-      
+
       dock_dimensions:
-        getValue("#edit-dock-dimensions")  
+        getValue("#edit-dock-dimensions"),
+
+      reference_price:
+        getValue("#edit-reference-price")
 
     };
 
@@ -2702,20 +2713,28 @@ const addRobotState = {
     status: "active"
   },
 
+
   specs: {
-    suction: "",
-    battery: "",
-    dustbin: "",
-    water_tank: "",
-    navigation: "",
-    noise: "",
-    hot_water: "",
-    mop_wash: "",
-    mop_dry: "",
-    mop_lift: "",
-    self_empty: "",
-    detergent: ""
+    suction_power: "",
+    obstacle_recognition: "",
+    mopping_technology: "",
+    mop_extension: "",
+    side_brush_extension: "",
+    automatic_mop_washing: "",
+    mop_drying: "",
+    wash_tray_self_cleaning: "",
+    automatic_dust_emptying: "",
+    automatic_detergent_dispensing: "",
+    carpet_mop_lift: "",
+    dust_bag_capacity: "",
+    clean_dirty_water_capacity: "",
+    battery_capacity: "",
+    cleaning_area: "",
+    robot_dimensions: "",
+    dock_dimensions: "",
+    reference_price: ""
   },
+
 
   content: {
     intro: "",
@@ -2775,20 +2794,28 @@ function resetAddRobotState() {
     status: "active"
   };
 
+
   addRobotState.specs = {
-    suction: "",
-    battery: "",
-    dustbin: "",
-    water_tank: "",
-    navigation: "",
-    noise: "",
-    hot_water: "",
-    mop_wash: "",
-    mop_dry: "",
-    mop_lift: "",
-    self_empty: "",
-    detergent: ""
+    suction_power: "",
+    obstacle_recognition: "",
+    mopping_technology: "",
+    mop_extension: "",
+    side_brush_extension: "",
+    automatic_mop_washing: "",
+    mop_drying: "",
+    wash_tray_self_cleaning: "",
+    automatic_dust_emptying: "",
+    automatic_detergent_dispensing: "",
+    carpet_mop_lift: "",
+    dust_bag_capacity: "",
+    clean_dirty_water_capacity: "",
+    battery_capacity: "",
+    cleaning_area: "",
+    robot_dimensions: "",
+    dock_dimensions: "",
+    reference_price: ""
   };
+
 
   addRobotState.content = {
     intro: "",
@@ -2864,40 +2891,39 @@ function saveAddRobotStep1() {
 // ============================================================
 
 function saveAddRobotStep2() {
-  const ids = [
-    "suction",
-    "battery",
-    "dustbin",
-    "water-tank",
-    "navigation",
-    "noise",
-    "hot-water",
-    "mop-wash",
-    "mop-dry",
-    "mop-lift",
-    "self-empty",
-    "detergent",
-    "robot-dimensions",
-    "dock-dimensions"
+  const fields = [
+    ["suction-power", "suction_power"],
+    ["obstacle-recognition", "obstacle_recognition"],
+    ["mopping-technology", "mopping_technology"],
+    ["mop-extension", "mop_extension"],
+    ["side-brush-extension", "side_brush_extension"],
+    ["automatic-mop-washing", "automatic_mop_washing"],
+    ["mop-drying", "mop_drying"],
+    ["wash-tray-self-cleaning", "wash_tray_self_cleaning"],
+    ["automatic-dust-emptying", "automatic_dust_emptying"],
+    ["automatic-detergent-dispensing", "automatic_detergent_dispensing"],
+    ["carpet-mop-lift", "carpet_mop_lift"],
+    ["dust-bag-capacity", "dust_bag_capacity"],
+    ["clean-dirty-water-capacity", "clean_dirty_water_capacity"],
+    ["battery-capacity", "battery_capacity"],
+    ["cleaning-area", "cleaning_area"],
+    ["robot-dimensions", "robot_dimensions"],
+    ["dock-dimensions", "dock_dimensions"],
+    ["reference-price", "reference_price"]
   ];
 
-  ids.forEach(function (id) {
-    const input = document.querySelector("#add-" + id);
+  fields.forEach(function (field) {
+    const input = document.querySelector("#add-" + field[0]);
 
     if (!input) {
       return;
     }
 
-    addRobotState.specs[
-      id.replace(/-([a-z])/g, function (_, letter) {
-        return letter.toUpperCase();
-      })
-    ] = input.value.trim();
+    addRobotState.specs[field[1]] = input.value.trim();
   });
 
   return true;
 }
-
 
 // ============================================================
 // LƯU BƯỚC 3
@@ -3051,22 +3077,28 @@ function autoFillParseProductText(rawText) {
       status: "active"
     },
 
+
     specs: {
-      suction: "",
-      battery: "",
-      dustbin: "",
-      water_tank: "",
-      navigation: "",
-      noise: "",
-      hot_water: "",
-      mop_wash: "",
-      mop_dry: "",
-      mop_lift: "",
-      self_empty: "",
-      detergent: "",
+      suction_power: "",
+      obstacle_recognition: "",
+      mopping_technology: "",
+      mop_extension: "",
+      side_brush_extension: "",
+      automatic_mop_washing: "",
+      mop_drying: "",
+      wash_tray_self_cleaning: "",
+      automatic_dust_emptying: "",
+      automatic_detergent_dispensing: "",
+      carpet_mop_lift: "",
+      dust_bag_capacity: "",
+      clean_dirty_water_capacity: "",
+      battery_capacity: "",
+      cleaning_area: "",
       robot_dimensions: "",
-      dock_dimensions: ""
+      dock_dimensions: "",
+      reference_price: ""
     },
+
 
     features: []
   };
@@ -3177,142 +3209,132 @@ function autoFillParseProductText(rawText) {
 
 
   // ==========================================================
-  // THÔNG SỐ KỸ THUẬT
+  // THÔNG SỐ KỸ THUẬT - 18 TRƯỜNG CHUẨN
   // ==========================================================
 
-  result.specs.suction =
+  result.specs.suction_power =
     autoFillFindLine(lines, [
       /^[-•*]?\s*Lực hút(?:\s+[^:]+)?\s*:\s*(.+)$/i,
       /^[-•*]?\s*Lực hút\s+(.+)$/i
     ]);
 
-
-  result.specs.battery =
+  result.specs.obstacle_recognition =
     autoFillFindLine(lines, [
-      /^[-•*]?\s*Pin\s*:\s*(.+)$/i
+      /^[-•*]?\s*Nhận diện vật cản\s*:\s*(.+)$/i
     ]);
 
-
-  result.specs.dustbin =
+  result.specs.mopping_technology =
     autoFillFindLine(lines, [
-      /^[-•*]?\s*Hộp bụi(?:\s+robot)?\s*:\s*(.+)$/i
+      /^[-•*]?\s*Công nghệ lau\s*:\s*(.+)$/i
     ]);
 
-
-  result.specs.water_tank =
+  result.specs.mop_extension =
     autoFillFindLine(lines, [
-      /^[-•*]?\s*Hộp nước(?:\s+robot)?\s*:\s*(.+)$/i,
-      /^[-•*]?\s*Bình nước(?:\s+robot)?\s*:\s*(.+)$/i,
-      /^[-•*]?\s*Bình nước sạch.*:\s*(.+)$/i
-    ]);
-// ==========================================================
-// KÍCH THƯỚC ROBOT
-// ==========================================================
-
-result.specs.robot_dimensions =
-  autoFillFindLine(lines, [
-    /^[-•*]?\s*(?:Kích thước\s+)?Robot\s*:\s*(.+)$/i
-  ]);
-
-// ==========================================================
-// KÍCH THƯỚC TRẠM SẠC
-// ==========================================================
-
-result.specs.dock_dimensions =
-  autoFillFindLine(lines, [
-    /^[-•*]?\s*(?:Kích thước\s+)?Trạm sạc\s*:\s*(.+)$/i,
-    /^[-•*]?\s*(?:Kích thước\s+)?Dock\s*:\s*(.+)$/i
-  ]);
-
-
-  result.specs.noise =
-    autoFillFindLine(lines, [
-      /^[-•*]?\s*Độ ồn\s*:\s*(.+)$/i
+      /^[-•*]?\s*Mở rộng cây lau\s*:\s*(.+)$/i
     ]);
 
-
-  // ==========================================================
-  // NƯỚC NÓNG
-  // ==========================================================
-
-  result.specs.hot_water =
+  result.specs.side_brush_extension =
     autoFillFindLine(lines, [
-      /^[-•*]?\s*Giặt giẻ bằng nước nóng\s*:\s*(.+)$/i,
-      /^[-•*]?\s*Nước nóng\s*:\s*(.+)$/i
+      /^[-•*]?\s*Chổi cạnh mở rộng\s*:\s*(.+)$/i
     ]);
 
-
-  // ==========================================================
-  // GIẶT GIẺ
-  // ==========================================================
-
-  result.specs.mop_wash =
+  result.specs.automatic_mop_washing =
     autoFillFindLine(lines, [
-      /^[-•*]?\s*(?:Tự động\s+)?Giặt (?:giẻ|khăn)(?:\s+.*)?\s*:\s*(.+)$/i
+      /^[-•*]?\s*Tự động giặt giẻ\s*:\s*(.+)$/i,
+      /^[-•*]?\s*Giặt giẻ\s*:\s*(.+)$/i,
+      /^[-•*]?\s*Giặt giẻ bằng nước nóng\s*:\s*(.+)$/i
     ]);
 
-
-  // ==========================================================
-  // SẤY GIẺ
-  // ==========================================================
-
-  result.specs.mop_dry =
+  result.specs.mop_drying =
     autoFillFindLine(lines, [
-      /^[-•*]?\s*(?:Tự động\s+)?Sấy (?:giẻ|khăn)(?:\s+.*)?\s*:\s*(.+)$/i
+      /^[-•*]?\s*Sấy khô giẻ lau\s*:\s*(.+)$/i,
+      /^[-•*]?\s*Sấy giẻ(?:\s+.*)?\s*:\s*(.+)$/i,
+      /^[-•*]?\s*Sấy khăn(?:\s+.*)?\s*:\s*(.+)$/i
     ]);
 
-
-  // ==========================================================
-  // NÂNG GIẺ
-  // ==========================================================
-
-  result.specs.mop_lift =
+  result.specs.wash_tray_self_cleaning =
     autoFillFindLine(lines, [
-      /^[-•*]?\s*Nâng giẻ\s*:\s*(.+)$/i,
-      /^[-•*]?\s*Nâng khăn\s*:\s*(.+)$/i
+      /^[-•*]?\s*Tự làm sạch khay giặt\s*:\s*(.+)$/i
     ]);
 
-
-  // ==========================================================
-  // TỰ ĐỔ BỤI
-  // ==========================================================
-
-  result.specs.self_empty =
+  result.specs.automatic_dust_emptying =
     autoFillFindLine(lines, [
+      /^[-•*]?\s*Tự động đổ rác\s*:\s*(.+)$/i,
       /^[-•*]?\s*Tự động đổ bụi\s*:\s*(.+)$/i,
       /^[-•*]?\s*Tự đổ bụi\s*:\s*(.+)$/i,
       /^[-•*]?\s*Túi bụi\s*:\s*(.+)$/i
     ]);
 
-
-  // Dạng:
-  // Tự động gom bụi vào túi
-  // Tự động đổ bụi vào túi
-
-  if (!result.specs.self_empty) {
-    const selfEmptyLine = lines.find(
-      function (line) {
-        return /tự động\s+(gom|đổ)\s+bụi/i.test(
-          line
-        );
-      }
-    );
+  if (!result.specs.automatic_dust_emptying) {
+    const selfEmptyLine = lines.find(function (line) {
+      return /tự động\s+(gom|đổ)\s+(bụi|rác)/i.test(line);
+    });
 
     if (selfEmptyLine) {
-      result.specs.self_empty = "Có";
+      result.specs.automatic_dust_emptying = "Có";
     }
   }
 
-
-  // ==========================================================
-  // DUNG DỊCH
-  // ==========================================================
-
-  result.specs.detergent =
+  result.specs.automatic_detergent_dispensing =
     autoFillFindLine(lines, [
+      /^[-•*]?\s*Tự pha nước lau sàn\s*:\s*(.+)$/i,
       /^[-•*]?\s*Dung dịch vệ sinh\s*:\s*(.+)$/i,
       /^[-•*]?\s*Dung dịch\s*:\s*(.+)$/i
     ]);
+
+  result.specs.carpet_mop_lift =
+    autoFillFindLine(lines, [
+      /^[-•*]?\s*Nâng giẻ khi gặp thảm\s*:\s*(.+)$/i,
+      /^[-•*]?\s*Nâng giẻ\s*:\s*(.+)$/i,
+      /^[-•*]?\s*Nâng khăn\s*:\s*(.+)$/i
+    ]);
+
+  result.specs.dust_bag_capacity =
+    autoFillFindLine(lines, [
+      /^[-•*]?\s*Dung tích túi bụi\s*:\s*(.+)$/i
+    ]);
+
+  result.specs.clean_dirty_water_capacity =
+    autoFillFindLine(lines, [
+      /^[-•*]?\s*Dung tích bình nước sạch\/bẩn\s*:\s*(.+)$/i,
+      /^[-•*]?\s*Dung tích bình nước sạch và bẩn\s*:\s*(.+)$/i,
+      /^[-•*]?\s*Bình nước sạch\/bẩn\s*:\s*(.+)$/i
+    ]);
+
+  result.specs.battery_capacity =
+    autoFillFindLine(lines, [
+      /^[-•*]?\s*Dung lượng pin\s*:\s*(.+)$/i,
+      /^[-•*]?\s*Pin\s*:\s*(.+)$/i
+    ]);
+
+  result.specs.cleaning_area =
+    autoFillFindLine(lines, [
+      /^[-•*]?\s*Diện tích làm sạch(?:\s+theo hãng)?\s*:\s*(.+)$/i
+    ]);
+
+  result.specs.robot_dimensions =
+    autoFillFindLine(lines, [
+      /^[-•*]?\s*Kích thước robot\s*:\s*(.+)$/i,
+      /^[-•*]?\s*Robot\s*:\s*(.+)$/i
+    ]);
+
+  result.specs.dock_dimensions =
+    autoFillFindLine(lines, [
+      /^[-•*]?\s*Kích thước trạm sạc\s*:\s*(.+)$/i,
+      /^[-•*]?\s*Kích thước Dock\s*:\s*(.+)$/i,
+      /^[-•*]?\s*Trạm sạc\s*:\s*(.+)$/i,
+      /^[-•*]?\s*Dock\s*:\s*(.+)$/i
+    ]);
+
+    result.specs.reference_price =
+    autoFillFindLine(lines, [
+      /^\s*[-•*]?\s*Giá tham khảo\s*:\s*([\d.,]+)\s*(?:₫|đ|VNĐ|VND|đồng)?\s*$/i
+    ]);
+
+  if (result.specs.reference_price) {
+    result.specs.reference_price =
+      result.specs.reference_price.replace(/[^\d]/g, "");
+  }
 
 
   // ==========================================================
@@ -3327,48 +3349,84 @@ result.specs.dock_dimensions =
 
     if (
       /^📌?\s*CHỨC NĂNG NỔI BẬT/i.test(
-        line
+        line.trim()
       )
     ) {
       inFeatures = true;
       continue;
     }
 
-
     if (
       inFeatures &&
       (
         /^⚙️?\s*THÔNG SỐ KỸ THUẬT/i.test(
-          line
+          line.trim()
         ) ||
-        /^🏠?\s*TRẠM/i.test(line)
+        /^🏠?\s*TRẠM/i.test(line.trim())
       )
     ) {
       inFeatures = false;
       continue;
     }
 
+    if (
+      !inFeatures ||
+      result.features.length >= 4
+    ) {
+      continue;
+    }
+
+    const featureText =
+      autoFillCleanValue(line)
+        .replace(/^[-•*]\s*/, "")
+        .trim();
 
     if (
-      inFeatures &&
-      result.features.length < 4
+      !featureText ||
+      /^📌|^⚙️|^🏠/.test(featureText)
     ) {
-      const featureText =
-        autoFillCleanValue(line);
+      continue;
+    }
 
-      if (
-        featureText &&
-        !/^📌|^⚙️|^🏠/.test(
-          featureText
-        )
-      ) {
-        result.features.push({
-          title: featureText,
-          description: "",
-          sort_order:
-            result.features.length + 1
-        });
+    let title = "";
+    let description = "";
+
+    const colonIndex =
+      featureText.indexOf(":");
+
+    if (colonIndex > 0) {
+      title =
+        featureText
+          .slice(0, colonIndex)
+          .trim();
+
+      description =
+        featureText
+          .slice(colonIndex + 1)
+          .trim();
+    } else {
+      const suctionMatch =
+        featureText.match(
+          /^Lực hút\s+(.+)$/i
+        );
+
+      if (suctionMatch) {
+        title = "Lực hút";
+        description =
+          suctionMatch[1].trim();
+      } else {
+        title = featureText;
+        description = "";
       }
+    }
+
+    if (title) {
+      result.features.push({
+        title: title,
+        description: description,
+        sort_order:
+          result.features.length + 1
+      });
     }
   }
 
@@ -3384,64 +3442,65 @@ result.specs.dock_dimensions =
 function applyAutoFillToAddRobotForm(parsed) {
   if (!parsed) return;
 
-
-  // ----------------------------------------------------------
   // ROBOT
-  // ----------------------------------------------------------
-
   if (parsed.robot) {
-    Object.keys(parsed.robot).forEach(
-      function (key) {
-        const value =
-          parsed.robot[key];
+    Object.keys(parsed.robot).forEach(function (key) {
+      const value = parsed.robot[key];
 
-        if (
-          value !== undefined &&
-          value !== ""
-        ) {
-          addRobotState.robot[key] =
-            value;
-        }
+      if (value !== undefined && value !== "") {
+        addRobotState.robot[key] = value;
       }
-    );
+    });
   }
 
-
-  // ----------------------------------------------------------
   // THÔNG SỐ
-  // ----------------------------------------------------------
-
   if (parsed.specs) {
-    Object.keys(parsed.specs).forEach(
-      function (key) {
-        const value =
-          parsed.specs[key];
+    const allowedSpecKeys = [
+      "suction_power",
+      "obstacle_recognition",
+      "mopping_technology",
+      "mop_extension",
+      "side_brush_extension",
+      "automatic_mop_washing",
+      "mop_drying",
+      "wash_tray_self_cleaning",
+      "automatic_dust_emptying",
+      "automatic_detergent_dispensing",
+      "carpet_mop_lift",
+      "dust_bag_capacity",
+      "clean_dirty_water_capacity",
+      "battery_capacity",
+      "cleaning_area",
+      "robot_dimensions",
+      "dock_dimensions",
+      "reference_price"
+    ];
 
-        if (
-          value !== undefined &&
-          value !== ""
-        ) {
-          addRobotState.specs[key] =
-            value;
-        }
+    allowedSpecKeys.forEach(function (key) {
+      const value = parsed.specs[key];
+
+      if (value !== undefined && value !== "") {
+        addRobotState.specs[key] = value;
       }
-    );
+    });
   }
 
-
-  // ----------------------------------------------------------
   // CHỨC NĂNG
-  // ----------------------------------------------------------
+  if (Array.isArray(parsed.features) && parsed.features.length > 0) {
+    addRobotState.features = parsed.features;
+  }
+
+  // CẬP NHẬT Ô GIÁ NẾU ĐANG HIỂN THỊ
+  const priceInput = document.querySelector("#add-reference-price");
 
   if (
-    Array.isArray(parsed.features) &&
-    parsed.features.length > 0
+    priceInput &&
+    addRobotState.specs.reference_price !== undefined &&
+    addRobotState.specs.reference_price !== ""
   ) {
-    addRobotState.features =
-      parsed.features;
+    priceInput.value = addRobotState.specs.reference_price;
   }
 }
-
 
 // ============================================================
 // XỬ LÝ NÚT AUTO FILL
@@ -3649,16 +3708,36 @@ function renderAddRobotStep1() {
 // BƯỚC 2
 // ============================================================
 
+
 function renderAddRobotStep2() {
-  const panel =
-    getAddRobotPanel();
+  const panel = getAddRobotPanel();
 
   if (!panel) {
     return;
   }
 
-  const specs =
-    addRobotState.specs;
+  const specs = addRobotState.specs;
+
+  const fields = [
+    ["suction-power", "Lực hút", "Ví dụ: 30.000 Pa", "suction_power"],
+    ["obstacle-recognition", "Nhận diện vật cản", "Ví dụ: Camera AI + ánh sáng cấu trúc", "obstacle_recognition"],
+    ["mopping-technology", "Công nghệ lau", "Ví dụ: Giẻ lau xoay kép", "mopping_technology"],
+    ["mop-extension", "Mở rộng cây lau", "Ví dụ: Có", "mop_extension"],
+    ["side-brush-extension", "Chổi cạnh mở rộng", "Ví dụ: Có", "side_brush_extension"],
+    ["automatic-mop-washing", "Tự động giặt giẻ", "Ví dụ: Nước nóng 75°C", "automatic_mop_washing"],
+    ["mop-drying", "Sấy khô giẻ lau", "Ví dụ: Khí nóng", "mop_drying"],
+    ["wash-tray-self-cleaning", "Tự làm sạch khay giặt", "Ví dụ: Có", "wash_tray_self_cleaning"],
+    ["automatic-dust-emptying", "Tự động đổ rác", "Ví dụ: Có", "automatic_dust_emptying"],
+    ["automatic-detergent-dispensing", "Tự pha nước lau sàn", "Ví dụ: Có", "automatic_detergent_dispensing"],
+    ["carpet-mop-lift", "Nâng giẻ khi gặp thảm", "Ví dụ: 10 mm", "carpet_mop_lift"],
+    ["dust-bag-capacity", "Dung tích túi bụi", "Ví dụ: 3,2 L", "dust_bag_capacity"],
+    ["clean-dirty-water-capacity", "Dung tích bình nước sạch/bẩn", "Ví dụ: Sạch 4 L / bẩn 3,5 L", "clean_dirty_water_capacity"],
+    ["battery-capacity", "Dung lượng pin", "Ví dụ: 6.400 mAh", "battery_capacity"],
+    ["cleaning-area", "Diện tích làm sạch", "Ví dụ: Tối đa 200 m²", "cleaning_area"],
+    ["robot-dimensions", "Kích thước robot", "Ví dụ: 350 × 350 × 97 mm", "robot_dimensions"],
+    ["dock-dimensions", "Kích thước trạm sạc", "Ví dụ: 340 × 457 × 590 mm", "dock_dimensions"],
+    ["reference-price", "Giá tham khảo (VNĐ)", "Ví dụ: 9200000", "reference_price"]
+  ];
 
   panel.innerHTML =
     '<div class="panel-header">' +
@@ -3668,113 +3747,35 @@ function renderAddRobotStep2() {
       '</div>' +
       '<button type="button" id="robot-add-close" class="button-secondary">Đóng</button>' +
     '</div>' +
-
     '<div class="admin-form-section">' +
-      '<h3>Thông số Robot</h3>' +
-
+      '<h3>Thông số robot</h3>' +
       '<div class="admin-form-grid">' +
+        fields.map(function (field) {
+          const value =
+            specs[field[3]] ??
+            (field[3] === "reference_price" ? specs.referencePrice : "") ??
+            "";
 
-        '<label>' +
-          '<span>Lực hút</span>' +
-          '<input id="add-suction" type="text" value="' +
-            escapeAddRobotHtml(specs.suction) +
-            '" placeholder="Ví dụ: 20.000 Pa">' +
-        '</label>' +
+          const inputType =
+            field[3] === "reference_price" ? "number" : "text";
 
-        '<label>' +
-          '<span>Pin</span>' +
-          '<input id="add-battery" type="text" value="' +
-            escapeAddRobotHtml(specs.battery) +
-            '" placeholder="Ví dụ: 6.400 mAh">' +
-        '</label>' +
+          const numericAttributes =
+            field[3] === "reference_price"
+              ? ' min="0" step="1000"'
+              : "";
 
-        '<label>' +
-          '<span>Hộp bụi</span>' +
-          '<input id="add-dustbin" type="text" value="' +
-            escapeAddRobotHtml(specs.dustbin) +
-            '" placeholder="Ví dụ: 395 ml">' +
-        '</label>' +
-
-        '<label>' +
-          '<span>Bình nước</span>' +
-          '<input id="add-water-tank" type="text" value="' +
-            escapeAddRobotHtml(specs.water_tank) +
-            '" placeholder="Ví dụ: 4,5 L / 4,0 L">' +
-        '</label>' +
-
-        '<label>' +
-          '<span>Điều hướng</span>' +
-          '<input id="add-navigation" type="text" value="' +
-            escapeAddRobotHtml(specs.navigation) +
-            '" placeholder="Ví dụ: LiDAR + Camera AI">' +
-        '</label>' +
-
-        '<label>' +
-          '<span>Độ ồn</span>' +
-          '<input id="add-noise" type="text" value="' +
-            escapeAddRobotHtml(specs.noise) +
-            '" placeholder="Ví dụ: 65 dB">' +
-        '</label>' +
-
-        '<label>' +
-          '<span>Nước nóng</span>' +
-          '<input id="add-hot-water" type="text" value="' +
-            escapeAddRobotHtml(specs.hot_water) +
-            '" placeholder="Ví dụ: Tới 80°C">' +
-        '</label>' +
-
-        '<label>' +
-          '<span>Giặt khăn</span>' +
-          '<input id="add-mop-wash" type="text" value="' +
-            escapeAddRobotHtml(specs.mop_wash) +
-            '" placeholder="Ví dụ: Có">' +
-        '</label>' +
-
-        '<label>' +
-          '<span>Sấy khăn</span>' +
-          '<input id="add-mop-dry" type="text" value="' +
-            escapeAddRobotHtml(specs.mop_dry) +
-            '" placeholder="Ví dụ: Sấy bằng khí nóng">' +
-        '</label>' +
-
-        '<label>' +
-          '<span>Nâng khăn</span>' +
-          '<input id="add-mop-lift" type="text" value="' +
-            escapeAddRobotHtml(specs.mop_lift) +
-            '" placeholder="Ví dụ: 10,5 mm">' +
-        '</label>' +
-
-        '<label>' +
-          '<span>Tự đổ bụi</span>' +
-          '<input id="add-self-empty" type="text" value="' +
-            escapeAddRobotHtml(specs.self_empty) +
-            '" placeholder="Ví dụ: Túi bụi 3,2 L">' +
-        '</label>' +
-
-        '<label>' +
-        '<span>Dung dịch vệ sinh</span>' +
-        '<input id="add-detergent" type="text" value="' +
-          escapeAddRobotHtml(specs.detergent) +
-          '" placeholder="Ví dụ: Có">' +
-      '</label>' +
-
-      '<label>' +
-        '<span>Kích thước Robot</span>' +
-        '<input id="add-robot-dimensions" type="text" value="' +
-          escapeAddRobotHtml(specs.robot_dimensions) +
-          '" placeholder="Ví dụ: 350 × 350 × 97mm">' +
-      '</label>' +
-
-      '<label>' +
-        '<span>Kích thước Trạm sạc</span>' +
-        '<input id="add-dock-dimensions" type="text" value="' +
-          escapeAddRobotHtml(specs.dock_dimensions) +
-          '" placeholder="Ví dụ: 340 × 457 × 590mm">' +
-      '</label>' +
-
+          return (
+            '<label>' +
+              '<span>' + field[1] + '</span>' +
+              '<input id="add-' + field[0] + '" type="' + inputType + '"' +
+                numericAttributes +
+                ' value="' + escapeAddRobotHtml(String(value)) + '"' +
+                ' placeholder="' + field[2] + '">' +
+            '</label>'
+          );
+        }).join("") +
       '</div>' +
     '</div>' +
-
     '<div class="admin-form-actions">' +
       '<button type="button" id="robot-add-back-step-2" class="button-secondary">← Quay lại</button>' +
       '<button type="button" id="robot-add-next-step-2" class="button-primary">Tiếp tục</button>' +
@@ -4070,8 +4071,8 @@ function renderAddRobotAIReview(
     panel.id =
       "robot-ai-review-panel";
 
-    panel.className =
-      "panel robot-ai-review-panel";
+      panel.className =
+      "panel robot-edit-panel robot-ai-review-panel";
 
     const robotSection =
       document.querySelector(
@@ -4172,9 +4173,10 @@ function renderAddRobotAIReview(
     '<div class="panel-header">' +
 
       '<div>' +
-        '<p class="eyebrow">NỘI DUNG AI</p>' +
-
-        '<h2>Kiểm tra nội dung AI</h2>' +
+        '<p class="eyebrow">CHỈNH SỬA</p>' +
+        '<h2>Chỉnh sửa ' +
+          escapeAddRobotHtml(robotModel || "Robot") +
+        '</h2>' +
 
         '<p class="panel-description">' +
           escapeAddRobotHtml(
@@ -4243,9 +4245,27 @@ function renderAddRobotAIReview(
       '</label>' +
 
     '</div>' +
-
     '<div class="admin-form-section">' +
 
+      '<label>' +
+        '<span>Ưu điểm</span>' +
+
+        '<textarea ' +
+          'id="robot-ai-pros" ' +
+          'rows="5" ' +
+          'placeholder="Tóm tắt những ưu điểm thực tế của robot..."' +
+        '>' +
+          escapeAddRobotHtml(
+            content.pros ||
+            ""
+          ) +
+        '</textarea>' +
+
+      '</label>' +
+
+    '</div>' +
+
+    '<div class="admin-form-section">' +
       '<div class="robot-add-feature-header">' +
         '<div>' +
           '<h3>Các chủ đề nội dung</h3>' +
@@ -4870,34 +4890,34 @@ document.addEventListener(
     event.target.closest(
       "#robot-add-image"
     );
-  
+
   if (!addImageButton) {
     return;
   }
-  
+
   const addPanel =
     getAddRobotPanel();
-  
+
   if (!addPanel) {
     return;
   }
-  
+
   try {
-  
+
     addImageButton.disabled =
       true;
-  
+
     addImageButton.textContent =
       "Đang tải thư mục...";
-  
+
     const folderResponse =
       await fetch(
         "/api/admin/drive/folders"
       );
-  
+
     const folderData =
       await folderResponse.json();
-  
+
     if (
       !folderResponse.ok ||
       !folderData.ok
@@ -4907,14 +4927,14 @@ document.addEventListener(
         "Không thể lấy danh sách thư mục"
       );
     }
-  
+
     const folders =
       Array.isArray(
         folderData.folders
       )
         ? folderData.folders
         : [];
-  
+
     if (
       folders.length === 0
     ) {
@@ -4922,116 +4942,119 @@ document.addEventListener(
         "Không có thư mục Google Drive"
       );
     }
-  
+
     let modal =
       document.querySelector(
         "#robot-add-image-picker"
       );
-  
+
     if (!modal) {
       modal =
         document.createElement(
           "div"
         );
-  
+
       modal.id =
         "robot-add-image-picker";
-  
+
       modal.className =
         "robot-image-picker";
-  
+
       document.body.appendChild(
         modal
       );
     }
-  
+
     modal.innerHTML =
       '<div class="robot-image-picker-overlay">' +
-  
+
         '<div class="robot-image-picker-dialog">' +
-  
+
           '<div class="robot-image-picker-header">' +
-  
+
             '<div>' +
               '<p class="eyebrow">GOOGLE DRIVE</p>' +
               '<h3>Thêm hình ảnh</h3>' +
             '</div>' +
-  
+
             '<button type="button" class="robot-add-image-picker-close">×</button>' +
-  
+
           '</div>' +
-  
+
           '<div class="robot-image-picker-browser">' +
-  
+
             '<div class="robot-image-picker-folders">' +
               '<div class="robot-image-picker-pane-title">Thư mục</div>' +
               '<div id="robot-add-folder-tree" class="robot-folder-tree"></div>' +
             '</div>' +
-  
+
             '<div class="robot-image-picker-files">' +
-  
+
               '<div class="robot-image-picker-pane-title">' +
-                '<span>Hình ảnh</span>' +
-                '<span id="robot-add-image-picker-folder-name"></span>' +
-              '</div>' +
-  
+              '<span>Hình ảnh</span>' +
+              '<span id="robot-add-image-picker-folder-name"></span>' +
+            '</div>' +
+            '<div class="robot-image-picker-select-actions">' +
+              '<button type="button" id="robot-add-image-picker-select-all" class="button-secondary">Chọn tất cả ảnh</button>' +
+            '</div>' +
+
               '<div id="robot-add-image-picker-list" class="robot-image-picker-list">' +
                 '<div class="robot-image-picker-empty">Chọn một thư mục để xem hình ảnh.</div>' +
               '</div>' +
-  
+
             '</div>' +
-  
+
           '</div>' +
-  
+
           '<div class="robot-image-picker-actions">' +
             '<button type="button" class="button-secondary robot-add-image-picker-close">Hủy</button>' +
             '<button type="button" id="robot-add-image-picker-add" class="button-primary">Thêm ảnh đã chọn</button>' +
           '</div>' +
-  
+
         '</div>' +
-  
+
       '</div>';
-  
+
     const tree =
       modal.querySelector(
         "#robot-add-folder-tree"
       );
-  
+
     const folderName =
       modal.querySelector(
         "#robot-add-image-picker-folder-name"
       );
-  
+
     const imageList =
       modal.querySelector(
         "#robot-add-image-picker-list"
       );
-  
+
     function createFolderTree(folderList) {
-  
+
       const root = {
         name: "",
         path: "",
         children: {},
         folder: null
       };
-  
+
       folderList.forEach(
         function (folder) {
-  
+
           const parts =
             folder.path
               .split("/")
               .filter(Boolean);
-  
+
           let current =
             root;
-  
+
           parts.forEach(
             function (part, index) {
-  
+
               if (!current.children[part]) {
-  
+
                 current.children[part] = {
                   name: part,
                   path: parts
@@ -5043,12 +5066,12 @@ document.addEventListener(
                   children: {},
                   folder: null
                 };
-  
+
               }
-  
+
               current =
                 current.children[part];
-  
+
               if (
                 index ===
                 parts.length - 1
@@ -5056,23 +5079,23 @@ document.addEventListener(
                 current.folder =
                   folder;
               }
-  
+
             }
           );
-  
+
         }
       );
-  
+
       return root;
     }
-  
-  
+
+
     function renderTreeNode(
       node,
       parentElement,
       level
     ) {
-  
+
       const names =
         Object.keys(
           node.children
@@ -5084,56 +5107,56 @@ document.addEventListener(
             );
           }
         );
-  
+
       names.forEach(
         function (name) {
-  
+
           const child =
             node.children[name];
-  
+
           const row =
             document.createElement(
               "div"
             );
-  
+
           row.className =
             "robot-folder-row";
-  
+
           row.dataset.level =
             level;
-  
+
           const hasChildren =
             Object.keys(
               child.children
             ).length > 0;
-  
+
           const arrow =
             document.createElement(
               "button"
             );
-  
+
           arrow.type =
             "button";
-  
+
           arrow.className =
             "robot-folder-arrow";
-  
+
           arrow.textContent =
             hasChildren
               ? "▶"
               : "";
-  
+
           const folderButton =
             document.createElement(
               "button"
             );
-  
+
           folderButton.type =
             "button";
-  
+
           folderButton.className =
             "robot-folder-button";
-  
+
           folderButton.innerHTML =
             '<span class="robot-folder-icon">📁</span>' +
             '<span class="robot-folder-name">' +
@@ -5141,73 +5164,73 @@ document.addEventListener(
                 child.name
               ) +
             '</span>';
-  
+
           row.appendChild(
             arrow
           );
-  
+
           row.appendChild(
             folderButton
           );
-  
+
           parentElement.appendChild(
             row
           );
-  
+
           let childrenContainer =
             null;
-  
+
           if (hasChildren) {
-  
+
             childrenContainer =
               document.createElement(
                 "div"
               );
-  
+
             childrenContainer.className =
               "robot-folder-children";
-  
+
             childrenContainer.hidden =
               true;
-  
+
             parentElement.appendChild(
               childrenContainer
             );
-  
+
             arrow.addEventListener(
               "click",
               function () {
-  
+
                 childrenContainer.hidden =
                   !childrenContainer.hidden;
-  
+
                 arrow.textContent =
                   childrenContainer.hidden
                     ? "▶"
                     : "▼";
-  
+
               }
             );
-  
+
           }
-  
+
           if (child.folder) {
-  
+
             folderButton.dataset.folderId =
               child.folder.id;
-  
+
             folderButton.dataset.folderPath =
               child.folder.path;
-  
+
             folderButton.addEventListener(
               "click",
               async function () {
-  
+
                 const buttons =
                   tree.querySelectorAll(
                     ".robot-folder-button"
                   );
-  
+
                 buttons.forEach(
                   function (button) {
                     button.classList.remove(
@@ -5215,58 +5238,58 @@ document.addEventListener(
                     );
                   }
                 );
-  
+
                 folderButton.classList.add(
                   "is-selected"
                 );
-  
+
                 folderName.textContent =
                   child.folder.path;
-  
+
                 await loadAddRobotFolderImages(
                   child.folder.id,
                   imageList
                 );
-  
+
               }
             );
-  
+
           } else {
-  
+
             folderButton.classList.add(
               "is-folder-group"
             );
-  
+
           }
-  
+
           if (
             hasChildren &&
             childrenContainer
           ) {
-  
+
             renderTreeNode(
               child,
               childrenContainer,
               level + 1
             );
-  
+
           }
-  
+
         }
       );
     }
-  
-  
+
+
     async function loadAddRobotFolderImages(
       folderId,
       target
     ) {
-  
+
       target.innerHTML =
         '<div class="robot-image-picker-empty">Đang tải hình ảnh...</div>';
-  
+
       try {
-  
+
         const response =
           await fetch(
             "/api/admin/drive/images?folderId=" +
@@ -5274,10 +5297,10 @@ document.addEventListener(
               folderId
             )
           );
-  
+
         const data =
           await response.json();
-  
+
         if (
           !response.ok ||
           !data.ok
@@ -5287,43 +5310,43 @@ document.addEventListener(
             "Không thể lấy hình ảnh"
           );
         }
-  
+
         if (
           !Array.isArray(
             data.images
           ) ||
           data.images.length === 0
         ) {
-  
+
           target.innerHTML =
             '<div class="robot-image-picker-empty">' +
               "Không có hình ảnh trong thư mục này." +
             "</div>";
-  
+
           return;
         }
-  
+
         target.innerHTML =
           "";
-  
+
         data.images.forEach(
           function (image) {
-  
+
             const item =
               document.createElement(
                 "label"
               );
-  
+
             item.className =
               "robot-image-picker-item";
-  
+
             item.innerHTML =
               '<input type="checkbox" class="robot-add-image-picker-checkbox" value="' +
                 escapeAddRobotHtml(
                   image.driveId
                 ) +
               '">' +
-  
+
               '<div class="robot-image-picker-preview">' +
                 '<img src="' +
                   escapeAddRobotHtml(
@@ -5336,7 +5359,7 @@ document.addEventListener(
                   ) +
                 '">' +
               "</div>" +
-  
+
               '<div class="robot-image-picker-info">' +
                 "<strong>" +
                   escapeAddRobotHtml(
@@ -5345,21 +5368,21 @@ document.addEventListener(
                   ) +
                 "</strong>" +
               "</div>";
-  
+
             target.appendChild(
               item
             );
-  
+
           }
         );
-  
+
       } catch (error) {
-  
+
         console.error(
           "Load add robot folder images error:",
           error
         );
-  
+
         target.innerHTML =
           '<div class="robot-image-picker-empty">' +
             "Không thể tải hình ảnh: " +
@@ -5367,11 +5390,11 @@ document.addEventListener(
               error.message
             ) +
           "</div>";
-  
+
       }
     }
-  
-  
+
+
     /*
      * TẠO CÂY THƯ MỤC
      * Đây là phần trước đó đang bị thiếu.
@@ -5380,132 +5403,132 @@ document.addEventListener(
       createFolderTree(
         folders
       );
-  
+
     tree.innerHTML =
       "";
-  
+
     renderTreeNode(
       folderTree,
       tree,
       0
     );
-  
-  
+
+
     function findFolderButton(
       path
     ) {
-  
+
       const buttons =
         tree.querySelectorAll(
           ".robot-folder-button"
         );
-  
+
       for (
         const button of buttons
       ) {
-  
+
         if (
           button.dataset.folderPath ===
           path
         ) {
           return button;
         }
-  
+
       }
-  
+
       return null;
     }
-  
-  
+
+
     const brand =
       addRobotState.robot.brand ||
       "";
-  
+
     const model =
       addRobotState.robot.model ||
       "";
-  
+
     const defaultFolderPath =
       "ROBOT/" +
       brand +
       "/" +
       model;
-  
+
     const defaultFolderButton =
       findFolderButton(
         defaultFolderPath
       );
-  
+
     if (defaultFolderButton) {
-  
+
       defaultFolderButton.click();
-  
+
       let row =
         defaultFolderButton.closest(
           ".robot-folder-row"
         );
-  
+
       while (row) {
-  
+
         const children =
           row.nextElementSibling;
-  
+
         if (
           children &&
           children.classList.contains(
             "robot-folder-children"
           )
         ) {
-  
+
           children.hidden =
             false;
-  
+
           const arrow =
             row.querySelector(
               ".robot-folder-arrow"
             );
-  
+
           if (arrow) {
             arrow.textContent =
               "▼";
           }
-  
+
         }
-  
+
         row =
           row.parentElement
             ? row.parentElement.closest(
                 ".robot-folder-row"
               )
             : null;
-  
+
       }
-  
+
     }
-  
+
     modal.hidden =
       false;
-  
+
   } catch (error) {
-  
+
     console.error(
       "Load add robot image picker error:",
       error
     );
-  
+
     alert(
       "Không thể mở danh sách hình ảnh:\n\n" +
       error.message
     );
-  
+
   } finally {
-  
+
     addImageButton.disabled =
       false;
-  
+
     addImageButton.textContent =
       "＋ Thêm hình ảnh";
-  
+
   }
 
   }
@@ -5542,7 +5565,31 @@ document.addEventListener(
   }
 );
 
+document.addEventListener("click", function(event) {
+  const button = event.target.closest("#robot-add-image-picker-select-all");
+  if (!button) return;
 
+  const modal = document.querySelector("#robot-add-image-picker");
+  if (!modal) return;
+
+  const checkboxes = modal.querySelectorAll(
+    ".robot-add-image-picker-checkbox"
+  );
+
+  if (!checkboxes.length) return;
+
+  const shouldSelectAll = Array.from(checkboxes).some(function(checkbox) {
+    return !checkbox.checked;
+  });
+
+  checkboxes.forEach(function(checkbox) {
+    checkbox.checked = shouldSelectAll;
+  });
+
+  button.textContent = shouldSelectAll
+    ? "Bỏ chọn tất cả"
+    : "Chọn tất cả ảnh";
+});
 // ============================================================
 // GOOGLE DRIVE - THÊM ẢNH ĐÃ CHỌN
 // ============================================================
@@ -5686,89 +5733,89 @@ document.addEventListener(
       document.addEventListener(
         "click",
         function (event) {
-      
+
           const selectButton =
             event.target.closest(
               "#article-cover-picker-select"
             );
-      
+
           if (!selectButton) {
             return;
           }
-      
+
           const modal =
             document.querySelector(
               "#article-cover-image-picker"
             );
-      
+
           if (!modal) {
             return;
           }
-      
+
           const selected =
             modal.querySelector(
               ".article-cover-image-radio:checked"
             );
-      
+
           if (!selected) {
             alert(
               "Vui lòng chọn một ảnh đại diện."
             );
-      
+
             return;
           }
-      
+
           const driveId =
             selected.value;
-      
+
           const item =
             selected.closest(
               ".robot-image-picker-item"
             );
-      
+
           const imageElement =
             item
               ? item.querySelector("img")
               : null;
-      
+
           const coverInput =
             document.getElementById(
               "article-create-cover"
             );
-      
+
           const preview =
             document.getElementById(
               "article-create-cover-preview"
             );
-      
+
           const previewImage =
             document.getElementById(
               "article-create-cover-preview-image"
             );
-      
+
           if (coverInput) {
             coverInput.value =
               driveId;
           }
-      
+
           if (
             preview &&
             previewImage
           ) {
-      
+
             previewImage.src =
               imageElement
                 ? imageElement.src
                 : "/api/image/" + driveId;
-      
+
             preview.style.display =
               "block";
-      
+
           }
-      
+
           modal.hidden =
             true;
-      
+
         }
       );
 
@@ -8135,7 +8182,7 @@ document.addEventListener(
       "và trở thành nội dung AI chính thức của Robot này.\n\n" +
       "Bạn đã kiểm tra nội dung chưa?"
     );
-    
+
     if (!confirmed) {
       return;
     }
@@ -8239,6 +8286,12 @@ document.addEventListener(
         sections:
           sections,
 
+          pros:
+          document.querySelector(
+            "#robot-ai-pros"
+          )?.value?.trim() ||
+          "",
+
         technical_view:
           technicalView,
 
@@ -8290,37 +8343,28 @@ document.addEventListener(
       );
 
       // Reset trạng thái tạo Robot
-      addRobotImages =
-        [];
+      addRobotImages = [];
 
-      addRobotState.step =
-        1;
+      addRobotState.step = 1;
 
-      window.currentAIContent =
-        null;
+      window.currentAIContent = null;
+      window.currentAIRobotId = null;
+      window.currentAIRobotModel = null;
 
-      window.currentAIRobotId =
-        null;
+      const aiReviewPanel = document.querySelector(
+        "#robot-ai-review-panel"
+      );
 
-      window.currentAIRobotModel =
-        null;
-
-        const aiReviewPanel =
-        document.querySelector(
-          "#robot-ai-review-panel"
-        );
-      
       if (aiReviewPanel) {
         aiReviewPanel.remove();
       }
 
-      if (
-        typeof loadRobots ===
-        "function"
-      ) {
+      // Chuyển về danh sách Robot
+      window.location.hash = "#robots";
+
+      // Tải lại danh sách Robot
+      if (typeof loadRobots === "function") {
         await loadRobots();
-      } else {
-        window.location.reload();
       }
 
     } catch (error) {

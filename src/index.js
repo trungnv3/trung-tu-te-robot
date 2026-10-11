@@ -925,7 +925,6 @@ if (
                 year,
                 category,
                 status,
-                description,
                 created_at,
                 updated_at
               FROM robots
@@ -1262,8 +1261,7 @@ const robot =
         slug,
         year,
         category,
-        status,
-        description
+        status
       FROM robots
       WHERE id = ?
       LIMIT 1
@@ -1295,18 +1293,24 @@ const specs =
     .prepare(
       `
       SELECT
-        suction,
-        battery,
-        dustbin,
-        water_tank,
-        navigation,
-        noise,
-        hot_water,
-        mop_wash,
-        mop_dry,
-        mop_lift,
-        self_empty,
-        detergent
+        suction_power,
+        obstacle_recognition,
+        mopping_technology,
+        mop_extension,
+        side_brush_extension,
+        automatic_mop_washing,
+        mop_drying,
+        wash_tray_self_cleaning,
+        automatic_dust_emptying,
+        automatic_detergent_dispensing,
+        carpet_mop_lift,
+        dust_bag_capacity,
+        clean_dirty_water_capacity,
+        battery_capacity,
+        cleaning_area,
+        robot_dimensions,
+        dock_dimensions,
+        reference_price
       FROM robot_specs
       WHERE robot_id = ?
       LIMIT 1
@@ -1382,39 +1386,30 @@ QUY TẮC VỀ THÔNG SỐ:
 - Có thể giải thích ý nghĩa thực tế của thông số đã được cung cấp.
 - Có thể đưa ra khuyến nghị bảo trì ở mức phổ thông, nhưng không được biến suy luận thành thông số kỹ thuật.
 PHẦN "CHỨC NĂNG NỔI BẬT":
-Hãy tạo một đoạn giới thiệu ngắn và sau đó có thể tạo các đoạn diễn giải dựa trên nhóm tính năng nổi bật.
-Không cần tạo danh sách bullet trong phần này vì website đã có danh sách tính năng riêng.
+
+Viết một đoạn giới thiệu ngắn về định hướng công nghệ và khả năng sử dụng thực tế của robot.
+
+DỮ LIỆU ƯU TIÊN:
+- Trường features chứa danh sách chức năng nổi bật đã được nhập cho chính model robot này.
+- Mỗi mục features có title và có thể có description.
+- Hãy đọc và phân tích từng mục features, kết hợp với specs để hiểu đúng tính năng.
+- Không bỏ qua features chỉ vì thông tin đó không được lặp lại trong specs.
+
 CÁC CHỦ ĐỀ DIỄN GIẢI:
 
-Hãy tự phân tích dữ liệu kỹ thuật của từng robot và tự đặt tiêu đề phù hợp.
+Hãy tạo từ 1 đến tối đa 4 chủ đề khi dữ liệu features có thông tin hỗ trợ. Không trả về sections rỗng nếu danh sách features có ít nhất một tính năng đủ thông tin để diễn giải.
 
 Yêu cầu:
-- Tối đa 4 chủ đề.
-- Không bắt buộc phải đủ 4 chủ đề.
-- Chỉ tạo chủ đề khi robot thực sự có dữ liệu hỗ trợ.
-- Nếu robot chỉ có 2 hoặc 3 nhóm tính năng nổi bật thì chỉ tạo 2 hoặc 3 chủ đề tương ứng.
-- Không dùng danh sách tiêu đề cố định cho mọi robot.
-- Tiêu đề phải mô tả đúng nhóm công nghệ hoặc khả năng thực tế của model đó.
-- Có thể gộp nhiều tính năng vào cùng một chủ đề nếu chúng liên quan.
-
-Ví dụ:
-
-Robot có lực hút mạnh + chống rối:
-→ "Khả năng hút bụi và xử lý tóc rối"
-
-Robot có khăn lau mở rộng + nâng khăn + giặt khăn:
-→ "Khả năng lau nhà và xử lý các khu vực khó tiếp cận"
-
-Robot có trạm tự động:
-→ "Trạm sạc đa chức năng và khả năng tự động hóa"
-
-Robot có camera AI:
-→ "Điều hướng thông minh và nhận diện vật cản"
-
-Robot đơn giản không có trạm:
-→ Không tạo phần về trạm đa chức năng.
-
-Không tạo tiêu đề chỉ để đủ số lượng.
+- Mỗi chủ đề phải giải thích ý nghĩa sử dụng thực tế của một hoặc nhiều tính năng có liên quan.
+- Có thể gộp các tính năng liên quan thành một chủ đề, nhưng không được bỏ sót các nhóm tính năng quan trọng chỉ để viết ngắn.
+- Đặt tiêu đề riêng, phản ánh đúng tính năng thực tế của model.
+- Mỗi chủ đề có từ 1 đến 3 đoạn văn.
+- Không sao chép nguyên văn danh sách features thành các đoạn văn.
+- Không biến phần diễn giải thành danh sách thông số hoặc danh sách bullet.
+- Chỉ nêu lợi ích có cơ sở trực tiếp từ dữ liệu được cung cấp.
+- Không tự thêm cảm biến, công nghệ, cơ chế hoạt động hoặc khả năng không có trong dữ liệu.
+- Nếu dữ liệu chỉ cho biết tên tính năng mà chưa đủ cơ sở để kết luận lợi ích cụ thể, hãy diễn giải thận trọng hoặc không tạo chủ đề tương ứng.
+- Nếu không có dữ liệu tính năng đủ tin cậy, mới được trả về sections rỗng.
 PHẦN "ƯU ĐIỂM":
 Hãy viết một đoạn ngắn tóm tắt những ưu điểm thực tế của robot dựa trên dữ liệu kỹ thuật được cung cấp.
 
@@ -2522,7 +2517,6 @@ if (
                 year,
                 category,
                 status,
-                description,
                 created_at,
                 updated_at
               FROM robots
@@ -2552,24 +2546,28 @@ if (
             .prepare(
               `
               SELECT
-                suction,
-                battery,
-                dustbin,
-                water_tank,
-                navigation,
-                noise,
-                hot_water,
-                mop_wash,
-                mop_dry,
-                mop_lift,
-                self_empty,
-                detergent,
-                robot_dimensions,
-                dock_dimensions,
-                updated_at
-              FROM robot_specs
-              WHERE robot_id = ?
-              LIMIT 1
+              suction_power,
+              obstacle_recognition,
+              mopping_technology,
+              mop_extension,
+              side_brush_extension,
+              automatic_mop_washing,
+              mop_drying,
+              wash_tray_self_cleaning,
+              automatic_dust_emptying,
+              automatic_detergent_dispensing,
+              carpet_mop_lift,
+              dust_bag_capacity,
+              clean_dirty_water_capacity,
+              battery_capacity,
+              cleaning_area,
+              robot_dimensions,
+              dock_dimensions,
+              reference_price,
+              updated_at
+            FROM robot_specs
+            WHERE robot_id = ?
+            LIMIT 1
               `
             )
             .bind(robot.id)
@@ -3350,39 +3348,49 @@ ORDER BY
               `
               UPDATE robot_specs
               SET
-                suction = ?,
-                battery = ?,
-                dustbin = ?,
-                water_tank = ?,
-                navigation = ?,
-                noise = ?,
-                hot_water = ?,
-                mop_wash = ?,
-                mop_dry = ?,
-                mop_lift = ?,
-                self_empty = ?,
-                detergent = ?,
-                robot_dimensions = ?,
-                dock_dimensions = ?,
-                updated_at = CURRENT_TIMESTAMP
+              suction_power = ?,
+              obstacle_recognition = ?,
+              mopping_technology = ?,
+              mop_extension = ?,
+              side_brush_extension = ?,
+              automatic_mop_washing = ?,
+              mop_drying = ?,
+              wash_tray_self_cleaning = ?,
+              automatic_dust_emptying = ?,
+              automatic_detergent_dispensing = ?,
+              carpet_mop_lift = ?,
+              dust_bag_capacity = ?,
+              clean_dirty_water_capacity = ?,
+              battery_capacity = ?,
+              cleaning_area = ?,
+              robot_dimensions = ?,
+              dock_dimensions = ?,
+              reference_price = ?,
+              updated_at = CURRENT_TIMESTAMP
               WHERE robot_id = ?
               `
             )
             .bind(
-              specs.suction || null,
-              specs.battery || null,
-              specs.dustbin || null,
-              specs.water_tank || null,
-              specs.navigation || null,
-              specs.noise || null,
-              specs.hot_water || null,
-              specs.mop_wash || null,
-              specs.mop_dry || null,
-              specs.mop_lift || null,
-              specs.self_empty || null,
-              specs.detergent || null,
+              specs.suction_power || null,
+              specs.obstacle_recognition || null,
+              specs.mopping_technology || null,
+              specs.mop_extension || null,
+              specs.side_brush_extension || null,
+              specs.automatic_mop_washing || null,
+              specs.mop_drying || null,
+              specs.wash_tray_self_cleaning || null,
+              specs.automatic_dust_emptying || null,
+              specs.automatic_detergent_dispensing || null,
+              specs.carpet_mop_lift || null,
+              specs.dust_bag_capacity || null,
+              specs.clean_dirty_water_capacity || null,
+              specs.battery_capacity || null,
+              specs.cleaning_area || null,
               specs.robot_dimensions || null,
               specs.dock_dimensions || null,
+              specs.reference_price === "" || specs.reference_price === undefined || specs.reference_price === null
+                ? null
+                : (Number(specs.reference_price) > 0 ? Number(specs.reference_price) : null),
               robotId
             )
         );
@@ -4163,43 +4171,62 @@ ORDER BY
               INSERT INTO robot_specs
               (
                 robot_id,
-                suction,
-                battery,
-                dustbin,
-                water_tank,
-                navigation,
-                noise,
-                hot_water,
-                mop_wash,
-                mop_dry,
-                mop_lift,
-                self_empty,
-                detergent
+                suction_power,
+                obstacle_recognition,
+                mopping_technology,
+                mop_extension,
+                side_brush_extension,
+                automatic_mop_washing,
+                mop_drying,
+                wash_tray_self_cleaning,
+                automatic_dust_emptying,
+                automatic_detergent_dispensing,
+                carpet_mop_lift,
+                dust_bag_capacity,
+                clean_dirty_water_capacity,
+                battery_capacity,
+                cleaning_area,
                 robot_dimensions,
-                dock_dimensions
+                dock_dimensions,
+                reference_price
               )
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
               `
             )
             .bind(
               robotId,
-              specs.suction || null,
-              specs.battery || null,
-              specs.dustbin || null,
-              specs.water_tank || null,
-              specs.navigation || null,
-              specs.noise || null,
-              specs.hot_water || null,
-              specs.mop_wash || null,
-              specs.mop_dry || null,
-              specs.mop_lift || null,
-              specs.self_empty || null,
-              specs.detergent || null,
+              specs.suction_power || null,
+              specs.obstacle_recognition || null,
+              specs.mopping_technology || null,
+              specs.mop_extension || null,
+              specs.side_brush_extension || null,
+              specs.automatic_mop_washing || null,
+              specs.mop_drying || null,
+              specs.wash_tray_self_cleaning || null,
+              specs.automatic_dust_emptying || null,
+              specs.automatic_detergent_dispensing || null,
+              specs.carpet_mop_lift || null,
+              specs.dust_bag_capacity || null,
+              specs.clean_dirty_water_capacity || null,
+              specs.battery_capacity || null,
+              specs.cleaning_area || null,
               specs.robot_dimensions || null,
-              specs.dock_dimensions || null
+              specs.dock_dimensions || null,
+              specs.reference_price === "" ||
+              specs.reference_price === undefined ||
+              specs.reference_price === null
+                ? (
+                    Number(specs.referencePrice) > 0
+                      ? Number(specs.referencePrice)
+                      : null
+                  )
+                : (
+                    Number(specs.reference_price) > 0
+                      ? Number(specs.reference_price)
+                      : null
+                  )
             )
         );
-
 
         // =================================================
         // NỘI DUNG
