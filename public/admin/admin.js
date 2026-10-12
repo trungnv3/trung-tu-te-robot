@@ -589,48 +589,42 @@ let html = "";
 
             '</p>' +
 
-            '<button ' +
-              'type="button" ' +
-              'class="robot-edit-button" ' +
-              'data-robot-id="' +
-              robot.id +
-            '">' +
+            
+'<div class="robot-card-actions">' +
 
-              'Sửa' +
+'<button ' +
+  'type="button" ' +
+  'class="robot-edit-button" ' +
+  'data-robot-id="' +
+  robot.id +
+'">' +
+  'Sửa' +
+'</button>' +
 
-            '</button>' +
+'<button ' +
+  'type="button" ' +
+  'class="robot-ai-button" ' +
+  'data-robot-id="' +
+  robot.id +
+'">' +
+  (
+    Number(robot.has_ai_content) === 1
+      ? '🔄 AI'
+      : '🤖 AI'
+  ) +
+'</button>' +
 
-            '<button ' +
-              'type="button" ' +
-              'class="robot-ai-button" ' +
-              'data-robot-id="' +
-              robot.id +
-            '">' +
+'<button ' +
+  'type="button" ' +
+  'class="robot-delete-button" ' +
+  'data-robot-id="' +
+  robot.id +
+'">' +
+  'Xóa' +
+'</button>' +
 
-              (
-                Number(
-                  robot.has_ai_content
-                ) === 1
+'</div>' +
 
-                  ? '🔄 Tạo lại AI'
-
-                  : '🤖 Tạo nội dung AI'
-              ) +
-
-            '</button>' +
-
-            '<button ' +
-              'type="button" ' +
-              'class="robot-delete-button" ' +
-              'data-robot-id="' +
-              robot.id +
-            '">' +
-
-              'Xóa' +
-
-            '</button>' +
-
-          '</div>' +
 
         '</article>';
 
