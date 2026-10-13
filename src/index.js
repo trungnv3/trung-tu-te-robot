@@ -2272,8 +2272,10 @@ if (
   ) ||
   typeof aiContent.technical_view !==
     "string" ||
-  typeof aiContent.suitable_for !==
-    "string"
+    !Array.isArray(aiContent.suitable_for) ||
+    !aiContent.suitable_for.every(
+      item => typeof item === "string"
+    )
 ) {
   return Response.json(
     {
