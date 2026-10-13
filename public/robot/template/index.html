@@ -198,13 +198,54 @@
       margin: 0;
     }
 
-    .robot-spec-list {
-      margin: 0 0 10px;
-    }
+    
+.robot-spec-list {
+  width: 100%;
+  margin: 0 0 16px;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 15px;
+  line-height: 1.6;
+}
 
-    .robot-spec-list p {
-      margin-bottom: 12px;
-    }
+.robot-spec-list th,
+.robot-spec-list td {
+  padding: 10px 12px;
+  border: 1px solid var(--border-color, #e5e7eb);
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.robot-spec-list th {
+  width: 40%;
+  font-weight: 600;
+  background: var(--surface-secondary, #f8fafc);
+}
+
+.robot-spec-list td {
+  width: 60%;
+}
+
+@media (max-width: 600px) {
+  .robot-spec-list {
+    font-size: 14px;
+  }
+
+  .robot-spec-list th,
+  .robot-spec-list td {
+    padding: 8px;
+  }
+
+  .robot-spec-list th {
+    width: 42%;
+  }
+
+  .robot-spec-list td {
+    width: 58%;
+  }
+}
+
 
     .robot-feature-list {
       margin: 0 0 20px;
@@ -1074,59 +1115,33 @@ robotBottomBack.href =
 
     }
 
+function addArticleSpec(
+  container,
+  label,
+  value
+) {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
+    return;
+  }
 
-    function addArticleSpec(
-      container,
-      label,
-      value
-    ) {
+  const row = document.createElement("tr");
 
-      if (
-        value === null ||
-        value === undefined ||
-        value === ""
-      ) {
+  const labelCell = document.createElement("th");
+  labelCell.scope = "row";
+  labelCell.textContent = label;
 
-        return;
+  const valueCell = document.createElement("td");
+  valueCell.textContent = value;
 
-      }
+  row.appendChild(labelCell);
+  row.appendChild(valueCell);
 
-
-      const paragraph =
-        document.createElement(
-          "p"
-        );
-
-
-      const strong =
-        document.createElement(
-          "strong"
-        );
-
-
-      strong.textContent =
-        label +
-        ":";
-
-
-      paragraph.appendChild(
-        strong
-      );
-
-
-      paragraph.appendChild(
-        document.createTextNode(
-          " " +
-          value
-        )
-      );
-
-
-      container.appendChild(
-        paragraph
-      );
-
-    }
+  container.appendChild(row);
+}
 
 
     function renderArticle(
@@ -1395,34 +1410,39 @@ robotBottomBack.href =
 
 
       const specList =
-        document.createElement("div");
+  document.createElement("table");
 
-      specList.className =
-        "robot-spec-list";
+specList.className =
+  "robot-spec-list";
 
-      addArticleSpec(specList, "Lực hút", specs.suction_power);
-      addArticleSpec(specList, "Nhận diện vật cản", specs.obstacle_recognition);
-      addArticleSpec(specList, "Công nghệ lau", specs.mopping_technology);
-      addArticleSpec(specList, "Mở rộng cây lau", specs.mop_extension);
-      addArticleSpec(specList, "Chổi cạnh mở rộng", specs.side_brush_extension);
-      addArticleSpec(specList, "Tự động giặt giẻ", specs.automatic_mop_washing);
-      addArticleSpec(specList, "Sấy khô giẻ lau", specs.mop_drying);
-      addArticleSpec(specList, "Tự làm sạch khay giặt", specs.wash_tray_self_cleaning);
-      addArticleSpec(specList, "Tự động đổ rác", specs.automatic_dust_emptying);
-      addArticleSpec(specList, "Tự pha nước lau sàn", specs.automatic_detergent_dispensing);
-      addArticleSpec(specList, "Nâng giẻ khi gặp thảm", specs.carpet_mop_lift);
-      addArticleSpec(specList, "Dung tích túi bụi", specs.dust_bag_capacity);
-      addArticleSpec(specList, "Dung tích bình nước sạch/bẩn", specs.clean_dirty_water_capacity);
-      addArticleSpec(specList, "Dung lượng pin", specs.battery_capacity);
-      addArticleSpec(specList, "Diện tích làm sạch", specs.cleaning_area);
-      addArticleSpec(specList, "Kích thước robot", specs.robot_dimensions);
-      addArticleSpec(specList, "Kích thước trạm sạc", specs.dock_dimensions);
+const specBody =
+  document.createElement("tbody");
+
+specList.appendChild(specBody);
+
+      addArticleSpec(specBody, "Lực hút", specs.suction_power);
+      addArticleSpec(specBody, "Nhận diện vật cản", specs.obstacle_recognition);
+      addArticleSpec(specBody, "Công nghệ lau", specs.mopping_technology);
+      addArticleSpec(specBody, "Mở rộng cây lau", specs.mop_extension);
+      addArticleSpec(specBody, "Chổi cạnh mở rộng", specs.side_brush_extension);
+      addArticleSpec(specBody, "Tự động giặt giẻ", specs.automatic_mop_washing);
+      addArticleSpec(specBody, "Sấy khô giẻ lau", specs.mop_drying);
+      addArticleSpec(specBody, "Tự làm sạch khay giặt", specs.wash_tray_self_cleaning);
+      addArticleSpec(specBody, "Tự động đổ rác", specs.automatic_dust_emptying);
+      addArticleSpec(specBody, "Tự pha nước lau sàn", specs.automatic_detergent_dispensing);
+      addArticleSpec(specBody, "Nâng giẻ khi gặp thảm", specs.carpet_mop_lift);
+      addArticleSpec(specBody, "Dung tích túi bụi", specs.dust_bag_capacity);
+      addArticleSpec(specBody, "Dung tích bình nước sạch/bẩn", specs.clean_dirty_water_capacity);
+      addArticleSpec(specBody, "Dung lượng pin", specs.battery_capacity);
+      addArticleSpec(specBody, "Diện tích làm sạch", specs.cleaning_area);
+      addArticleSpec(specBody, "Kích thước robot", specs.robot_dimensions);
+      addArticleSpec(specBody, "Kích thước trạm sạc", specs.dock_dimensions);
 
       const referencePrice = Number(specs.reference_price);
 
       if (Number.isFinite(referencePrice) && referencePrice > 0) {
         addArticleSpec(
-          specList,
+          specBody,
           "Giá tham khảo",
           `Giá khoảng ${Math.floor(referencePrice / 1000000)} triệu`
         );
