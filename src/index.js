@@ -1584,7 +1584,7 @@ NGUYÊN TẮC CUỐI CÙNG:
 Chính xác trước, hữu ích sau, ngắn gọn nhưng không bỏ sót tính năng quan trọng. Không bịa dữ liệu, không suy diễn quá mức và không quảng cáo vượt quá căn cứ kỹ thuật.
 
 DỮ LIỆU ROBOT CẦN BIÊN TẬP:
-${JSON.stringify(robotData, null, 2)}
+${JSON.stringify(sourceData, null, 2)}
 `;
 // ---------------------------------------------------------
 // JSON SCHEMA CHO GEMINI
