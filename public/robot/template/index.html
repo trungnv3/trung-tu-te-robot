@@ -1505,38 +1505,49 @@ robotBottomBack.href =
         );
 
       }
+// =========================================================
+// PHÙ HỢP VỚI AI?
+// =========================================================
 
-
-        // =========================================================
-      // PHÙ HỢP VỚI
-      // =========================================================
-
-      const suitableFor =
-        aiContent &&
-        typeof aiContent.suitable_for === "string" &&
+const suitableFor =
+  Array.isArray(aiContent?.suitable_for)
+    ? aiContent.suitable_for
+    : typeof aiContent?.suitable_for === "string" &&
         aiContent.suitable_for.trim()
-          ? aiContent.suitable_for
-          : content.suitable_for;
+      ? aiContent.suitable_for
+      : content.suitable_for;
 
+const suitableItems = (
+  Array.isArray(suitableFor)
+    ? suitableFor
+    : typeof suitableFor === "string"
+      ? suitableFor.split(/\r?\n/)
+      : []
+)
+  .map(item =>
+    String(item)
+      .replace(/^\s*(?:[-•*]|\d+[.)、])\s*/, "")
+      .trim()
+  )
+  .filter(Boolean);
 
-      if (
-        suitableFor
-      ) {
+if (suitableItems.length > 0) {
+  addArticleHeading(
+    container,
+    "Phù hợp với ai?"
+  );
 
-        addArticleHeading(
-          container,
-          "Phù hợp với ai?"
-        );
+  const list = document.createElement("ul");
+  list.className = "robot-suitable-list";
 
+  suitableItems.forEach(item => {
+    const li = document.createElement("li");
+    li.textContent = item;
+    list.appendChild(li);
+  });
 
-        addArticleParagraph(
-          container,
-          suitableFor
-        );
-
-      }
-
-
+  container.appendChild(list);
+}
       addArticleHeading(
         container,
         "Bảo trì và sửa chữa"

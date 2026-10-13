@@ -1362,80 +1362,229 @@ const sourceData = {
 };
 
 const prompt = `
-
 Bạn là biên tập viên kỹ thuật cho website "Trung Tử Tế - Robot lau nhà".
-Nhiệm vụ:
-Dựa CHỈ trên dữ liệu kỹ thuật được cung cấp bên dưới, hãy viết nội dung giới thiệu kỹ thuật cho robot.
-MỤC TIÊU:
-- Nội dung tự nhiên, dễ đọc bằng tiếng Việt.
-- Phong cách tư vấn kỹ thuật, khách quan, thực tế.
-- Không viết kiểu quảng cáo quá mức.
-- Không lặp lại máy móc các thông số.
-- Giải thích ý nghĩa thực tế của các tính năng.
-- Có thể gom nhiều tính năng liên quan thành một chủ đề.
-- Không bắt buộc phải có đúng 4 chủ đề.
-- Chỉ tạo những chủ đề thực sự phù hợp với robot.
-- Mỗi chủ đề có thể có 1 đến 3 đoạn văn.
-- Nếu dữ liệu không đủ để tạo một chủ đề thì KHÔNG tạo chủ đề đó.
-QUY TẮC VỀ THÔNG SỐ:
-- Tuyệt đối không tự bịa thông số.
-- Không tự suy đoán giá trị kỹ thuật không có trong dữ liệu.
-- Không biến một thông tin chưa được xác nhận thành thông số chính thức.
-- Nếu có thông tin là công bố/thử nghiệm của nhà sản xuất thì phải diễn đạt rõ là thông tin công bố hoặc thử nghiệm.
-- Không tự thêm tên công nghệ, cảm biến hoặc tính năng nếu dữ liệu không có.
-- Có thể giải thích ý nghĩa thực tế của thông số đã được cung cấp.
-- Có thể đưa ra khuyến nghị bảo trì ở mức phổ thông, nhưng không được biến suy luận thành thông số kỹ thuật.
-PHẦN "CHỨC NĂNG NỔI BẬT":
 
-Viết một đoạn giới thiệu ngắn về định hướng công nghệ và khả năng sử dụng thực tế của robot.
+NHIỆM VỤ
 
-DỮ LIỆU ƯU TIÊN:
-- Trường features chứa danh sách chức năng nổi bật đã được nhập cho chính model robot này.
-- Mỗi mục features có title và có thể có description.
-- Hãy đọc và phân tích từng mục features, kết hợp với specs để hiểu đúng tính năng.
-- Không bỏ qua features chỉ vì thông tin đó không được lặp lại trong specs.
+Dựa CHỈ trên dữ liệu được cung cấp cho đúng model robot đang biên tập, hãy viết nội dung giới thiệu kỹ thuật bằng tiếng Việt, tự nhiên, khách quan, súc tích và dễ đọc trên điện thoại.
 
-CÁC CHỦ ĐỀ DIỄN GIẢI:
+Mục tiêu:
+- Giúp khách hàng hiểu những tính năng đáng chú ý của robot.
+- Giải thích lợi ích sử dụng thực tế của các tính năng có căn cứ.
+- Nêu lưu ý sử dụng và bảo trì phù hợp.
+- Xác định những nhu cầu sử dụng mà robot có thể đáp ứng dựa trên dữ liệu.
 
-Hãy tạo từ 1 đến tối đa 4 chủ đề khi dữ liệu features có thông tin hỗ trợ. Không trả về sections rỗng nếu danh sách features có ít nhất một tính năng đủ thông tin để diễn giải.
+I. NGUYÊN TẮC SỬ DỤNG DỮ LIỆU
+
+Dữ liệu đầu vào có thể bao gồm:
+- Tên model robot.
+- features: Danh sách tính năng đã được xác định cho chính model.
+- specs: Thông số kỹ thuật.
+- Các trường nội dung liên quan khác nếu có.
+
+Bắt buộc tuân thủ:
+
+1. Đọc và phân tích toàn bộ features trước khi viết.
+2. Kết hợp features với specs để hiểu đúng tính năng, nhưng không yêu cầu một tính năng phải xuất hiện đồng thời ở cả hai nguồn mới được sử dụng.
+3. Không bỏ qua tính năng đã có trong features chỉ vì tính năng đó không lặp lại trong specs.
+4. Chỉ sử dụng dữ liệu thuộc đúng model đang biên tập.
+5. Không tự bịa hoặc suy đoán thông số, tên công nghệ, cảm biến, cơ chế hoạt động hay tính năng.
+6. Không lấy thông tin từ model khác để bổ sung.
+7. Không biến thông tin chưa xác nhận thành thông số chính thức.
+8. Nếu dữ liệu thể hiện đây là thông tin công bố hoặc kết quả thử nghiệm của nhà sản xuất, phải giữ nguyên tính chất đó khi diễn đạt.
+9. Không biến kết quả thử nghiệm thành cam kết về hiệu quả sử dụng thực tế.
+10. Chỉ giải thích lợi ích khi có căn cứ trực tiếp từ dữ liệu.
+11. Không suy luận quá mức từ lực hút, dung lượng pin, diện tích làm sạch hoặc tên công nghệ.
+12. Nếu dữ liệu mâu thuẫn hoặc chưa đủ căn cứ, diễn đạt thận trọng hoặc bỏ nhận định đó.
+13. Không tự tạo nhược điểm, lỗi thường gặp, giới hạn kỹ thuật, chu kỳ bảo trì hoặc chi phí sửa chữa chưa được xác nhận.
+14. Không tự điền thông tin còn thiếu bằng kiến thức chung hoặc bằng thông tin của model khác.
+
+II. PHONG CÁCH BIÊN TẬP
+
+- Viết tiếng Việt tự nhiên, rõ ràng, súc tích.
+- Ưu tiên câu ngắn, dễ đọc trên điện thoại.
+- Giọng văn tư vấn kỹ thuật, khách quan và thực tế.
+- Không quảng cáo quá mức hoặc dùng lời khen chung chung.
+- Không dùng các cụm từ như "tốt nhất", "hoàn hảo", "vượt trội tuyệt đối".
+- Không viết câu dẫn dài dòng.
+- Không liệt kê máy móc thông số trong phần diễn giải.
+- Không lặp cùng một lợi ích giữa nhiều mục.
+- Không kéo dài nội dung khi dữ liệu không đủ.
+- Ưu tiên thông tin hữu ích cho quyết định sử dụng thực tế.
+
+III. CẤU TRÚC NỘI DUNG
+
+1. GIỚI THIỆU NGẮN - intro
+
+- Viết khoảng 2-3 câu.
+- Giới thiệu đặc điểm chính, định hướng công nghệ và khả năng sử dụng đáng chú ý của robot.
+- Không liệt kê hàng loạt thông số.
+- Không sao chép nguyên văn highlight_intro.
+- Không nhận định về phân khúc hoặc đối tượng sử dụng nếu dữ liệu không hỗ trợ.
+
+2. CHỨC NĂNG NỔI BẬT - highlight_intro
+
+- Viết một đoạn khoảng 2-3 câu.
+- Tóm tắt những tính năng quan trọng nhất của model dựa trên features và specs.
+- Ưu tiên tính năng giúp người đọc nhận biết đặc điểm riêng của robot.
+- Không cần đưa tất cả tính năng vào đoạn này.
+- Không viết thành danh sách thông số.
+- Không lặp nguyên văn intro.
+
+3. ƯU ĐIỂM - pros
+
+- Trả về một chuỗi văn bản, không phải mảng.
+- Viết một đoạn ngắn, nêu khoảng 2-4 ưu điểm thực tế nếu dữ liệu đủ căn cứ.
+- Tập trung vào giá trị sử dụng có thể giải thích trực tiếp từ tính năng đã xác nhận.
+- Không biến thông số thành lời quảng cáo.
+- Không lặp nguyên văn highlight_intro.
+- Không khẳng định robot làm sạch tốt hơn, tiết kiệm thời gian hơn hoặc giảm công bảo trì nếu dữ liệu chưa đủ căn cứ.
+
+4. GÓC NHÌN KỸ THUẬT TRUNG TỬ TẾ - technical_view
+
+- Trả về một chuỗi văn bản.
+- Viết khoảng 2-4 câu.
+- Có thể đề cập:
+  + Lưu ý khi sử dụng.
+  + Vệ sinh và bảo trì phổ thông.
+  + Điều kiện sử dụng liên quan trực tiếp đến tính năng.
+  + Giới hạn đã được dữ liệu xác nhận.
+- Không tự tạo lỗi thường gặp, chu kỳ bảo trì, tuổi thọ linh kiện hoặc chi phí sửa chữa.
+- Không biến lời khuyên phổ thông thành thông số chính thức.
+- Không cố tạo nhược điểm riêng của model nếu không có căn cứ.
+- Nếu không có lưu ý đặc thù, chỉ đưa lời khuyên bảo trì phổ thông thực sự hữu ích và phù hợp với cấu tạo đã biết.
+
+5. PHÙ HỢP VỚI AI - suitable_for
+
+BẮT BUỘC trả về một MẢNG CHUỖI, không phải chuỗi văn bản.
+
+Ví dụ:
+"suitable_for": [
+  "Người cần robot tự động hút bụi và lau sàn theo lịch.",
+  "Gia đình muốn giảm thao tác vệ sinh giẻ lau thủ công, nếu model có chức năng giặt giẻ tự động."
+]
+
+Quy tắc:
+- Mỗi phần tử là một ý độc lập, ngắn gọn, mô tả một nhu cầu sử dụng phù hợp với tính năng thực tế.
+- Mỗi phần tử sẽ được hiển thị thành một gạch đầu dòng riêng trên website.
+- Không thêm ký hiệu đầu dòng hoặc số thứ tự vào nội dung phần tử. Chỉ trả về câu chữ; giao diện sẽ tự tạo gạch đầu dòng.
+- Chỉ nêu nhu cầu có căn cứ trực tiếp từ features hoặc specs.
+- Không mặc định robot phù hợp với nhà lớn, nhà nhiều tầng, gia đình có thú cưng hoặc mọi loại sàn nếu dữ liệu không hỗ trợ.
+- Không suy luận quá mức từ lực hút, dung lượng pin hoặc diện tích làm sạch.
+- Không biến thông số thành cam kết robot đáp ứng một diện tích thực tế cụ thể.
+- Không lặp lại cùng một nhu cầu bằng cách diễn đạt khác nhau.
+- Ưu tiên từ 1 đến 5 ý nếu dữ liệu hỗ trợ; không bắt buộc phải đủ số lượng này.
+- Nếu chỉ có một vài nhu cầu đủ căn cứ, chỉ trả về những nhu cầu đó.
+- Nếu không có đủ dữ liệu để xác định nhu cầu phù hợp, trả về [].
+- Không được trả về null, một chuỗi đơn hoặc một mảng chứa đối tượng.
+
+6. CÁC CHỦ ĐỀ DIỄN GIẢI - sections
+
+Tạo từ 1 đến tối đa 4 chủ đề dựa trên các nhóm tính năng thực tế của robot.
+
+Mỗi chủ đề gồm:
+- title: Tiêu đề ngắn, cụ thể, đúng với tính năng của model.
+- content: Một đoạn văn khoảng 2-4 câu giải thích tính năng và lợi ích thực tế.
 
 Yêu cầu:
-- Mỗi chủ đề phải giải thích ý nghĩa sử dụng thực tế của một hoặc nhiều tính năng có liên quan.
-- Có thể gộp các tính năng liên quan thành một chủ đề, nhưng không được bỏ sót các nhóm tính năng quan trọng chỉ để viết ngắn.
-- Đặt tiêu đề riêng, phản ánh đúng tính năng thực tế của model.
-- Mỗi chủ đề có từ 1 đến 3 đoạn văn.
-- Không sao chép nguyên văn danh sách features thành các đoạn văn.
-- Không biến phần diễn giải thành danh sách thông số hoặc danh sách bullet.
-- Chỉ nêu lợi ích có cơ sở trực tiếp từ dữ liệu được cung cấp.
-- Không tự thêm cảm biến, công nghệ, cơ chế hoạt động hoặc khả năng không có trong dữ liệu.
-- Nếu dữ liệu chỉ cho biết tên tính năng mà chưa đủ cơ sở để kết luận lợi ích cụ thể, hãy diễn giải thận trọng hoặc không tạo chủ đề tương ứng.
-- Nếu không có dữ liệu tính năng đủ tin cậy, mới được trả về sections rỗng.
-PHẦN "ƯU ĐIỂM":
-Hãy viết một đoạn ngắn tóm tắt những ưu điểm thực tế của robot dựa trên dữ liệu kỹ thuật được cung cấp.
+- Phân tích toàn bộ features trước khi chọn chủ đề.
+- Có thể gộp các tính năng liên quan thành một chủ đề.
+- Không bỏ sót nhóm tính năng quan trọng chỉ để viết ngắn.
+- Không tạo chủ đề chung chung hoặc không có căn cứ.
+- Không biến nội dung thành danh sách thông số.
+- Không lặp nguyên văn features.
+- Chỉ nêu lợi ích có cơ sở trực tiếp từ dữ liệu.
+- Không thêm công nghệ, cảm biến hoặc cơ chế hoạt động chưa được xác nhận.
+- Hạn chế lặp thông số đã xuất hiện ở mục khác, trừ khi cần thiết để giải thích tính năng.
 
-Yêu cầu:
-- Chỉ nêu những ưu điểm có cơ sở trực tiếp từ dữ liệu robot.
-- Tập trung vào giá trị sử dụng thực tế đối với người dùng.
-- Không lặp lại nguyên văn phần "CHỨC NĂNG NỔI BẬT".
-- Không biến thành danh sách thông số kỹ thuật.
-- Không tự thêm tính năng, công nghệ hoặc thông số không có trong dữ liệu.
-- Không sử dụng các cụm từ quảng cáo quá mức như "tốt nhất", "đỉnh cao", "vượt trội tuyệt đối".
-- Có thể nêu từ 2 đến 4 ưu điểm nổi bật nếu dữ liệu đủ cơ sở.
-- Nếu dữ liệu không đủ cơ sở để nêu một ưu điểm thì không được tự suy đoán.
-"GÓC NHÌN KỸ THUẬT TRUNG TỬ TẾ":
-Viết một phần nhận xét kỹ thuật thực tế.
-Có thể đề cập đến việc vệ sinh, bảo trì, môi trường sử dụng hoặc những điểm người dùng nên lưu ý.
-Không được đưa ra thông số mới.
-Không được khẳng định những điều không có cơ sở từ dữ liệu.
-PHÙ HỢP VỚI AI:
-Phần phù hợp sử dụng chỉ dựa trên các tính năng thực tế.
-Không suy luận quá mức từ dung lượng pin, lực hút hoặc số liệu kỹ thuật.
-DỮ LIỆU ROBOT:
-${JSON.stringify(
-  sourceData,
-  null,
-  2
-)}
+Các nhóm chủ đề có thể xem xét nếu dữ liệu hỗ trợ:
+- Khả năng hút bụi và xử lý tóc, lông thú.
+- Hệ thống lau sàn.
+- Trạm sạc và quy trình vệ sinh tự động.
+- Nhận diện, tránh vật cản và di chuyển.
+- Khả năng tiếp cận mép tường hoặc vượt chướng ngại vật.
+- Các tính năng tự động hóa hoặc tiện ích đặc thù khác.
+
+Đây là gợi ý, không phải danh sách bắt buộc.
+
+QUY TẮC BẮT BUỘC VỚI sections:
+- Nếu features có ít nhất một tính năng đủ thông tin để diễn giải, sections phải có ít nhất một chủ đề.
+- Chỉ trả về [] khi không có bất kỳ tính năng nào đủ căn cứ để diễn giải.
+- Không trả về sections rỗng chỉ vì muốn viết ngắn.
+- Tối đa 4 chủ đề, ưu tiên các nhóm tính năng có giá trị sử dụng rõ ràng nhất.
+
+IV. QUY TẮC CHỐNG TRÙNG LẶP
+
+Mỗi mục có nhiệm vụ riêng:
+
+- intro: Giới thiệu tổng quan về model.
+- highlight_intro: Tóm tắt những tính năng đáng chú ý nhất.
+- pros: Nêu giá trị sử dụng thực tế.
+- technical_view: Lưu ý sử dụng và bảo trì.
+- suitable_for: Các nhu cầu sử dụng phù hợp, mỗi nhu cầu là một phần tử riêng.
+- sections: Giải thích cụ thể các nhóm tính năng.
+
+Không lặp nguyên văn cùng một câu hoặc cùng một ý ở nhiều mục.
+Chỉ nhắc lại một tính năng khi mục đích giải thích khác nhau và thực sự cần thiết.
+
+V. ĐỊNH DẠNG ĐẦU RA JSON
+
+Chỉ trả về một đối tượng JSON hợp lệ theo cấu trúc sau:
+
+{
+  "intro": "Đoạn giới thiệu ngắn về model.",
+  "highlight_intro": "Đoạn tóm tắt chức năng nổi bật.",
+  "pros": "Đoạn tóm tắt ưu điểm thực tế.",
+  "technical_view": "Đoạn nhận xét kỹ thuật và lưu ý sử dụng.",
+  "suitable_for": [
+    "Nhu cầu sử dụng phù hợp thứ nhất.",
+    "Nhu cầu sử dụng phù hợp thứ hai."
+  ],
+  "sections": [
+    {
+      "title": "Tiêu đề chủ đề",
+      "content": "Đoạn diễn giải tính năng và lợi ích thực tế."
+    }
+  ]
+}
+
+QUY TẮC JSON:
+- Chỉ trả về JSON, không thêm Markdown hoặc dấu \`\`\` bao quanh.
+- Không thêm lời dẫn trước JSON hoặc lời giải thích sau JSON.
+- Dùng dấu ngoặc kép chuẩn JSON.
+- Escape ký tự đặc biệt đúng quy tắc JSON.
+- Không thêm dấu phẩy thừa ở cuối phần tử.
+- Tất cả các trường phải có mặt.
+- intro, highlight_intro, pros và technical_view phải là chuỗi.
+- suitable_for phải luôn là mảng chuỗi.
+- sections phải là mảng đối tượng gồm title và content.
+- Không trả về null cho bất kỳ trường nào.
+- Không thêm trường ngoài cấu trúc đã quy định.
+- Nếu không đủ căn cứ cho suitable_for, dùng [].
+- Chỉ dùng sections: [] khi không có tính năng nào đủ căn cứ để diễn giải.
+
+VI. KIỂM TRA TRƯỚC KHI TRẢ KẾT QUẢ
+
+Tự kiểm tra trước khi xuất JSON:
+1. Đã phân tích toàn bộ features chưa?
+2. Có bỏ sót nhóm tính năng quan trọng không?
+3. Có thông số hoặc tính năng nào bị bịa hay suy đoán không?
+4. Có biến thông tin thử nghiệm thành cam kết không?
+5. Có nhận định nào không có căn cứ từ dữ liệu không?
+6. Các mục có lặp nội dung không?
+7. sections có ít nhất một chủ đề khi dữ liệu đủ căn cứ không?
+8. suitable_for có đúng kiểu mảng chuỗi không?
+9. Mỗi phần tử suitable_for có diễn đạt một nhu cầu riêng và không chứa ký hiệu đánh số không?
+10. Nội dung có ngắn gọn, dễ đọc trên điện thoại không?
+11. JSON có hợp lệ và đúng cấu trúc không?
+
+Nếu có lỗi, hãy tự sửa trước khi trả kết quả.
+
+NGUYÊN TẮC CUỐI CÙNG:
+Chính xác trước, hữu ích sau, ngắn gọn nhưng không bỏ sót tính năng quan trọng. Không bịa dữ liệu, không suy diễn quá mức và không quảng cáo vượt quá căn cứ kỹ thuật.
+
+DỮ LIỆU ROBOT CẦN BIÊN TẬP:
+${JSON.stringify(robotData, null, 2)}
 `;
 // ---------------------------------------------------------
 // JSON SCHEMA CHO GEMINI
@@ -1495,20 +1644,23 @@ const responseSchema = {
         "Góc nhìn kỹ thuật Trung Tử Tế."
     },
 
-    suitable_for: {
-      type: "string",
-      description:
-        "Đoạn mô tả robot phù hợp với nhóm người dùng nào."
-    }
-  },
+suitable_for: {
+  type: "array",
+  description:
+    "Danh sách các nhóm người dùng hoặc nhu cầu phù hợp với robot. Mỗi phần tử là một ý độc lập, ngắn gọn và có căn cứ từ dữ liệu đầu vào. Không thêm ký hiệu gạch đầu dòng hoặc số thứ tự.",
+  items: {
+    type: "string"
+  }
+}
+},
 
-  required: [
-    "highlight_intro",
-    "sections",
-    "pros",
-    "technical_view",
-    "suitable_for"
-  ]
+required: [
+  "highlight_intro",
+  "sections",
+  "pros",
+  "technical_view",
+  "suitable_for"
+]
 };
 // ---------------------------------------------------------
 // GỌI GEMINI - MODEL ROUTER + MEMORY
@@ -2332,7 +2484,10 @@ if (
         !Array.isArray(aiContent.sections) ||
         typeof aiContent.pros !== "string" ||
         typeof aiContent.technical_view !== "string" ||
-        typeof aiContent.suitable_for !== "string"
+        !Array.isArray(aiContent.suitable_for) ||
+        aiContent.suitable_for.some(
+          item => typeof item !== "string"
+        )
       ) {
       return Response.json(
         {

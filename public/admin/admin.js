@@ -4303,26 +4303,33 @@ function renderAddRobotAIReview(
       '</label>' +
 
     '</div>' +
+'<div class="admin-form-section">' +
 
-    '<div class="admin-form-section">' +
+'<label>' +
+  '<span>Phù hợp với ai?</span>' +
 
-      '<label>' +
-        '<span>Phù hợp với</span>' +
+  '<p class="robot-add-feature-note">' +
+    'Mỗi dòng là một ý riêng. Có thể tự nhập, sửa hoặc xóa từng ý.' +
+  '</p>' +
 
-        '<textarea ' +
-          'id="robot-ai-suitable-for" ' +
-          'rows="5" ' +
-          'placeholder="Robot phù hợp với nhóm người dùng nào..."' +
-        '>' +
-          escapeAddRobotHtml(
-            content.suitable_for ||
-            ""
-          ) +
-        '</textarea>' +
+  '<textarea ' +
+    'id="robot-ai-suitable-for" ' +
+    'rows="6" ' +
+    'placeholder="Người cần robot lau sàn bằng giẻ xoay kép.\n' +
+    'Gia đình muốn giảm thao tác vệ sinh thủ công.\n' +
+    'Người quan tâm đến khả năng tránh vật cản."' +
+  '>' +
+  escapeAddRobotHtml(
+    Array.isArray(content.suitable_for)
+      ? content.suitable_for.join("\n")
+      : content.suitable_for || ""
+  ) +
+  '</textarea>' +
 
-      '</label>' +
+'</label>' +
 
-    '</div>' +
+'</div>' +
+
 
     '<div class="admin-form-actions">' +
 
@@ -8200,11 +8207,18 @@ document.addEventListener(
         )?.value?.trim() ||
         "";
 
-      const suitableFor =
+        const suitableForText =
         document.querySelector(
           "#robot-ai-suitable-for"
-        )?.value?.trim() ||
-        "";
+        )?.value || "";
+            const suitableFor = suitableForText
+        .split(/\r?\n/)
+        .map(item =>
+          item
+            .replace(/^\s*(?:[-•*]|\d+[.)、])\s*/, "")
+            .trim()
+        )
+        .filter(Boolean);
 
       const sectionElements =
         document.querySelectorAll(
@@ -8355,11 +8369,14 @@ document.addEventListener(
 
       // Chuyển về danh sách Robot
       window.location.hash = "#robots";
+    alert(
+        "Đã lưu nội dung AI thành công."
+      );
 
-      // Tải lại danh sách Robot
-      if (typeof loadRobots === "function") {
-        await loadRobots();
-      }
+      // Tải lại toàn bộ trang sau khi lưu thành công
+      window.location.reload();
+      return;
+
 
     } catch (error) {
 
