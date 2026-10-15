@@ -3325,11 +3325,11 @@ function autoFillParseProductText(rawText) {
     ]);
 
   result.specs.clean_dirty_water_capacity =
-    autoFillFindLine(lines, [
-      /^[-•*]?\s*Dung tích bình nước sạch\/bẩn\s*:\s*(.+)$/i,
-      /^[-•*]?\s*Dung tích bình nước sạch và bẩn\s*:\s*(.+)$/i,
-      /^[-•*]?\s*Bình nước sạch\/bẩn\s*:\s*(.+)$/i
-    ]);
+autoFillFindLine(lines, [
+  /^[-•*]?\s*Dung tích bình nước sạch\/bẩn(?:\s+của trạm)?\s*:\s*(.+)$/i,
+  /^[-•*]?\s*Dung tích bình nước sạch và bẩn(?:\s+của trạm)?\s*:\s*(.+)$/i,
+  /^[-•*]?\s*Bình nước sạch\/bẩn(?:\s+của trạm)?\s*:\s*(.+)$/i
+]);
 
   result.specs.battery_capacity =
     autoFillFindLine(lines, [
