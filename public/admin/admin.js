@@ -3206,11 +3206,47 @@ function autoFillParseProductText(rawText) {
   // THÔNG SỐ KỸ THUẬT - 18 TRƯỜNG CHUẨN
   // ==========================================================
 
+  
+  // Ưu tiên nhận diện lực hút trong mục THÔNG SỐ KỸ THUẬT.
+  const technicalSectionIndex = lines.findIndex(function (line) {
+    return /THÔNG SỐ KỸ THUẬT/i.test(line);
+  });
+
+  const technicalLines = technicalSectionIndex >= 0
+    ? lines.slice(technicalSectionIndex + 1)
+    : [];
+
+  const suctionPatterns = [
+    /^[-•*]?\s*Lực hút\s*:\s*(.+)$/i,
+    /^[-•*]?\s*Lực hút\s+(.+)$/i
+  ];
+
   result.specs.suction_power =
-    autoFillFindLine(lines, [
-      /^[-•*]?\s*Lực hút(?:\s+[^:]+)?\s*:\s*(.+)$/i,
-      /^[-•*]?\s*Lực hút\s+(.+)$/i
-    ]);
+    autoFillFindLine(technicalLines, suctionPatterns);
+
+  // Nếu không có trong thông số kỹ thuật, mới tìm ở nội dung còn lại.
+  if (!result.specs.suction_power) {
+    const suctionLine = lines.find(function (line) {
+      return /^[-•*]?\s*Lực hút\b/i.test(line.trim());
+    });
+
+    if (suctionLine) {
+      const suctionMatch = suctionLine.trim().match(
+        /^[-•*]?\s*Lực hút(?:\s*:\s*|\s+)(.*)$/i
+      );
+
+      if (suctionMatch) {
+        const valueMatch = suctionMatch[1].match(
+          /([\d.,]+\s*(?:Pa|kPa)\b)/i
+        );
+
+        result.specs.suction_power = valueMatch
+          ? valueMatch[1].replace(/\s+/g, "")
+          : autoFillCleanValue(suctionMatch[1]);
+      }
+    }
+  }
+
 
   result.specs.obstacle_recognition =
     autoFillFindLine(lines, [
@@ -3320,15 +3356,17 @@ function autoFillParseProductText(rawText) {
       /^[-•*]?\s*Dock\s*:\s*(.+)$/i
     ]);
 
-    result.specs.reference_price =
-    autoFillFindLine(lines, [
-      /^\s*[-•*]?\s*Giá tham khảo\s*:\s*([\d.,]+)\s*(?:₫|đ|VNĐ|VND|đồng)?\s*$/i
-    ]);
+    
+result.specs.reference_price =
+autoFillFindLine(lines, [
+  /^\s*[-•*]?\s*Giá tham khảo\s*:\s*([\d.,]+)(?:\s*(?:₫|đ|VNĐ|VND|đồng))?/i
+]);
 
-  if (result.specs.reference_price) {
-    result.specs.reference_price =
-      result.specs.reference_price.replace(/[^\d]/g, "");
-  }
+if (result.specs.reference_price) {
+result.specs.reference_price =
+  result.specs.reference_price.replace(/[^\d]/g, "");
+}
+
 
 
   // ==========================================================
