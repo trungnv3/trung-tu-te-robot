@@ -3591,8 +3591,11 @@ FROM robots r
 LEFT JOIN robot_content rc
   ON rc.robot_id = r.id
 ORDER BY
+  CASE WHEN r.year IS NULL THEN 1 ELSE 0 END ASC,
+  r.year ASC,
   r.brand ASC,
-  r.model ASC
+  r.model ASC,
+  r.id ASC
               `
             )
             .all();
