@@ -392,32 +392,46 @@
   
   .brands-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
   }
-  
   .brands-grid a {
-  min-height: 120px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 22px;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  background: white;
-  transition:
-  transform 0.2s ease,
-  border-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: white;
+    transition:
+      transform 0.2s ease,
+      border-color 0.2s ease;
   }
-  
+  .brands-grid .brand-logo {
+    display: block;
+    width: 70%;
+    height: 18px;
+    object-fit: contain;
+    object-position: center;
+  }
   .brands-grid a:hover {
   transform: translateY(-3px);
   border-color: #b7cdbf;
   }
   
+
   .brands-grid b {
-  font-size: 20px;
+    font-size: 20px;
   }
+
+  .brands-grid .brand-logo {
+    display: block;
+    width: 90%;
+    height: 24px;
+    object-fit: contain;
+    object-position: center;
+  }
+
   
   .brands-grid span {
   color: var(--green);
@@ -428,16 +442,28 @@
    ROBOT MODEL LIST
    ============================================================ */
 
-#brand-models-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, 180px);
-  gap: 18px;
-  justify-content: start;
-}
+   .brand-models-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 180px);
+    gap: 18px;
+    justify-content: start;
+    align-items: start;
+  }
+
+  #brand-models-list > .article-model-card {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    box-sizing: border-box;
+    width: 180px;
+    min-height: 0;
+    padding: 0;
+  }
+
   /* =========================================================
   DỊCH VỤ
   ========================================================= */
-  
   .services {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -469,7 +495,7 @@
   color: var(--muted);
   font-size: 14px;
   }
-  
+
   /* =========================================================
   CONTACT
   ========================================================= */
@@ -672,7 +698,7 @@ footer {
   }
   
   .brands-grid {
-  grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
   
   .services {
@@ -1198,8 +1224,8 @@ footer {
   
   .article-model-card-image {
     position: relative;
-    width: 110px;
-    height: 110px;
+    width: 150px;
+    height: 150px;
     margin: 12px auto 0;
     overflow: hidden;
     background: #f5f5f5;

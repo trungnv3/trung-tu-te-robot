@@ -96,7 +96,14 @@
   Chia sẻ
 
 </a>
+<a
+    href="#chatbot-faqs"
+    data-section="chatbot-faqs">
 
+    <span>💬</span>
+    FAQ Chatbot
+
+  </a>
 
   <a
     href="#">
@@ -902,6 +909,94 @@
   </section>
 
 </section>
+
+<!-- =====================================================
+     FAQ CHATBOT
+     ===================================================== -->
+     <section id="chatbot-faqs-section" class="admin-section">
+
+      <header class="admin-header">
+        <div>
+          <p class="eyebrow">QUẢN LÝ CHATBOT</p>
+          <h1>FAQ Chatbot</h1>
+          <p class="admin-header-description">
+            Quản lý câu hỏi thường gặp theo từng nhóm nội dung.
+          </p>
+        </div>
+      </header>
+      <div class="chatbot-faq-layout">
+        <aside class="panel chatbot-faq-sidebar">
+          <div class="chatbot-faq-sidebar-heading">
+            <h2>Danh mục FAQ</h2>
+            <p>Chọn nhóm để quản lý câu hỏi.</p>
+          </div>
+          <nav id="chatbot-faq-category-list"
+               class="chatbot-faq-category-list"
+               aria-label="Danh mục FAQ">
+            <button type="button"
+                    class="chatbot-faq-category active"
+                    data-faq-category="Tư vấn chọn robot">
+              <span class="chatbot-faq-category-icon">⌕</span>
+              <span class="chatbot-faq-category-text">Tư vấn chọn robot</span>
+              <span class="chatbot-faq-category-count">0</span>
+            </button>
+            <button type="button"
+                    class="chatbot-faq-category"
+                    data-faq-category="Vệ sinh và bảo trì">
+              <span class="chatbot-faq-category-icon">↻</span>
+              <span class="chatbot-faq-category-text">Vệ sinh và bảo trì</span>
+              <span class="chatbot-faq-category-count">0</span>
+            </button>
+            <button type="button"
+                    class="chatbot-faq-category"
+                    data-faq-category="Tính năng">
+              <span class="chatbot-faq-category-icon">⚙</span>
+              <span class="chatbot-faq-category-text">Tính năng</span>
+              <span class="chatbot-faq-category-count">0</span>
+            </button>
+            <button type="button"
+                    class="chatbot-faq-category"
+                    data-faq-category="Dịch vụ">
+              <span class="chatbot-faq-category-icon">♡</span>
+              <span class="chatbot-faq-category-text">Dịch vụ</span>
+              <span class="chatbot-faq-category-count">0</span>
+            </button>
+            <button type="button"
+                    class="chatbot-faq-category"
+                    data-faq-category="__legacy__">
+              <span class="chatbot-faq-category-icon">☰</span>
+              <span class="chatbot-faq-category-text">Khác / Chưa phân loại</span>
+              <span class="chatbot-faq-category-count">0</span>
+            </button>
+          </nav>
+        </aside>
+        <section class="panel chatbot-faq-main">
+          <div class="panel-header chatbot-faq-main-header">
+            <div>
+              <p class="eyebrow">NỘI DUNG CHATBOT</p>
+              <h2 id="chatbot-faq-category-title">Tư vấn chọn robot</h2>
+              <p class="panel-description">
+                Thêm, chỉnh sửa hoặc tạm tắt câu trả lời.
+              </p>
+            </div>
+            <button type="button"
+                    id="chatbot-faq-add"
+                    class="button-primary">
+              + Thêm FAQ
+            </button>
+          </div>
+          <div id="chatbot-faq-message" role="status"></div>
+          <div id="chatbot-faq-list">
+            <p class="robot-loading">Đang tải FAQ...</p>
+          </div>
+          <div id="chatbot-faq-form-panel"
+               class="chatbot-faq-form-panel"
+               style="display:none;">
+          </div>
+
+        </section>
+      </div>
+    </section>
   <!-- =====================================================
        FORM CHỈNH SỬA ROBOT
        ===================================================== -->

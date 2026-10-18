@@ -636,42 +636,48 @@
             return;
           }
 
-
           brands.forEach(function(brand) {
 
-            const link =
-              document.createElement("a");
+const link = document.createElement("a");
+
+link.href =
+  "robot/brand.html?brand=" +
+  encodeURIComponent(brand);
+
+const logoFiles = {
+  dreame: "Dreame.png",
+  ecovacs: "Ecovacs.png",
+  mova: "Mova.png",
+  roborock: "roborock.png",
+  xiaomi: "Xiaomi.png"
+};
+
+const logoFile = logoFiles[brand.toLowerCase()];
+const name = document.createElement("b");
+
+if (logoFile) {
+  const logo = document.createElement("img");
+
+  logo.src = "/assets/brand-logos/" + logoFile;
+  logo.alt = brand;
+  logo.className = "brand-logo";
+
+  logo.onerror = function() {
+    logo.remove();
+    name.textContent = brand;
+  };
+
+  link.appendChild(logo);
+} else {
+  name.textContent = brand;
+}
 
 
-            link.href =
-              "robot/brand.html?brand=" +
-              encodeURIComponent(brand);
+link.appendChild(name);
 
+container.appendChild(link);
 
-            const name =
-              document.createElement("b");
-
-
-            name.textContent =
-              brand;
-
-
-            const detail =
-              document.createElement("span");
-
-
-            detail.textContent =
-              "Khám phá →";
-
-
-            link.appendChild(name);
-
-            link.appendChild(detail);
-
-            container.appendChild(link);
-
-          });
-
+});
 
         } catch (error) {
 
@@ -703,6 +709,6 @@
    </div>
 
    <script src="/js/visitor-counter.js"></script>
-
+   <script src="/js/chatbot.js?v=20261018-1"></script>
 </body>
 </html>

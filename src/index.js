@@ -1191,6 +1191,669 @@ if (
         );
       }
     }
+
+    // =========================================================
+    // PUBLIC AI CHATBOT - TRUNG TU TE
+    // =========================================================
+    if (url.pathname === "/api/chat") {
+      if (request.method !== "POST") {
+        return Response.json(
+          { ok: false, error: "Chỉ hỗ trợ phương thức POST" },
+          {
+            status: 405,
+            headers: { Allow: "POST" }
+          }
+        );
+      }
+
+      try {
+
+        let body;
+
+        try {
+          body = await request.json();
+        } catch {
+          return Response.json(
+            { ok: false, error: "Dữ liệu gửi lên không hợp lệ" },
+            { status: 400 }
+          );
+        }
+
+        const message = String(body?.message || "").trim();
+
+        if (!message || message.length > 2000) {
+          return Response.json(
+            {
+              ok: false,
+              error: "Tin nhắn phải có từ 1 đến 2000 ký tự"
+            },
+            { status: 400 }
+          );
+        }
+
+        const history = Array.isArray(body?.history)
+          ? body.history
+              .filter(item =>
+                item &&
+                ["user", "model"].includes(item.role) &&
+                typeof item.text === "string"
+              )
+              .slice(-8)
+              .map(item => ({
+                role: item.role,
+                parts: [{
+                  text: item.text.slice(0, 1500)
+                }]
+              }))
+          : [];
+
+        const robotsResult = await env.trung_tu_te_robot_db
+          .prepare(`
+            SELECT
+              r.brand,
+              r.model,
+              r.slug,
+              r.year,
+              r.category,
+              s.suction_power,
+              s.obstacle_recognition,
+              s.mopping_technology,
+              s.mop_extension,
+              s.side_brush_extension,
+              s.automatic_mop_washing,
+              s.mop_drying,
+              s.wash_tray_self_cleaning,
+              s.automatic_dust_emptying,
+              s.automatic_detergent_dispensing,
+              s.carpet_mop_lift,
+              s.dust_bag_capacity,
+              s.clean_dirty_water_capacity,
+              s.battery_capacity,
+              s.cleaning_area,
+              s.robot_dimensions,
+              s.dock_dimensions,
+              s.reference_price,
+              c.intro,
+              c.highlights,
+              c.pros,
+              c.notes,
+              c.suitable_for,
+              c.ai_content
+            FROM robots r
+            LEFT JOIN robot_specs s
+              ON s.robot_id = r.id
+            LEFT JOIN robot_content c
+              ON c.robot_id = r.id
+            WHERE r.status = 'active'
+            ORDER BY r.brand, r.model
+            LIMIT 50
+          `)
+          .all();
+
+        const robots = robotsResult.results || [];
+        const parseSuctionPowerPa = (value) => {
+          const match = String(value ?? "").match(/(\d[\d.,]*)\s*(kpa|pa)\b/i);
+
+          if (!match) return null;
+
+          const unit = match[2].toLowerCase();
+          const rawNumber = match[1];
+
+           const number = unit === "kpa"
+            ? Number(rawNumber.replace(",", "."))
+            : Number(rawNumber.replace(/[.,]/g, ""));
+
+          if (!Number.isFinite(number) || number <= 0) return null;
+
+          return unit === "kpa" ? Math.round(number * 1000) : number;
+        };
+        const featuresResult = await env.trung_tu_te_robot_db
+          .prepare(`
+            SELECT
+              r.brand,
+              r.model,
+              f.title,
+              f.description
+            FROM robot_features f
+            INNER JOIN robots r
+              ON r.id = f.robot_id
+            WHERE r.status = 'active'
+            ORDER BY r.brand, r.model, f.sort_order, f.id
+          `)
+          .all();
+
+        const featuresByRobot = new Map();
+
+        for (const feature of featuresResult.results || []) {
+          const key = `${feature.brand} ${feature.model}`;
+
+          if (!featuresByRobot.has(key)) {
+            featuresByRobot.set(key, []);
+          }
+
+          featuresByRobot.get(key).push({
+            title: feature.title,
+            description: feature.description
+          });
+        }
+
+        const catalog = robots.map(robot => ({
+          ...robot,
+          suction_power_numeric_pa: parseSuctionPowerPa(robot.suction_power),
+          features:
+            featuresByRobot.get(
+              `${robot.brand} ${robot.model}`
+            ) || []
+        }));
+
+        // =========================================================
+        // CHATBOT FAQ - UU TIEN DU LIEU D1
+        // =========================================================
+        const normalizeFaqText = (value) =>
+          String(value ?? "")
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/đ/g, "d")
+            .replace(/[^a-z0-9]+/g, " ")
+            .trim();
+
+        const normalizedMessage = normalizeFaqText(message);
+
+        let faqMatch = null;
+        let faqMatchScore = 0;
+
+        try {
+          const faqResult = await env.trung_tu_te_robot_db
+            .prepare(`
+              SELECT id, code, category, question, keywords,
+                     answer_template, answer_type, sort_order
+              FROM chatbot_faqs
+              WHERE is_active = 1
+              ORDER BY sort_order ASC, id ASC
+            `)
+            .all();
+
+          for (const faq of faqResult.results || []) {
+            const normalizedQuestion = normalizeFaqText(faq.question);
+
+            const keywords = String(faq.keywords || "")
+              .split(/[,;\n]+/)
+              .map(item => normalizeFaqText(item))
+              .filter(item => item.length >= 3);
+
+            let score = 0;
+
+            // Uu tien tu khoa duoc quan tri vien khai bao.
+            for (const keyword of keywords) {
+              if (normalizedMessage.includes(keyword)) {
+                score += Math.min(keyword.split(" ").length + 2, 5);
+              }
+            }
+
+            // Neu cau hoi FAQ xuat hien tron ven trong tin nhan.
+            if (
+              normalizedQuestion.length >= 8 &&
+              normalizedMessage.includes(normalizedQuestion)
+            ) {
+              score += 5;
+            }
+
+            if (score > faqMatchScore) {
+              faqMatch = faq;
+              faqMatchScore = score;
+            }
+          }
+        } catch (error) {
+          // Khong de loi FAQ ngan chatbot su dung Gemini.
+          console.error("CHATBOT FAQ READ ERROR:", error);
+        }
+        console.log("CHATBOT FAQ MATCH:", JSON.stringify({
+          message,
+          normalizedMessage,
+          matchedCode: faqMatch?.code || null,
+          score: faqMatchScore
+        }));
+        if (faqMatch && faqMatchScore >= 3) {
+          const answerType = faqMatch.answer_type;
+          const template = String(faqMatch.answer_template || "");
+
+          // Tim dung model duoc nhac den trong cau hoi.
+          const matchedRobot = catalog.find(robot => {
+            const modelName = normalizeFaqText(
+              `${robot.brand || ""} ${robot.model || ""}`
+            );
+
+            return modelName.length >= 3 &&
+              normalizedMessage.includes(modelName);
+          });
+
+          // Cac FAQ theo thong so can co model ro rang.
+          const modelDependentTypes = [
+            "suction",
+            "mop_wash_dry",
+            "mop_lift",
+            "obstacle_avoidance",
+            "obstacle_clearance",
+            "price"
+          ];
+
+          if (modelDependentTypes.includes(answerType) && !matchedRobot) {
+            if (answerType === "suction") {
+              const robotsWithSuction = catalog.filter(
+                robot =>
+                  robot.suction_power &&
+                  String(robot.suction_power).trim()
+              );
+
+              const robotList = robotsWithSuction
+                .slice(0, 5)
+                .map(
+                  (robot, index) =>
+                    `${index + 1}. ${robot.brand} ${robot.model} (${robot.suction_power})`
+                )
+                .join("\n");
+
+              if (robotList) {
+                return Response.json({
+                  ok: true,
+                  reply:
+                    "Dạ, hiện tại shop có các mẫu robot sau. " +
+                    "Bạn muốn tìm hiểu lực hút của mẫu nào ạ?\n\n" +
+                    robotList,
+                  source: "catalog_selection"
+                });
+              }
+
+              return Response.json({
+                ok: true,
+                reply:
+                  "Dạ, hiện dữ liệu chưa có thông số lực hút để đối chiếu. " +
+                  "Bạn gửi giúp mình tên model robot cần tìm hiểu nhé.",
+                source: "faq"
+              });
+            }
+
+            // Các FAQ thông số khác vẫn yêu cầu xác định model.
+            faqMatch = null;
+          } else {
+            const safeValue = value =>
+              value === null ||
+              value === undefined ||
+              String(value).trim() === ""
+                ? "chưa có dữ liệu xác nhận"
+                : String(value).trim();
+
+            const mopLiftValue = matchedRobot?.carpet_mop_lift;
+            const washValue = matchedRobot?.automatic_mop_washing;
+            const dryValue = matchedRobot?.mop_drying;
+
+            const featureList = matchedRobot
+              ? matchedRobot.features
+                  .map(feature =>
+                    [feature.title, feature.description]
+                      .filter(Boolean)
+                      .join(": ")
+                  )
+                  .filter(Boolean)
+                  .join("; ")
+              : "";
+
+            const replacements = {
+              "{{model_name}}": matchedRobot
+                ? `${matchedRobot.brand || ""} ${matchedRobot.model || ""}`.trim()
+                : "",
+              "{{suction}}": safeValue(matchedRobot?.suction_power),
+              "{{mop_wash_status}}": safeValue(washValue),
+              "{{mop_dry_status}}": safeValue(dryValue),
+              "{{mop_lift_status}}": safeValue(mopLiftValue),
+              "{{obstacle_features}}": safeValue(featureList),
+              "{{obstacle_clearance}}": "chưa có dữ liệu xác nhận",
+              "{{reference_price}}": safeValue(matchedRobot?.reference_price),
+              "{{model_1}}": "",
+              "{{model_2}}": ""
+            };
+
+            let reply = template;
+
+            for (const [placeholder, value] of Object.entries(replacements)) {
+              reply = reply.split(placeholder).join(value);
+            }
+
+            if (answerType === "contact") {
+              reply +=
+                "\n\n📞 Điện thoại: 0905 191 099" +
+                "\n📘 Facebook: https://www.facebook.com/robotlaunhadaklak" +
+                "\n💬 Zalo: https://zalo.me/0905191099";
+            }
+
+            if (reply.trim()) {
+              return Response.json({
+                ok: true,
+                reply: reply.trim(),
+                source: "faq",
+                faqCode: faqMatch.code
+              });
+            }
+          }
+        }
+
+        // =========================================================
+        // CHATBOT - XU LY KHACH CHON MODEL TU DANH SACH TRUOC DO
+        // Khong phu thuoc Gemini
+        // =========================================================
+        const selectionMatch = normalizeFaqText(message).match(
+          /\b(?:mau|model|so)\s*(?:thu\s*)?([1-9])\b/
+        );
+
+        if (selectionMatch) {
+          const selectedNumber = Number(selectionMatch[1]);
+
+          const lastModelReply = [...history]
+            .reverse()
+            .find(item =>
+              item.role === "model" &&
+              typeof item.parts?.[0]?.text === "string"
+            )?.parts?.[0]?.text || "";
+
+          const lastUserMessage = [...history]
+            .reverse()
+            .find(item =>
+              item.role === "user" &&
+              typeof item.parts?.[0]?.text === "string"
+            )?.parts?.[0]?.text || "";
+
+          const normalizedPreviousReply =
+            normalizeFaqText(lastModelReply);
+
+          // Chi xu ly neu cau tra loi truoc do thuc su liet ke model.
+          const listedRobots = catalog
+            .map(robot => {
+              const fullName = normalizeFaqText(
+                `${robot.brand || ""} ${robot.model || ""}`
+              );
+
+              const position = normalizedPreviousReply.indexOf(fullName);
+
+              return {
+                robot,
+                position,
+                fullName
+              };
+            })
+            .filter(item => item.position >= 0)
+            .sort((a, b) => a.position - b.position);
+
+          const previousReplyHasList =
+            listedRobots.length >= selectedNumber &&
+            /\b(?:1|2|3)[.)]/.test(lastModelReply);
+
+          if (previousReplyHasList) {
+            const selectedRobot =
+              listedRobots[selectedNumber - 1].robot;
+
+            const previousQuestion =
+              normalizeFaqText(lastUserMessage);
+
+            let reply =
+              `Dạ, mẫu số ${selectedNumber} là ` +
+              `${selectedRobot.brand} ${selectedRobot.model}.`;
+
+            if (
+              /luc hut|suction/.test(previousQuestion)
+            ) {
+              const suction =
+                selectedRobot.suction_power;
+
+              if (
+                suction &&
+                String(suction).trim()
+              ) {
+                reply +=
+                  ` Mẫu này có thông số lực hút: ${String(suction).trim()}.`;
+              } else {
+                reply +=
+                  " Hiện dữ liệu chưa có thông số lực hút xác nhận cho mẫu này.";
+              }
+            } else {
+              reply +=
+                " Bạn muốn tìm hiểu thêm thông số nào của mẫu này ạ?";
+            }
+
+            return Response.json({
+              ok: true,
+              reply,
+              source: "catalog_selection",
+              model: `${selectedRobot.brand} ${selectedRobot.model}`
+            });
+          }
+        }
+        // Khach chon so/model nhung khong co lich su de doi chieu.
+        if (
+          selectionMatch &&
+          !history.some(item => item.role === "model")
+        ) {
+          return Response.json({
+            ok: true,
+            reply:
+              "Dạ, bạn đang muốn hỏi mẫu robot nào ạ? " +
+              "Bạn gửi giúp mình tên model hoặc câu hỏi trước đó " +
+              "để mình tư vấn đúng mẫu nhé.",
+            source: "clarify_model_selection"
+          });
+        }
+        // FAQ khong phu hop: moi chuyen sang Gemini.
+
+        if (!env.GEMINI_API_KEY) {
+          return Response.json(
+            { ok: false, error: "AI_UNAVAILABLE" },
+            { status: 503 }
+          );
+        }
+
+        const asksSuctionRanking =
+        /lực hút|suction/i.test(message) &&
+        /mạnh nhất|cao nhất|lớn nhất|xếp hạng|top\s*\d*|đứng đầu|mạnh hơn/i.test(message);
+
+      const suctionRankingContext = asksSuctionRanking
+        ? `DỮ LIỆU XẾP HẠNG LỰC HÚT ĐÃ TÍNH TỪ CƠ SỞ DỮ LIỆU:
+      ${JSON.stringify(
+        catalog
+          .filter(robot => robot.suction_power_numeric_pa !== null)
+          .sort((a, b) => b.suction_power_numeric_pa - a.suction_power_numeric_pa)
+          .map(robot => ({
+            brand: robot.brand,
+            model: robot.model,
+            suction_power: robot.suction_power,
+            suction_power_numeric_pa: robot.suction_power_numeric_pa
+          }))
+      )}`
+        : "";
+        const systemInstruction = `
+
+        Bạn là trợ lý tư vấn của Trung Tử Tế, chuyên robot lau nhà. Bạn hỗ trợ khách chọn robot, so sánh sản phẩm và xử lý các vấn đề kỹ thuật cơ bản.
+
+        ## 1. NGUỒN DỮ LIỆU
+
+        Danh mục robot bên dưới được lấy từ cơ sở dữ liệu website. Đây là nguồn dữ liệu chính để tư vấn sản phẩm.
+
+        - Chỉ tư vấn các model có trong danh mục được cung cấp.
+        - Chỉ nêu thông số, giá, tính năng và công nghệ khi dữ liệu có thông tin tương ứng.
+        - Không tự suy đoán thông số còn thiếu dựa trên model tương tự hoặc kiến thức về model khác.
+        - Nếu một trường dữ liệu trống hoặc không có, hãy nói rõ chưa có dữ liệu xác nhận.
+        - Phân biệt thông tin do nhà sản xuất công bố với nhận định tư vấn thực tế.
+        - Không khẳng định một tính năng tốt hơn model khác nếu dữ liệu không đủ căn cứ so sánh.
+        - Khi khách yêu cầu xếp hạng hoặc tìm robot có lực hút mạnh nhất, phải dựa vào trường suction_power_numeric_pa và dữ liệu xếp hạng lực hút được cung cấp; không tự xếp hạng bằng cách đọc cảm tính chuỗi thông số.
+        - Nếu nhiều model có cùng lực hút, không tự phân định model nào mạnh hơn.
+        - Chỉ xếp hạng các model có dữ liệu lực hút hợp lệ; không tự điền giá trị còn thiếu.
+        - Danh sách xếp hạng chỉ bao gồm robot nằm trong danh mục được cung cấp, không được tuyên bố đó là toàn bộ thị trường.
+        ## NGUYÊN TẮC TƯ VẤN THEO MODEL CỤ THỂ
+
+        Khi khách hỏi về một model robot cụ thể:
+
+        - Ưu tiên sử dụng ai_content để hiểu nội dung giới thiệu và cách diễn giải sản phẩm đã được chuẩn bị trước.
+        - Kết hợp với intro, highlights, pros, notes, suitable_for, features và thông số kỹ thuật liên quan để trả lời đúng câu hỏi.
+        - Diễn đạt tự nhiên như nhân viên tư vấn đang trò chuyện trực tiếp; không chép nguyên văn toàn bộ nội dung AI đã tạo.
+        - Trả lời đúng trọng tâm, giải thích lợi ích thực tế khi có dữ liệu hỗ trợ và không lặp lại toàn bộ thông số ở mỗi lượt.
+        - Tận dụng nhu cầu, ngân sách, diện tích và thông tin nhà ở khách đã cung cấp trong lịch sử trò chuyện; không hỏi lại điều đã rõ.
+        - Nếu khách nói “con này”, “model đó” hoặc “bản này”, hãy dựa vào lịch sử để xác định model. Nếu có nhiều khả năng, hỏi lại ngắn gọn.
+        - Không xem ai_content là nguồn xác minh độc lập cho thông số kỹ thuật. Dùng các trường thông số có cấu trúc trong danh mục làm căn cứ cho thông số tương ứng.
+        - Nếu ai_content mâu thuẫn với dữ liệu có cấu trúc, ưu tiên dữ liệu có cấu trúc cho thông số kỹ thuật; không tự chọn hoặc kết hợp các giá trị mâu thuẫn.
+        - Chỉ nêu giá bán khi dữ liệu được cung cấp có giá rõ ràng và có căn cứ sử dụng. Nếu không có giá hoặc không xác định được giá còn hiệu lực, không tự đưa ra giá tham khảo.
+        - Không khẳng định chắc chắn về hiệu quả hoặc mức độ phù hợp khi dữ liệu chưa đủ. Tránh các câu tuyệt đối như “không bỏ sót”, “hút sạch hoàn toàn”, “thừa sức” hoặc “hoàn toàn phù hợp” nếu không có căn cứ tương ứng.
+        - Không tự suy ra diện tích làm sạch thực tế, thời gian hoạt động, khả năng chống rối hoặc khả năng xử lý mọi loại sàn từ một thông số riêng lẻ.
+        - Khi dữ liệu chưa đủ để kết luận, hãy nêu rõ giới hạn thông tin và đưa ra nhận định có điều kiện thay vì đoán.
+        ## 2. QUY TẮC TƯ VẤN CHỌN ROBOT
+
+        Khi khách hỏi chọn robot, hãy xem xét các yếu tố phù hợp với câu hỏi:
+        - Diện tích nhà và cách bố trí không gian.
+        - Ngân sách.
+        - Có nuôi chó, mèo hoặc có nhiều tóc, lông rụng hay không.
+        - Loại sàn, thảm và mức độ bẩn.
+        - Nhu cầu lau sàn, giặt giẻ, sấy giẻ và bảo trì.
+        - Khả năng chống rối tóc, lông nếu dữ liệu sản phẩm có đề cập.
+
+        Không chỉ dựa vào lực hút để kết luận robot phù hợp nhất.
+
+        Diện tích làm sạch do hãng công bố không phải cam kết về diện tích thực tế trong mọi điều kiện. Không suy ra thời lượng pin hoặc diện tích sử dụng thực tế nếu dữ liệu không hỗ trợ.
+
+        Nếu khách chưa cung cấp đủ thông tin để đưa ra lựa chọn có căn cứ, hãy hỏi thêm một câu ngắn về yếu tố quan trọng nhất còn thiếu, chẳng hạn ngân sách hoặc loại sàn.
+
+        ## 3. CÁCH ĐỀ XUẤT MODEL
+        - Khi đề xuất một robot cụ thể, luôn ghi rõ thương hiệu và tên model đầy đủ.
+        - Giải thích ngắn gọn vì sao model đó có thể phù hợp với nhu cầu của khách, dựa trên dữ liệu hiện có.
+        - Nêu hạn chế hoặc thông tin còn thiếu có ảnh hưởng đến quyết định.
+        - Nếu có nhiều lựa chọn, hãy so sánh theo nhu cầu của khách thay vì mặc định model có lực hút cao nhất là tốt nhất.
+        - Không tự tạo bảng xếp hạng hoặc tuyên bố model tốt nhất khi chưa đủ căn cứ.
+        - Nếu chưa thể kết luận, hãy nói rõ và hỏi thêm thông tin cần thiết.
+        ## 4. HỖ TRỢ KỸ THUẬT
+        - Hướng dẫn kiểm tra, vệ sinh và xử lý lỗi cơ bản theo cách an toàn.
+        - Phân biệt dấu hiệu quan sát được với nguyên nhân lỗi chỉ đang nghi ngờ.
+        - Không khẳng định hỏng linh kiện khi chưa kiểm tra thực tế.
+        - Với lỗi cần chuyên môn hoặc có nguy cơ mất an toàn, khuyên khách ngừng sử dụng nếu cần và liên hệ kỹ thuật viên.
+        - Không yêu cầu khách cung cấp mật khẩu, mã OTP hoặc thông tin thanh toán.
+        ## 5. VĂN PHONG VÀ CÁCH TRÒ CHUYỆN
+
+        - Luôn trả lời bằng tiếng Việt tự nhiên, thân thiện, lịch sự như một nhân viên tư vấn am hiểu robot lau nhà.
+        - Giọng điệu gần gũi, chân thành, không cứng nhắc như tài liệu kỹ thuật và không quảng cáo quá mức.
+        - Trả lời trực tiếp điều khách hỏi trước, sau đó mới giải thích hoặc đưa ra gợi ý nếu cần.
+        - Ưu tiên cách diễn đạt dễ hiểu, giải thích tính năng gắn với lợi ích thực tế khi có dữ liệu hỗ trợ.
+        - Không lặp lại thông tin khách đã biết hoặc toàn bộ thông số của model trong mỗi lượt trò chuyện.
+        - Với câu hỏi đơn giản, trả lời ngắn gọn. Với yêu cầu so sánh hoặc liệt kê, hoàn thành đầy đủ các mục khách yêu cầu.
+        - Chỉ hỏi thêm khi thiếu thông tin thực sự ảnh hưởng đến tư vấn; mỗi lần chỉ hỏi một câu ngắn, tự nhiên.
+        - Có thể gợi ý một hướng tìm hiểu tiếp theo khi phù hợp, nhưng không bắt buộc kết thúc bằng câu hỏi ở mọi lượt trả lời.
+        - Khi khách chào hỏi, cảm ơn hoặc xác nhận, phản hồi tương ứng một cách tự nhiên, không tự động giới thiệu sản phẩm.
+        - Không tự nhận đã trực tiếp trải nghiệm, kiểm tra hoặc sửa chữa robot.
+        - Không tự tạo thông số, giá bán, chính sách bảo hành hoặc cam kết dịch vụ.
+        - Với tư vấn thông thường, ưu tiên khoảng 40–100 từ; chỉ trả lời dài hơn khi khách yêu cầu phân tích, so sánh hoặc liệt kê chi tiết.
+        - Luôn hoàn thành câu trả lời, không kết thúc giữa câu hoặc giữa một mục liệt kê.
+        ## DANH MỤC ROBOT HIỆN CÓ
+
+        Dữ liệu sản phẩm được cung cấp bên dưới:
+
+        ${suctionRankingContext}
+
+        DANH MỤC ROBOT:
+        ${JSON.stringify(catalog)}
+        `.trim();
+
+        const model = env.GEMINI_MODEL || "gemini-3.8-flash";
+        console.log("CHATBOT GEMINI CONFIG:", JSON.stringify({ model, maxOutputTokens: 2048, thinkingLevel: "low" }));
+        const geminiResponse = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-goog-api-key": env.GEMINI_API_KEY
+            },
+            body: JSON.stringify({
+              systemInstruction: {
+                parts: [{ text: systemInstruction }]
+              },
+              contents: [
+                ...history,
+                {
+                  role: "user",
+                  parts: [{ text: message }]
+                }
+              ],
+              generationConfig: {
+                temperature: 0.3,
+                maxOutputTokens: 2048,
+                thinkingConfig: {
+                  thinkingLevel: "low"
+                }
+              }
+            })
+          }
+        );
+
+if (!geminiResponse.ok) {
+  const errorText = await geminiResponse.text();
+
+  console.error(
+    "CHATBOT GEMINI ERROR:",
+    geminiResponse.status,
+    errorText.slice(0, 1000)
+  );
+
+  return Response.json(
+    {
+      ok: false,
+      error: "AI_UNAVAILABLE"
+    },
+    { status: 503 }
+  );
+}
+
+        const geminiData = await geminiResponse.json();
+
+        const candidate = geminiData?.candidates?.[0];
+        const reply = (candidate?.content?.parts || [])
+          .map(part => typeof part.text === "string" ? part.text : "")
+          .join("")
+          .trim();
+
+          console.log("CHATBOT GEMINI RESULT:", JSON.stringify({
+            finishReason: candidate?.finishReason || null,
+            promptFeedback: geminiData?.promptFeedback?.blockReason || null,
+            outputTokenCount: geminiData?.usageMetadata?.candidatesTokenCount ?? null,
+            thoughtsTokenCount: geminiData?.usageMetadata?.thoughtsTokenCount ?? null,
+            totalTokenCount: geminiData?.usageMetadata?.totalTokenCount ?? null,
+            replyLength: reply.length
+          }));
+
+        if (!reply) {
+          return Response.json(
+            {
+              ok: false,
+              error: "AI chưa tạo được câu trả lời đầy đủ. Vui lòng thử lại."
+            },
+            { status: 502 }
+          );
+        }
+
+        return Response.json({
+          ok: true,
+          reply,
+          robotCount: robots.length,
+          finishReason: candidate?.finishReason || null
+        });
+
+      } catch (error) {
+        console.error("CHATBOT ERROR:", error);
+
+        return Response.json(
+          {
+            ok: false,
+            error: "Có lỗi khi xử lý tin nhắn. Vui lòng thử lại."
+          },
+          { status: 500 }
+        );
+      }
+    }
+
     // =========================================================
 // AI - GENERATE ROBOT CONTENT WITH GEMINI
 // =========================================================
@@ -2934,56 +3597,49 @@ ORDER BY
             )
             .all();
 
-        const robots =
-          robotsResult.results || [];
+const robots =
+robotsResult.results || [];
 
-        for (
-          const robot of robots
-        ) {
+const imagesResult =
+await env
+  .trung_tu_te_robot_db
+  .prepare(
+    `
+    SELECT
+      robot_id,
+      drive_id,
+      file_name,
+      sort_order,
+      is_primary
+    FROM robot_images
+    ORDER BY
+      sort_order ASC,
+      id ASC
+    `
+  )
+  .all();
 
-          const imagesResult =
-            await env
-              .trung_tu_te_robot_db
-              .prepare(
-                `
-                SELECT
-                  drive_id,
-                  file_name,
-                  sort_order,
-                  is_primary
-                FROM robot_images
-                WHERE robot_id = ?
-                ORDER BY
-                  sort_order ASC,
-                  id ASC
-                `
-              )
-              .bind(
-                robot.id
-              )
-              .all();
+const imagesByRobotId = new Map();
 
-          robot.images =
-            (
-              imagesResult.results ||
-              []
-            ).map(
-              (image) => ({
-                id:
-                  image.drive_id,
-                fileName:
-                  image.file_name,
-                sortOrder:
-                  image.sort_order,
-                primary:
-                  Boolean(
-                    image.is_primary
-                  ),
-                url:
-                  `/api/image/${image.drive_id}`
-              })
-            );
-        }
+for (const image of imagesResult.results || []) {
+if (!imagesByRobotId.has(image.robot_id)) {
+  imagesByRobotId.set(image.robot_id, []);
+}
+
+imagesByRobotId.get(image.robot_id).push({
+  id: image.drive_id,
+  fileName: image.file_name,
+  sortOrder: image.sort_order,
+  primary: Boolean(image.is_primary),
+  url: `/api/image/${image.drive_id}`
+});
+}
+
+for (const robot of robots) {
+robot.images =
+  imagesByRobotId.get(robot.id) || [];
+}
+
 
         return Response.json({
           ok: true,
@@ -6136,6 +6792,197 @@ if (
     );
   }
 }
+
+    // =========================================================
+    // CHATBOT FAQ - ADMIN
+    // =========================================================
+    if (
+      url.pathname === "/api/admin/chatbot-faqs" &&
+      ["GET", "POST"].includes(request.method)
+    ) {
+      const isAdmin = await requireAdminSession(request, env);
+
+      if (!isAdmin) {
+        return Response.json(
+          { ok: false, error: "Unauthorized" },
+          { status: 401 }
+        );
+      }
+
+      try {
+        const db = env.trung_tu_te_robot_db;
+
+        if (request.method === "GET") {
+          const result = await db.prepare(`
+            SELECT id, code, category, question, keywords,
+                   answer_template, answer_type, is_active,
+                   sort_order, created_at, updated_at
+            FROM chatbot_faqs
+            ORDER BY sort_order ASC, id ASC
+          `).all();
+
+          return Response.json({
+            ok: true,
+            faqs: result.results || []
+          });
+        }
+
+        const body = await request.json();
+        const code = String(body.code || "").trim();
+        const question = String(body.question || "").trim();
+        const answerTemplate = String(body.answer_template || "").trim();
+        const category = String(body.category || "general").trim();
+        const keywords = String(body.keywords || "").trim();
+        const answerType = String(body.answer_type || "static").trim();
+        const sortOrder = Number(body.sort_order ?? 0);
+        const isActive = Number(body.is_active ?? 1);
+
+        const allowedTypes = [
+          "static", "suction", "mop_wash_dry", "mop_lift",
+          "obstacle_avoidance", "obstacle_clearance",
+          "price", "compare", "contact"
+        ];
+
+        if (
+          !/^[a-zA-Z0-9_-]{2,80}$/.test(code) ||
+          !question ||
+          question.length > 500 ||
+          !answerTemplate ||
+          answerTemplate.length > 10000 ||
+          !allowedTypes.includes(answerType) ||
+          !Number.isInteger(sortOrder) ||
+          ![0, 1].includes(isActive)
+        ) {
+          return Response.json(
+            { ok: false, error: "Dữ liệu FAQ không hợp lệ." },
+            { status: 400 }
+          );
+        }
+
+        const result = await db.prepare(`
+          INSERT INTO chatbot_faqs
+            (code, category, question, keywords, answer_template,
+             answer_type, is_active, sort_order, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        `).bind(
+          code, category, question, keywords, answerTemplate,
+          answerType, isActive, sortOrder
+        ).run();
+
+        return Response.json({
+          ok: true,
+          id: result.meta?.last_row_id ?? null
+        });
+      } catch (error) {
+        const duplicate = /unique constraint/i.test(error.message || "");
+
+        return Response.json(
+          {
+            ok: false,
+            error: duplicate
+              ? "Mã FAQ đã tồn tại."
+              : "Không thể xử lý FAQ."
+          },
+          { status: duplicate ? 409 : 500 }
+        );
+      }
+    }
+
+    if (
+      url.pathname.startsWith("/api/admin/chatbot-faq/") &&
+      ["PUT", "DELETE"].includes(request.method)
+    ) {
+      const isAdmin = await requireAdminSession(request, env);
+
+      if (!isAdmin) {
+        return Response.json(
+          { ok: false, error: "Unauthorized" },
+          { status: 401 }
+        );
+      }
+
+      const id = Number(url.pathname.split("/").pop());
+
+      if (!Number.isInteger(id) || id < 1) {
+        return Response.json(
+          { ok: false, error: "ID FAQ không hợp lệ." },
+          { status: 400 }
+        );
+      }
+
+      try {
+        const db = env.trung_tu_te_robot_db;
+
+        if (request.method === "DELETE") {
+          await db.prepare(`
+            UPDATE chatbot_faqs
+            SET is_active = 0, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+          `).bind(id).run();
+
+          return Response.json({ ok: true });
+        }
+
+        const body = await request.json();
+        const question = String(body.question || "").trim();
+        const answerTemplate = String(body.answer_template || "").trim();
+        const category = String(body.category || "general").trim();
+        const keywords = String(body.keywords || "").trim();
+        const answerType = String(body.answer_type || "static").trim();
+        const sortOrder = Number(body.sort_order ?? 0);
+        const isActive = Number(body.is_active ?? 1);
+
+        const allowedTypes = [
+          "static", "suction", "mop_wash_dry", "mop_lift",
+          "obstacle_avoidance", "obstacle_clearance",
+          "price", "compare", "contact"
+        ];
+
+        if (
+          !question ||
+          question.length > 500 ||
+          !answerTemplate ||
+          answerTemplate.length > 10000 ||
+          !allowedTypes.includes(answerType) ||
+          !Number.isInteger(sortOrder) ||
+          ![0, 1].includes(isActive)
+        ) {
+          return Response.json(
+            { ok: false, error: "Dữ liệu FAQ không hợp lệ." },
+            { status: 400 }
+          );
+        }
+
+        const result = await db.prepare(`
+          UPDATE chatbot_faqs
+          SET category = ?, question = ?, keywords = ?,
+              answer_template = ?, answer_type = ?,
+              is_active = ?, sort_order = ?,
+              updated_at = CURRENT_TIMESTAMP
+          WHERE id = ?
+        `).bind(
+          category, question, keywords, answerTemplate,
+          answerType, isActive, sortOrder, id
+        ).run();
+
+        if (!result.meta?.changes) {
+          return Response.json(
+            { ok: false, error: "Không tìm thấy FAQ." },
+            { status: 404 }
+          );
+        }
+
+        return Response.json({ ok: true });
+      } catch (error) {
+        console.error("CHATBOT FAQ ADMIN ERROR:", error);
+
+        return Response.json(
+          { ok: false, error: "Không thể lưu FAQ." },
+          { status: 500 }
+        );
+      }
+    }
+
     // =========================================================
     // STATIC WEBSITE
     // =========================================================

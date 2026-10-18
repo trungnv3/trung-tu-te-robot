@@ -196,12 +196,72 @@
 <script src="../js/footer.js"></script>
 
 <script>
+
+const brandLogoFiles = {
+  dreame: "Dreame.png",
+  ecovacs: "Ecovacs.png",
+  mova: "Mova.png",
+  roborock: "roborock.png",
+  xiaomi: "Xiaomi.png"
+};
+
+function renderBrands(brands, container) {
+  container.innerHTML = "";
+
+  if (brands.length === 0) {
+    container.innerHTML = "<span>Chưa có hãng robot.</span>";
+    return;
+  }
+
+  brands.forEach(function(brand) {
+    const link = document.createElement("a");
+
+    link.href =
+      "brand.html?brand=" +
+      encodeURIComponent(brand);
+
+    const logoFile =
+      brandLogoFiles[brand.toLowerCase()];
+
+    const name = document.createElement("b");
+
+    if (logoFile) {
+      const logo = document.createElement("img");
+      logo.src = "../assets/brand-logos/" + logoFile;
+      logo.alt = brand;
+      logo.className = "brand-logo";
+
+      logo.onerror = function() {
+        logo.remove();
+        name.textContent = brand;
+      };
+
+      link.appendChild(logo);
+    } else {
+      name.textContent = brand;
+    }
+
+    link.appendChild(name);
+    container.appendChild(link);
+  });
+}
+
 async function loadBrands() {
   const container = document.getElementById("brands-list");
 
   if (!container) {
     return;
   }
+
+  const initialBrands = [
+    "Dreame",
+    "Ecovacs",
+    "Mova",
+    "Roborock",
+    "Xiaomi"
+  ];
+
+  renderBrands(initialBrands, container);
 
   try {
     const response = await fetch("/api/robots");
@@ -240,44 +300,15 @@ async function loadBrands() {
       return a.localeCompare(b, "vi");
     });
 
-    container.innerHTML = "";
-
-    if (brands.length === 0) {
-      container.innerHTML =
-        "<span>Chưa có hãng robot.</span>";
-      return;
-    }
-
-    brands.forEach(function(brand) {
-      const link = document.createElement("a");
-
-      link.href =
-        "brand.html?brand=" +
-        encodeURIComponent(brand);
-
-      const name = document.createElement("b");
-      name.textContent = brand;
-
-      const detail = document.createElement("span");
-      detail.textContent = "Khám phá →";
-
-      link.appendChild(name);
-      link.appendChild(detail);
-
-      container.appendChild(link);
-    });
+    renderBrands(brands, container);
 
   } catch (error) {
     console.error("Load brands:", error);
-
-    container.innerHTML =
-      "<span>Không thể tải danh sách hãng.</span>";
   }
 }
-
 loadBrands();
 </script>
-
+<script src="/js/chatbot.js?v=20261018-1"></script>
 </body>
 
 </html>

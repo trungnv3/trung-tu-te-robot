@@ -835,7 +835,20 @@ function showSection(sectionName) {
     loadAIModelStatus();
 
   }
+
+  // =========================================================
+  // FAQ CHATBOT
+  // =========================================================
+
+  if (
+    sectionName === "chatbot-faqs"
+  ) {
+
+    loadChatbotFaqs();
+
+  }
 }
+
 async function loadAIModelStatus() {
 
   const container =
@@ -10213,3 +10226,405 @@ document.addEventListener(
       editor.innerHTML;
   }
 );
+
+const chatbotFaqTypes = [
+  ["static", "Câu trả lời cố định"],
+  ["suction", "Lực hút"],
+  ["mop_wash_dry", "Giặt và sấy giẻ"],
+  ["mop_lift", "Nâng giẻ lau"],
+  ["obstacle_avoidance", "Tránh vật cản"],
+  ["obstacle_clearance", "Vượt gờ"],
+  ["price", "Giá tham khảo"],
+  ["compare", "So sánh robot"],
+  ["contact", "Liên hệ"]
+];
+
+let chatbotFaqCache = [];
+let chatbotFaqSelectedCategory = "Tư vấn chọn robot";
+
+const chatbotFaqCategories = [
+  "Tư vấn chọn robot",
+  "Vệ sinh và bảo trì",
+  "Tính năng",
+  "Dịch vụ"
+];
+
+function chatbotFaqGetCategory(faq) {
+  return chatbotFaqCategories.includes(String(faq.category || "").trim())
+    ? String(faq.category).trim()
+    : "__legacy__";
+}
+
+function chatbotFaqGetCategoryLabel(category) {
+  return category === "__legacy__"
+    ? "Khác / Chưa phân loại"
+    : category;
+}
+
+function chatbotFaqEscape(value) {
+  return String(value ?? "").replace(/[&<>"']/g, function (char) {
+    return {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    }[char];
+  });
+}
+
+function chatbotFaqMessage(message, isError = false) {
+  const element = document.getElementById("chatbot-faq-message");
+  if (!element) return;
+
+  element.textContent = message;
+  element.style.color = isError ? "#b42318" : "#167647";
+  element.style.marginBottom = "12px";
+}
+
+async function loadChatbotFaqs() {
+  const list = document.getElementById("chatbot-faq-list");
+  if (!list) return;
+
+  list.textContent = "Đang tải danh sách FAQ...";
+
+  try {
+    const response = await fetch("/api/admin/chatbot-faqs", {
+      method: "GET",
+      credentials: "same-origin"
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.ok) {
+      throw new Error(data.error || "Không thể tải FAQ.");
+    }
+
+    chatbotFaqCache = Array.isArray(data.faqs) ? data.faqs : [];
+    chatbotFaqRenderList();
+  } catch (error) {
+    list.textContent = error.message || "Không thể tải FAQ.";
+    chatbotFaqMessage("Lỗi tải FAQ. Hãy kiểm tra đăng nhập và kết nối API.", true);
+  }
+}
+
+
+function chatbotFaqRenderList() {
+  const list = document.getElementById("chatbot-faq-list");
+  if (!list) return;
+
+  const categoryButtons = document.querySelectorAll("[data-faq-category]");
+  const title = document.getElementById("chatbot-faq-category-title");
+
+  categoryButtons.forEach(function (button) {
+    const category = button.dataset.faqCategory;
+    const count = chatbotFaqCache.filter(function (faq) {
+      return chatbotFaqGetCategory(faq) === category;
+    }).length;
+
+    const countElement = button.querySelector(".chatbot-faq-category-count");
+    if (countElement) countElement.textContent = String(count);
+
+    const selected = category === chatbotFaqSelectedCategory;
+    button.classList.toggle("active", selected);
+    button.setAttribute("aria-pressed", selected ? "true" : "false");
+  });
+
+  if (title) {
+    title.textContent = chatbotFaqGetCategoryLabel(chatbotFaqSelectedCategory);
+  }
+
+  const filteredFaqs = chatbotFaqCache.filter(function (faq) {
+    return chatbotFaqGetCategory(faq) === chatbotFaqSelectedCategory;
+  });
+
+  if (!filteredFaqs.length) {
+    list.textContent = "Danh mục này chưa có FAQ. Bấm “Thêm FAQ” để tạo câu hỏi mới.";
+    return;
+  }
+
+  list.innerHTML = filteredFaqs.map(function (faq) {
+    const typeLabel = chatbotFaqTypes.find(function (item) {
+      return item[0] === faq.answer_type;
+    })?.[1] || faq.answer_type;
+
+    return `
+      <article class="chatbot-faq-item">
+        <div class="chatbot-faq-item-content">
+          <div class="chatbot-faq-item-info">
+            <strong>${chatbotFaqEscape(faq.question)}</strong>
+            <p>
+              Mã: ${chatbotFaqEscape(faq.code)}
+              · Nhóm: ${chatbotFaqEscape(faq.category)}
+              · Loại: ${chatbotFaqEscape(typeLabel)}
+            </p>
+            <span class="chatbot-faq-status ${Number(faq.is_active) === 1 ? "is-active" : "is-inactive"}">
+              ${Number(faq.is_active) === 1 ? "Đang bật" : "Đang tắt"}
+            </span>
+          </div>
+          <div class="chatbot-faq-item-actions">
+            <button type="button" data-faq-edit="${Number(faq.id)}">Sửa</button>
+            <button type="button" data-faq-toggle="${Number(faq.id)}">
+              ${Number(faq.is_active) === 1 ? "Tắt" : "Bật"}
+            </button>
+          </div>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+
+
+function chatbotFaqShowForm(faq = null) {
+  const panel = document.getElementById("chatbot-faq-form-panel");
+  if (!panel) return;
+
+  const editing = Boolean(faq);
+  const currentCategory = String(
+    faq?.category || chatbotFaqSelectedCategory || chatbotFaqCategories[0]
+  ).trim();
+
+  const selectedCategory = chatbotFaqCategories.includes(currentCategory)
+    ? currentCategory
+    : chatbotFaqSelectedCategory;
+
+  const categoryOptions = chatbotFaqCategories.map(function (category) {
+    return `<option value="${chatbotFaqEscape(category)}" ${
+      category === selectedCategory ? "selected" : ""
+    }>${chatbotFaqEscape(category)}</option>`;
+  });
+
+  if (editing && !chatbotFaqCategories.includes(currentCategory)) {
+    categoryOptions.push(
+      `<option value="${chatbotFaqEscape(currentCategory)}" selected>${chatbotFaqEscape(currentCategory)} (nhóm cũ)</option>`
+    );
+  }
+
+  const typeOptions = chatbotFaqTypes.map(function (item) {
+    return `<option value="${item[0]}" ${
+      (faq?.answer_type || "static") === item[0] ? "selected" : ""
+    }>${chatbotFaqEscape(item[1])}</option>`;
+  }).join("");
+
+  panel.style.display = "block";
+  panel.innerHTML = `
+    <form id="chatbot-faq-form" class="chatbot-faq-form">
+      <h3>${editing ? "Chỉnh sửa FAQ" : "Thêm FAQ mới"}</h3>
+
+      <label>Mã FAQ
+        <input name="code" required maxlength="80"
+          pattern="[a-zA-Z0-9_-]{2,80}"
+          placeholder="VD: FAQ-001"
+          value="${chatbotFaqEscape(faq?.code || "")}"
+          ${editing ? "readonly" : ""}>
+      </label>
+
+      <label>Danh mục
+        <select name="category" required>
+          ${categoryOptions.join("")}
+        </select>
+      </label>
+
+      <label>Câu hỏi
+        <input name="question" maxlength="500" required
+          value="${chatbotFaqEscape(faq?.question || "")}">
+      </label>
+
+      <label>Từ khóa (phân cách bằng dấu phẩy)
+        <input name="keywords"
+          value="${chatbotFaqEscape(faq?.keywords || "")}">
+      </label>
+
+      <label>Loại câu trả lời
+        <select name="answer_type">${typeOptions}</select>
+      </label>
+
+      <label>Nội dung câu trả lời
+        <textarea name="answer_template" rows="6" maxlength="10000" required>${chatbotFaqEscape(faq?.answer_template || "")}</textarea>
+      </label>
+
+      <label>Thứ tự hiển thị
+        <input name="sort_order" type="number" step="1"
+          value="${Number.isInteger(Number(faq?.sort_order)) ? Number(faq.sort_order) : 0}" required>
+      </label>
+
+      <label class="chatbot-faq-checkbox">
+        <input name="is_active" type="checkbox"
+          ${!faq || Number(faq.is_active) === 1 ? "checked" : ""}>
+        Đang bật FAQ
+      </label>
+
+      <div class="chatbot-faq-form-actions">
+        <button type="submit" class="button-primary">Lưu FAQ</button>
+        <button type="button" data-faq-cancel>Hủy</button>
+      </div>
+    </form>
+  `;
+
+  const form = panel.querySelector("#chatbot-faq-form");
+  if (editing && form) {
+    form.dataset.faqId = String(faq.id);
+  }
+
+  panel.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+
+document.addEventListener("click", function (event) {
+  const categoryButton = event.target.closest("[data-faq-category]");
+  if (!categoryButton) return;
+
+  const category = categoryButton.dataset.faqCategory;
+  if (!category) return;
+
+  chatbotFaqSelectedCategory = category;
+
+  const panel = document.getElementById("chatbot-faq-form-panel");
+  if (panel) {
+    panel.style.display = "none";
+    panel.replaceChildren();
+  }
+
+  chatbotFaqMessage("");
+  chatbotFaqRenderList();
+});
+
+document.addEventListener("click", async function (event) {
+  const addButton = event.target.closest("#chatbot-faq-add");
+  if (addButton) {
+    chatbotFaqShowForm();
+    chatbotFaqMessage("");
+    return;
+  }
+
+  if (event.target.closest("[data-faq-cancel]")) {
+    const panel = document.getElementById("chatbot-faq-form-panel");
+    if (panel) {
+      panel.style.display = "none";
+      panel.replaceChildren();
+    }
+    return;
+  }
+
+  const editButton = event.target.closest("[data-faq-edit]");
+  if (editButton) {
+    const faq = chatbotFaqCache.find(function (item) {
+      return Number(item.id) === Number(editButton.dataset.faqEdit);
+    });
+if (faq) {
+  chatbotFaqSelectedCategory = chatbotFaqGetCategory(faq);
+  chatbotFaqRenderList();
+  chatbotFaqShowForm(faq);
+}
+return;
+
+  }
+
+  const toggleButton = event.target.closest("[data-faq-toggle]");
+  if (toggleButton) {
+    const faq = chatbotFaqCache.find(function (item) {
+      return Number(item.id) === Number(toggleButton.dataset.faqToggle);
+    });
+    if (!faq) return;
+
+    toggleButton.disabled = true;
+
+    try {
+      const enabling = Number(faq.is_active) !== 1;
+      const response = enabling
+        ? await fetch("/api/admin/chatbot-faq/" + Number(faq.id), {
+            method: "PUT",
+            credentials: "same-origin",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              question: faq.question,
+              answer_template: faq.answer_template,
+              category: faq.category,
+              keywords: faq.keywords,
+              answer_type: faq.answer_type,
+              sort_order: Number(faq.sort_order),
+              is_active: 1
+            })
+          })
+        : await fetch("/api/admin/chatbot-faq/" + Number(faq.id), {
+            method: "DELETE",
+            credentials: "same-origin"
+          });
+
+      const data = await response.json();
+      if (!response.ok || !data.ok) {
+        throw new Error(data.error || "Không thể đổi trạng thái FAQ.");
+      }
+
+      chatbotFaqMessage(enabling ? "Đã bật FAQ." : "Đã tắt FAQ.");
+      await loadChatbotFaqs();
+    } catch (error) {
+      chatbotFaqMessage(error.message || "Không thể đổi trạng thái FAQ.", true);
+    } finally {
+      toggleButton.disabled = false;
+    }
+    return;
+  }
+});
+
+document.addEventListener("submit", async function (event) {
+  const form = event.target.closest("#chatbot-faq-form");
+  if (!form) return;
+
+  event.preventDefault();
+
+  const formData = new FormData(form);
+  const faqId = form.dataset.faqId;
+  const body = {
+    code: String(formData.get("code") || "").trim(),
+    category: String(formData.get("category") || "general").trim(),
+    question: String(formData.get("question") || "").trim(),
+    keywords: String(formData.get("keywords") || "").trim(),
+    answer_template: String(formData.get("answer_template") || "").trim(),
+    answer_type: String(formData.get("answer_type") || "static"),
+    sort_order: Number(formData.get("sort_order") || 0),
+    is_active: form.querySelector('[name="is_active"]').checked ? 1 : 0
+  };
+
+  if (!Number.isInteger(body.sort_order)) {
+    chatbotFaqMessage("Thứ tự hiển thị phải là số nguyên.", true);
+    return;
+  }
+
+  const saveButton = form.querySelector('button[type="submit"]');
+  saveButton.disabled = true;
+
+  try {
+    const response = await fetch(
+      faqId ? "/api/admin/chatbot-faq/" + Number(faqId) : "/api/admin/chatbot-faqs",
+      {
+        method: faqId ? "PUT" : "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      }
+    );
+
+    const data = await response.json();
+    if (!response.ok || !data.ok) {
+      throw new Error(data.error || "Không thể lưu FAQ.");
+    }
+
+    const panel = document.getElementById("chatbot-faq-form-panel");
+    if (panel) {
+      panel.style.display = "none";
+      panel.replaceChildren();
+    }
+
+    chatbotFaqMessage(faqId ? "Đã cập nhật FAQ." : "Đã thêm FAQ.");
+    chatbotFaqSelectedCategory = chatbotFaqGetCategory({
+      category: body.category
+    });
+    await loadChatbotFaqs();
+  } catch (error) {
+    chatbotFaqMessage(error.message || "Không thể lưu FAQ.", true);
+  } finally {
+    saveButton.disabled = false;
+  }
+});
