@@ -31,18 +31,41 @@
       </header>
 
       <div class="ttt-chat-messages" aria-live="polite">
-        <div class="ttt-chat-bubble ttt-chat-bot">
-          Chào bạn! Mình có thể tư vấn chọn robot lau nhà,
-          tra cứu thông số và hỗ trợ các vấn đề kỹ thuật cơ bản.
-          Bạn đang cần hỗ trợ điều gì?
-        </div>
-      </div>
+  <div class="ttt-chat-bubble ttt-chat-bot">
+    <strong>Xin chào! 👋</strong>
+    <div>Mình có thể giúp bạn chọn robot lau nhà, so sánh thông số và tìm hiểu cách xử lý lỗi thường gặp.</div>
+    <div class="ttt-chat-welcome-hint">Bạn muốn bắt đầu từ đâu?</div>
+  </div>
+</div>
 
-      <div class="ttt-chat-suggestions">
-        <button type="button" data-question="Tư vấn chọn robot theo nhu cầu">Chọn robot</button>
-        <button type="button" data-question="Tôi muốn so sánh các mẫu robot hiện có">So sánh robot</button>
-        <button type="button" data-question="Tôi cần hỗ trợ kiểm tra lỗi robot lau nhà">Hỗ trợ kỹ thuật</button>
-      </div>
+<div class="ttt-chat-suggestions">
+  <button type="button" data-question="Tôi muốn chọn robot lau nhà phù hợp với nhu cầu và ngân sách. Bạn hãy tư vấn giúp tôi.">
+    <span class="ttt-chat-suggestion-icon">✦</span>
+    <span class="ttt-chat-suggestion-content">
+      <strong>Tư vấn chọn robot</strong>
+      <span>Tìm mẫu phù hợp với nhu cầu và ngân sách.</span>
+    </span>
+    <span class="ttt-chat-suggestion-arrow">›</span>
+  </button>
+
+  <button type="button" data-question="Tôi muốn tìm hiểu thông số và so sánh các mẫu robot lau nhà.">
+    <span class="ttt-chat-suggestion-icon">⇄</span>
+    <span class="ttt-chat-suggestion-content">
+      <strong>So sánh và tra cứu</strong>
+      <span>Xem thông số, tính năng và điểm khác biệt.</span>
+    </span>
+    <span class="ttt-chat-suggestion-arrow">›</span>
+  </button>
+
+  <button type="button" data-question="Tôi cần hỗ trợ kỹ thuật cho robot lau nhà. Hãy giúp tôi tìm hiểu nguyên nhân và cách xử lý.">
+    <span class="ttt-chat-suggestion-icon">⚙</span>
+    <span class="ttt-chat-suggestion-content">
+      <strong>Hỗ trợ kỹ thuật</strong>
+      <span>Tìm hiểu lỗi, bảo trì và cách sử dụng.</span>
+    </span>
+    <span class="ttt-chat-suggestion-arrow">›</span>
+  </button>
+</div>
 
       <form class="ttt-chat-form">
         <label class="ttt-chat-sr-only" for="ttt-chat-input">Tin nhắn</label>
@@ -286,6 +309,10 @@ renderMarkdownSafe(waiting, data.reply);
 
   form.addEventListener("submit", function (event) {
     event.preventDefault();
+
+    if (!input.value.trim() || sending) return;
+
+    suggestions.hidden = true;
     sendMessage(input.value);
   });
 
@@ -300,7 +327,9 @@ renderMarkdownSafe(waiting, data.reply);
     const button = event.target.closest("[data-question]");
     if (!button || sending) return;
 
+    input.value = button.dataset.question;
     suggestions.hidden = true;
-    sendMessage(button.dataset.question);
+    input.focus();
+    input.setSelectionRange(input.value.length, input.value.length);
   });
 })();

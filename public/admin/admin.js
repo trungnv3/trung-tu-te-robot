@@ -8420,9 +8420,6 @@ document.addEventListener(
 
       // Chuyển về danh sách Robot
       window.location.hash = "#robots";
-    alert(
-        "Đã lưu nội dung AI thành công."
-      );
 
       // Tải lại toàn bộ trang sau khi lưu thành công
       window.location.reload();
