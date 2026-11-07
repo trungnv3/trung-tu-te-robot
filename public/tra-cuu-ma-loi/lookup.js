@@ -3,6 +3,7 @@
 
   if (!form) return;
 
+  const deviceTypeSelect = document.querySelector("#lookup-device-type");
   const manufacturerSelect = document.querySelector("#lookup-manufacturer");
   const modelSelect = document.querySelector("#lookup-model");
   const symptomSelect = document.querySelector("#lookup-symptom");
@@ -43,10 +44,12 @@
     placeholderOption.textContent = placeholder;
     fragment.appendChild(placeholderOption);
 
-    values.forEach((value) => {
+    values.forEach((item) => {
+      const value = typeof item === "string" ? item : String(item?.value || "");
+      const label = typeof item === "string" ? item : String(item?.label || value);
       const option = document.createElement("option");
       option.value = value;
-      option.textContent = value;
+      option.textContent = label;
       option.selected = value === selectedValue;
       fragment.appendChild(option);
     });
@@ -84,9 +87,9 @@
     setOptions(modelSelect, "Đang tải model...", []);
 
     try {
-      const data = await fetchJson(
-        `/api/error-lookup/filters?${new URLSearchParams({ manufacturer })}`
-      );
+      const params = new URLSearchParams({ manufacturer });
+      if (deviceTypeSelect.value) params.set("device_type", deviceTypeSelect.value);
+      const data = await fetchJson(`/api/error-lookup/filters?${params}`);
       setOptions(modelSelect, "Tất cả model", data.model_scopes || [], selectedValue);
       modelSelect.disabled = false;
     } catch (error) {
@@ -110,6 +113,7 @@
 
     try {
       const params = new URLSearchParams({ manufacturer });
+      if (deviceTypeSelect.value) params.set("device_type", deviceTypeSelect.value);
       if (modelSelect.value) params.set("model_scope", modelSelect.value);
       const data = await fetchJson(`/api/error-lookup/filters?${params}`);
       setOptions(symptomSelect, "Tất cả triệu chứng", data.symptoms || [], selectedValue);
@@ -117,6 +121,22 @@
     } catch (error) {
       setOptions(symptomSelect, "Không tải được triệu chứng", []);
       symptomSelect.disabled = true;
+      setStatus(error.message, true);
+    }
+  }
+
+  async function loadManufacturers(selectedValue = "") {
+    manufacturerSelect.disabled = true;
+    setOptions(manufacturerSelect, "Đang tải hãng...", []);
+
+    try {
+      const params = new URLSearchParams();
+      if (deviceTypeSelect.value) params.set("device_type", deviceTypeSelect.value);
+      const data = await fetchJson(`/api/error-lookup/filters?${params}`);
+      setOptions(manufacturerSelect, "Tất cả hãng", data.manufacturers || [], selectedValue);
+      manufacturerSelect.disabled = false;
+    } catch (error) {
+      setOptions(manufacturerSelect, "Không tải được hãng", []);
       setStatus(error.message, true);
     }
   }
@@ -224,11 +244,18 @@
   }
 
   async function runLookup() {
+    const deviceType = deviceTypeSelect.value;
     const manufacturer = manufacturerSelect.value;
     const modelScope = modelSelect.value;
-    const query = queryInput.value.trim() || symptomSelect.value;
+    const selectedSymptom = symptomSelect.value;
+    const selectedCode = selectedSymptom.startsWith("code:")
+      ? selectedSymptom.slice("code:".length)
+      : "";
+    const query = queryInput.value.trim() || (
+      selectedCode ? "" : selectedSymptom.replace(/^symptom:/, "")
+    );
 
-    if (!manufacturer && !modelScope && !query) {
+    if (!deviceType && !manufacturer && !modelScope && !query) {
       resultsTitle.textContent = "Chưa có truy vấn";
       setEmpty(
         "⌕",
@@ -240,9 +267,11 @@
     }
 
     const params = new URLSearchParams({ limit: "50" });
+    if (deviceType) params.set("device_type", deviceType);
     if (manufacturer) params.set("manufacturer", manufacturer);
     if (modelScope) params.set("model_scope", modelScope);
     if (query) params.set("q", query);
+    if (!query && selectedCode) params.set("error_code", selectedCode);
 
     setStatus("Đang tra cứu dữ liệu...");
 
@@ -261,9 +290,8 @@
 
   async function initialise() {
     try {
-      const data = await fetchJson("/api/error-lookup/filters");
-      setOptions(manufacturerSelect, "Tất cả hãng", data.manufacturers || []);
-      setStatus("Sẵn sàng tra cứu. Hãy chọn hãng, model hoặc triệu chứng.");
+      await loadManufacturers();
+      setStatus("Sẵn sàng tra cứu. Hãy chọn loại máy, hãng, model hoặc triệu chứng.");
     } catch (error) {
       setStatus(error.message, true);
       setEmpty(
@@ -279,6 +307,15 @@
     await loadSymptoms();
   });
 
+  deviceTypeSelect.addEventListener("change", async () => {
+    manufacturerSelect.value = "";
+    modelSelect.value = "";
+    symptomSelect.value = "";
+    await loadManufacturers();
+    await loadModels();
+    await loadSymptoms();
+  });
+
   modelSelect.addEventListener("change", async () => {
     await loadSymptoms();
   });
@@ -289,8 +326,10 @@
   });
 
   resetButton.addEventListener("click", async () => {
+    deviceTypeSelect.value = "";
     manufacturerSelect.value = "";
     queryInput.value = "";
+    await loadManufacturers();
     await loadModels();
     await loadSymptoms();
     resultsTitle.textContent = "Chưa có truy vấn";
