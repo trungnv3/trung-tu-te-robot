@@ -129,7 +129,7 @@
 
 .lookup-form {
   display: grid;
-  grid-template-columns: minmax(150px, 0.78fr) minmax(210px, 1.2fr) minmax(220px, 1.35fr) auto;
+  grid-template-columns: minmax(145px, 0.72fr) minmax(180px, 1fr) minmax(210px, 1.25fr) minmax(200px, 1.15fr) auto;
   gap: 14px;
   align-items: end;
   padding: 19px;
@@ -408,6 +408,49 @@
   font-size: 13px;
 }
 
+.lookup-checklist,
+.lookup-service-guide {
+  margin: 16px 0 0;
+  padding: 17px 18px;
+  border-radius: 12px;
+}
+
+.lookup-checklist {
+  border: 1px solid #dcebe2;
+  background: #f7fbf8;
+}
+
+.lookup-checklist h4,
+.lookup-service-guide h4 {
+  margin: 0 0 9px;
+  color: var(--lookup-ink);
+  font-size: 14px;
+}
+
+.lookup-checklist ol {
+  margin: 0;
+  padding-left: 21px;
+  color: #3d5147;
+  font-size: 14px;
+  line-height: 1.62;
+}
+
+.lookup-checklist li + li {
+  margin-top: 6px;
+}
+
+.lookup-service-guide {
+  border: 1px solid rgba(164, 71, 54, 0.2);
+  background: #fff9f7;
+  color: #6b493f;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.lookup-service-guide h4 {
+  color: var(--lookup-danger);
+}
+
 .lookup-source {
   display: flex;
   flex-wrap: wrap;
@@ -485,9 +528,9 @@
   flex: 0 0 auto;
 }
 
-@media (max-width: 1050px) {
+@media (max-width: 1180px) {
   .lookup-form {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
   }
 
   .lookup-keyword-field {

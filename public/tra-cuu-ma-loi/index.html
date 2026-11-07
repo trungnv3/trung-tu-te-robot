@@ -49,10 +49,10 @@
       <div class="wrap lookup-hero-grid">
         <div>
           <p class="lookup-eyebrow">TRUNG TỬ TẾ · HỖ TRỢ KỸ THUẬT</p>
-          <h1>Tra cứu mã lỗi<br><em>đúng hãng, đúng model.</em></h1>
+          <h1>Tra cứu lỗi và<br><em>tự kiểm tra đúng cách.</em></h1>
           <p>
-            Nhập mã đang hiển thị hoặc chọn model để xem bước kiểm tra ban đầu.
-            Kết quả luôn kèm nguồn và mức độ tin cậy.
+            Chọn hãng, model và triệu chứng để xem các bước kiểm tra an toàn tại nhà
+            trước khi quyết định mang máy đi sửa.
           </p>
         </div>
 
@@ -77,8 +77,8 @@
             <h2 id="lookup-title">Tìm theo robot bạn đang dùng</h2>
           </div>
           <p>
-            Hãy chọn hãng và model nếu có thể. Cùng một mã có thể mang ý nghĩa
-            khác nhau ở các đời máy khác nhau.
+            Cùng một mã hoặc triệu chứng có thể có nguyên nhân khác nhau theo từng đời máy.
+            Nếu chưa rõ model, xem tem dưới đáy robot hoặc mục thông tin thiết bị trong ứng dụng.
           </p>
         </div>
 
@@ -91,20 +91,27 @@
           </div>
 
           <div class="lookup-field">
-            <label for="lookup-model">Model hoặc phạm vi áp dụng</label>
+            <label for="lookup-model">Model</label>
             <select id="lookup-model" name="model_scope" disabled>
               <option value="">Chọn hãng trước</option>
             </select>
           </div>
 
+          <div class="lookup-field">
+            <label for="lookup-symptom">Triệu chứng thường gặp</label>
+            <select id="lookup-symptom" name="symptom" disabled>
+              <option value="">Chọn hãng trước</option>
+            </select>
+          </div>
+
           <div class="lookup-field lookup-keyword-field">
-            <label for="lookup-query">Mã lỗi hoặc triệu chứng</label>
+            <label for="lookup-query">Mã lỗi hoặc từ khóa khác</label>
             <input
               id="lookup-query"
               name="q"
               type="search"
               maxlength="120"
-              placeholder="Ví dụ: 2003, không sạc, chổi kẹt..."
+              placeholder="Ví dụ: 2003, kẹt chổi, lỗi laser..."
               autocomplete="off"
             >
           </div>
@@ -129,8 +136,8 @@
             <h2 id="lookup-results-title">Chưa có truy vấn</h2>
           </div>
           <div class="lookup-legend" aria-label="Chú thích nguồn">
-            <span><i class="legend-official"></i> Nguồn chính hãng</span>
-            <span><i class="legend-reference"></i> Triệu chứng tham khảo</span>
+            <span><i class="legend-official"></i> Mã lỗi theo model</span>
+            <span><i class="legend-reference"></i> Hướng dẫn tự kiểm tra</span>
           </div>
         </div>
 
@@ -138,7 +145,7 @@
           <span aria-hidden="true">⌕</span>
           <h3>Chọn robot hoặc nhập mã lỗi</h3>
           <p>
-            Ví dụ chọn Roborock → S4 → nhập “10”, hoặc nhập “không sạc”.
+            Ví dụ chọn Dreame → L10s Ultra → “Không sạc, không về trạm”.
           </p>
         </div>
 
@@ -150,8 +157,8 @@
       <div class="wrap">
         <h2>Về dữ liệu tra cứu</h2>
         <p>
-          Kết quả là hướng dẫn kiểm tra ban đầu, không thay thế chẩn đoán trực tiếp.
-          Những mục “tham khảo” cần đối chiếu lại với tài liệu đúng model trước khi sửa chữa.
+          Đây là hướng dẫn kiểm tra ban đầu, không thay thế chẩn đoán trực tiếp.
+          Không tháo pin, bo mạch, động cơ hoặc phần điện khi chưa có chuyên môn.
         </p>
       </div>
     </section>
