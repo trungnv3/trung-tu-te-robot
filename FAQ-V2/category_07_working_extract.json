@@ -1,0 +1,1004 @@
+﻿{
+  "schema_version": "1.0",
+  "project": "Trung Tu Te Robot FAQ V2",
+  "language": "vi-VN",
+  "category_id": "07",
+  "category_name": "Tài khoản, ứng dụng và kết nối",
+  "created_as": "new",
+  "scenario_count": 10,
+  "minimum_tests_per_scenario": 3,
+  "scenarios": [
+    {
+      "branch_id": "07.01",
+      "intent": "Kết nối Wi-Fi",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Bạn cho biết model robot, tên ứng dụng và thông báo lỗi đang hiển thị được không? Nếu biết, Wi-Fi nhà bạn đang dùng băng tần nào?",
+          "required": true
+        }
+      ],
+      "category_id": "07",
+      "handling_rules": [
+        "Không mặc định mọi model hỗ trợ cùng băng tần, chuẩn bảo mật hoặc phương thức kết nối",
+        "Hướng dẫn kiểm tra từng bước theo tài liệu chính hãng đúng model",
+        "Không yêu cầu người dùng cung cấp mật khẩu Wi-Fi, mật khẩu tài khoản hoặc mã OTP",
+        "Không hướng dẫn đặt lại cấu hình khi chưa giải thích hậu quả có thể xảy ra"
+      ],
+      "question_variants": [
+        "Không kết nối được robot với Wi-Fi",
+        "Robot báo lỗi khi nhập mạng Wi-Fi",
+        "Đã nhập mật khẩu Wi-Fi nhưng robot vẫn không kết nối",
+        "Nhờ hướng dẫn kết nối robot với ứng dụng"
+      ],
+      "evidence_policy": {
+        "rule": "Thông tin về băng tần, chuẩn mạng và quy trình ghép nối phải dựa trên tài liệu chính hãng đúng model; không suy đoán khi chưa xác minh",
+        "source_priority": [
+          "Hướng dẫn chính hãng đúng model",
+          "Hướng dẫn chính thức của ứng dụng",
+          "Thông báo lỗi và thông tin mạng người dùng cung cấp",
+          "Không suy đoán khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Không kết nối được robot với Wi-Fi",
+      "routing": {
+        "message": "Nếu chưa xử lý được, hãy cung cấp model robot, tên ứng dụng, thông báo lỗi và các bước đã thử. Không gửi mật khẩu hoặc mã OTP.",
+        "type": "self_help"
+      },
+      "test_cases": [
+        {
+          "case_id": "07.01.T01",
+          "pass_criteria": [
+            "Xác định đúng vấn đề kết nối Wi-Fi",
+            "Hỏi model, ứng dụng hoặc thông báo lỗi khi cần",
+            "Không khẳng định khả năng hỗ trợ băng tần khi chưa có căn cứ"
+          ],
+          "input": "Tôi nhập mật khẩu Wi-Fi rồi nhưng robot vẫn không kết nối được",
+          "expected": "Hướng dẫn kiểm tra thông báo lỗi, mạng điện thoại đang sử dụng và khả năng tương thích Wi-Fi theo tài liệu đúng model; không yêu cầu người dùng gửi mật khẩu."
+        },
+        {
+          "case_id": "07.01.T02",
+          "pass_criteria": [
+            "Có phương án tìm model khi người dùng chưa biết",
+            "Không yêu cầu thông tin đăng nhập bí mật",
+            "Không hướng dẫn đặt lại ngay từ đầu"
+          ],
+          "input": "Tôi không biết model robot và cũng không rõ Wi-Fi đang dùng băng tần nào",
+          "expected": "Hướng dẫn tìm model trên nhãn máy hoặc trong ứng dụng nếu có; đề nghị kiểm tra thông tin router khi cần rồi mới chọn quy trình kết nối phù hợp."
+        },
+        {
+          "case_id": "07.01.T03",
+          "pass_criteria": [
+            "Không lặp lại vô hạn các bước đã thử",
+            "Ghi nhận kết quả xử lý trước đó",
+            "Có tiêu chí chuyển hỗ trợ kỹ thuật"
+          ],
+          "input": "Tôi đã khởi động lại router và thử ghép nối nhiều lần nhưng vẫn thất bại",
+          "expected": "Hỏi thông báo lỗi cụ thể và các bước đã thực hiện; hướng dẫn bước kiểm tra tiếp theo phù hợp hoặc chuyển kỹ thuật viên nếu cần, không yêu cầu tiếp tục thử lặp vô hạn."
+        }
+      ],
+      "context_required": [
+        "Model robot",
+        "Tên và phiên bản ứng dụng nếu biết",
+        "Thông báo lỗi",
+        "Băng tần và cấu hình Wi-Fi nếu xác định được",
+        "Trạng thái đèn hoặc chế độ ghép nối",
+        "Các bước đã thử"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Robot có dấu hiệu pin phồng, khói, mùi khét, nóng bất thường hoặc nguy cơ điện cần dừng thao tác",
+          "Người dùng chỉ hỏi cách sử dụng tính năng khác không liên quan kết nối"
+        ],
+        "signals": [
+          "Không kết nối được Wi-Fi",
+          "Robot không ghép nối được mạng",
+          "Nhập mật khẩu Wi-Fi nhưng thất bại",
+          "Ứng dụng báo lỗi kết nối mạng"
+        ]
+      },
+      "answer_strategy": "Xác định model và thông báo lỗi trước; kiểm tra mạng, trạng thái ghép nối và quyền truy cập cần thiết theo hướng dẫn chính hãng. Chỉ đề xuất đặt lại cấu hình khi đã giải thích rõ hậu quả và có hướng dẫn đúng model.",
+      "scenario": "Không kết nối được robot với Wi-Fi",
+      "status": "approved",
+      "scenario_id": "07.01",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "07.02",
+      "intent": "Không tìm thấy thiết bị",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Robot đang bật, ở trạng thái sẵn sàng ghép nối và điện thoại đã mở đúng ứng dụng của robot chưa?",
+          "required": true
+        }
+      ],
+      "category_id": "07",
+      "handling_rules": [
+        "Phân biệt ứng dụng không dò thấy robot với robot không vào được chế độ ghép nối",
+        "Không mặc định quy trình ghép nối giống nhau giữa các hãng và model",
+        "Kiểm tra các bước cơ bản trước khi đề xuất đặt lại cấu hình",
+        "Không yêu cầu mật khẩu, OTP hoặc thông tin đăng nhập bí mật"
+      ],
+      "question_variants": [
+        "Ứng dụng không tìm thấy robot",
+        "Thêm thiết bị mới nhưng không thấy robot",
+        "Robot không xuất hiện trong danh sách thiết bị",
+        "Không thể ghép nối robot với điện thoại"
+      ],
+      "evidence_policy": {
+        "rule": "Trình tự đưa robot vào chế độ ghép nối và quyền ứng dụng cần thiết phải theo tài liệu chính hãng đúng model",
+        "source_priority": [
+          "Hướng dẫn chính hãng đúng model",
+          "Hướng dẫn chính thức của ứng dụng",
+          "Trạng thái robot và thông báo thực tế",
+          "Không suy đoán khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Ứng dụng không tìm thấy robot",
+      "routing": {
+        "message": "Nếu vẫn không tìm thấy thiết bị, hãy cung cấp model, tên ứng dụng, trạng thái robot và bước ghép nối đã thử. Không gửi mật khẩu hoặc mã OTP.",
+        "type": "self_help"
+      },
+      "test_cases": [
+        {
+          "case_id": "07.02.T01",
+          "pass_criteria": [
+            "Kiểm tra đúng ứng dụng và trạng thái ghép nối",
+            "Không yêu cầu khôi phục cài đặt gốc ngay",
+            "Hỏi model khi cần hướng dẫn thao tác cụ thể"
+          ],
+          "input": "Tôi mở ứng dụng nhưng không thấy robot để thêm thiết bị",
+          "expected": "Hướng dẫn xác nhận ứng dụng đúng hãng, robot đang bật và đã vào chế độ ghép nối theo tài liệu model; sau đó kiểm tra các quyền cần thiết của ứng dụng."
+        },
+        {
+          "case_id": "07.02.T02",
+          "pass_criteria": [
+            "Đưa ra cách tìm model khi chưa biết",
+            "Không giả định vị trí nút ghép nối",
+            "Không hướng dẫn thao tác không xác minh được"
+          ],
+          "input": "Tôi không biết nút ghép nối nằm ở đâu trên robot",
+          "expected": "Hỏi model hoặc hướng dẫn tìm model trên nhãn máy; chỉ vị trí và thao tác ghép nối theo tài liệu đúng model, không tự đoán tổ hợp nút."
+        },
+        {
+          "case_id": "07.02.T03",
+          "pass_criteria": [
+            "Phân biệt lỗi dò tìm với lỗi kết nối Wi-Fi",
+            "Không lặp lại bước đã thất bại mà không có thông tin mới",
+            "Đề xuất bước tiếp theo rõ ràng"
+          ],
+          "input": "Robot đã vào chế độ ghép nối nhưng ứng dụng vẫn không tìm thấy",
+          "expected": "Kiểm tra quyền ứng dụng, trạng thái mạng và thông báo trên màn hình; nếu vẫn thất bại, thu thập model cùng các bước đã thử để chuyển hỗ trợ phù hợp."
+        }
+      ],
+      "context_required": [
+        "Model robot",
+        "Tên ứng dụng",
+        "Trạng thái nguồn và chế độ ghép nối",
+        "Điện thoại và hệ điều hành nếu cần",
+        "Quyền ứng dụng đã cấp",
+        "Thông báo lỗi"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Robot có dấu hiệu pin hoặc điện nguy hiểm cần dừng thao tác",
+          "Robot đã xuất hiện trong ứng dụng nhưng chỉ báo ngoại tuyến"
+        ],
+        "signals": [
+          "Không tìm thấy thiết bị",
+          "Không thêm được robot",
+          "Ứng dụng không dò thấy robot",
+          "Robot không xuất hiện trong danh sách"
+        ]
+      },
+      "answer_strategy": "Xác minh ứng dụng, chế độ ghép nối và quyền truy cập trước; sau đó thực hiện quy trình thêm thiết bị đúng model. Không xóa dữ liệu hoặc đặt lại thiết bị khi chưa cần thiết.",
+      "scenario": "Ứng dụng không tìm thấy robot",
+      "status": "approved",
+      "scenario_id": "07.02",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "07.03",
+      "intent": "Mất kết nối chập chờn",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Robot mất kết nối ở mọi vị trí hay chỉ tại một khu vực, và hiện tượng xảy ra thường xuyên đến mức nào?",
+          "required": true
+        }
+      ],
+      "category_id": "07",
+      "handling_rules": [
+        "Không kết luận lỗi phần cứng chỉ từ việc mất kết nối mạng",
+        "Phân biệt mất kết nối Wi-Fi với việc robot dừng hoạt động hoặc không hoàn thành nhiệm vụ",
+        "Không yêu cầu tháo máy hoặc can thiệp phần cứng khi chưa có căn cứ",
+        "Không đề nghị đặt lại cấu hình trước khi đánh giá các bước đơn giản"
+      ],
+      "question_variants": [
+        "Robot thường xuyên mất kết nối",
+        "Robot lúc online lúc offline",
+        "Ứng dụng mất kết nối khi robot đi sang phòng khác",
+        "Robot hay ngắt kết nối với Wi-Fi"
+      ],
+      "evidence_policy": {
+        "rule": "Khoanh vùng vấn đề mạng, vị trí và trạng thái ứng dụng dựa trên biểu hiện quan sát được; không suy ra lỗi bo mạch hoặc linh kiện khi chưa kiểm tra",
+        "source_priority": [
+          "Hướng dẫn chính hãng đúng model",
+          "Thông báo từ ứng dụng và router",
+          "Mô tả vị trí, thời điểm xảy ra lỗi",
+          "Không suy đoán khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Robot thường xuyên mất kết nối",
+      "routing": {
+        "message": "Hãy cho biết model, vị trí robot thường mất kết nối, trạng thái ứng dụng và các bước đã thử. Không gửi mật khẩu hoặc mã OTP.",
+        "type": "diagnose_then_route"
+      },
+      "test_cases": [
+        {
+          "case_id": "07.03.T01",
+          "pass_criteria": [
+            "Hỏi vị trí và thời điểm xảy ra mất kết nối",
+            "Không kết luận hỏng phần cứng khi chưa đủ căn cứ",
+            "Đưa ra kiểm tra mạng phù hợp"
+          ],
+          "input": "Robot chỉ mất kết nối khi đi vào phòng ngủ xa router",
+          "expected": "Ưu tiên kiểm tra vùng phủ Wi-Fi, vị trí router và hiện tượng tại các khu vực khác; không vội kết luận robot hỏng."
+        },
+        {
+          "case_id": "07.03.T02",
+          "pass_criteria": [
+            "Phân biệt mất kết nối ứng dụng với dừng hoạt động",
+            "Không yêu cầu dữ liệu đăng nhập bí mật",
+            "Hỏi thêm triệu chứng có liên quan"
+          ],
+          "input": "Ứng dụng báo offline nhưng robot vẫn tiếp tục dọn nhà",
+          "expected": "Xác định robot còn thực hiện nhiệm vụ hay không, thời điểm mất kết nối và trạng thái mạng; giải thích rằng trạng thái offline chưa đủ để kết luận lỗi phần cứng."
+        },
+        {
+          "case_id": "07.03.T03",
+          "pass_criteria": [
+            "Ghi nhận các bước đã thử",
+            "Không lặp hướng dẫn không hiệu quả",
+            "Có hướng chuyển tiếp khi lỗi kéo dài"
+          ],
+          "input": "Tôi đã khởi động lại router nhưng robot vẫn mất kết nối nhiều lần mỗi ngày",
+          "expected": "Hỏi model, tần suất và thông báo lỗi; đề xuất kiểm tra tiếp theo phù hợp hoặc chuyển kỹ thuật viên nếu đã loại trừ được các nguyên nhân mạng cơ bản."
+        }
+      ],
+      "context_required": [
+        "Model robot",
+        "Vị trí router và khu vực xảy ra lỗi",
+        "Tần suất và thời điểm mất kết nối",
+        "Trạng thái robot khi ứng dụng báo offline",
+        "Thông báo lỗi",
+        "Các bước đã thử"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Robot có dấu hiệu điện hoặc pin nguy hiểm cần dừng thao tác",
+          "Robot không thể khởi động hoặc gặp lỗi cơ học rõ ràng không liên quan kết nối"
+        ],
+        "signals": [
+          "Mất kết nối chập chờn",
+          "Robot lúc online lúc offline",
+          "Mất Wi-Fi khi sang phòng khác",
+          "Kết nối robot không ổn định"
+        ]
+      },
+      "answer_strategy": "Khoanh vùng theo vị trí, trạng thái robot và router; kiểm tra mạng trước khi đánh giá thiết bị. Chỉ chuyển hướng chẩn đoán kỹ thuật khi có dấu hiệu phù hợp hoặc sự cố vẫn tiếp diễn sau các bước cơ bản.",
+      "scenario": "Robot thường xuyên mất kết nối",
+      "status": "approved",
+      "scenario_id": "07.03",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "07.04",
+      "intent": "Lỗi đăng nhập",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Ứng dụng báo sai mật khẩu, không nhận tài khoản, lỗi máy chủ hay không hoàn tất được bước xác minh?",
+          "required": true
+        }
+      ],
+      "category_id": "07",
+      "handling_rules": [
+        "Không yêu cầu người dùng gửi mật khẩu, mã OTP hoặc mã khôi phục",
+        "Không hướng dẫn vượt cơ chế xác thực hoặc truy cập tài khoản không thuộc quyền người dùng",
+        "Phân biệt lỗi tài khoản với lỗi kết nối mạng hoặc lỗi dịch vụ ứng dụng",
+        "Chỉ hướng dẫn khôi phục qua kênh chính thức"
+      ],
+      "question_variants": [
+        "Không đăng nhập được ứng dụng robot",
+        "Ứng dụng báo sai mật khẩu",
+        "Không vào được tài khoản đang dùng",
+        "Đăng nhập ứng dụng bị lỗi"
+      ],
+      "evidence_policy": {
+        "rule": "Quy trình đăng nhập và khôi phục tài khoản phải dựa trên hướng dẫn chính thức của ứng dụng; không yêu cầu hoặc lưu giữ thông tin xác thực bí mật",
+        "source_priority": [
+          "Hướng dẫn chính thức của ứng dụng",
+          "Thông báo lỗi đang hiển thị",
+          "Thông tin phiên bản ứng dụng và hệ điều hành",
+          "Không suy đoán khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Không đăng nhập được ứng dụng",
+      "routing": {
+        "message": "Hãy cung cấp tên ứng dụng và nội dung thông báo lỗi, nhưng không gửi mật khẩu, mã OTP hoặc đường dẫn khôi phục có chứa thông tin riêng tư.",
+        "type": "self_help"
+      },
+      "test_cases": [
+        {
+          "case_id": "07.04.T01",
+          "pass_criteria": [
+            "Nhận diện đúng lỗi đăng nhập",
+            "Hướng dẫn kiểm tra tài khoản và mạng theo thứ tự hợp lý",
+            "Không yêu cầu mật khẩu"
+          ],
+          "input": "Ứng dụng báo email hoặc mật khẩu không đúng",
+          "expected": "Hướng dẫn kiểm tra phương thức đăng nhập, thông tin tài khoản và sử dụng chức năng khôi phục chính thức nếu cần; không yêu cầu người dùng gửi mật khẩu."
+        },
+        {
+          "case_id": "07.04.T02",
+          "pass_criteria": [
+            "Không yêu cầu mã OTP hoặc mã khôi phục",
+            "Không hướng dẫn vượt xác thực",
+            "Chỉ sử dụng quy trình chính thức"
+          ],
+          "input": "Tôi đăng nhập được trên điện thoại cũ nhưng không vào được trên điện thoại mới",
+          "expected": "Kiểm tra ứng dụng, phương thức đăng nhập và yêu cầu xác minh trên thiết bị mới; hướng dẫn theo quy trình chính thức, không đề nghị chia sẻ mã xác minh."
+        },
+        {
+          "case_id": "07.04.T03",
+          "pass_criteria": [
+            "Phân biệt lỗi tài khoản với lỗi dịch vụ",
+            "Không khẳng định máy chủ đang lỗi nếu chưa có căn cứ",
+            "Đề xuất kênh hỗ trợ phù hợp"
+          ],
+          "input": "Tôi nhập đúng thông tin nhưng ứng dụng liên tục báo lỗi máy chủ",
+          "expected": "Đề nghị kiểm tra kết nối, cập nhật ứng dụng và thử lại theo hướng dẫn chính thức; nếu lỗi tiếp tục, ghi nhận thông báo và liên hệ hỗ trợ ứng dụng."
+        }
+      ],
+      "context_required": [
+        "Tên ứng dụng",
+        "Nội dung thông báo lỗi",
+        "Phương thức đăng nhập",
+        "Phiên bản ứng dụng nếu biết",
+        "Điện thoại mới hay cũ",
+        "Các bước đã thử"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Người dùng chỉ không kết nối được robot sau khi đã đăng nhập thành công",
+          "Người dùng yêu cầu truy cập tài khoản của người khác hoặc vượt cơ chế xác thực"
+        ],
+        "signals": [
+          "Lỗi đăng nhập",
+          "Sai mật khẩu",
+          "Không vào được tài khoản",
+          "Ứng dụng không cho đăng nhập"
+        ]
+      },
+      "answer_strategy": "Xác định thông báo lỗi và phương thức đăng nhập; hướng dẫn kiểm tra mạng, ứng dụng và khôi phục tài khoản qua kênh chính thức. Không thu thập thông tin xác thực bí mật.",
+      "scenario": "Không đăng nhập được ứng dụng",
+      "status": "approved",
+      "scenario_id": "07.04",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "07.05",
+      "intent": "Mã xác minh",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Bạn đang chờ mã qua email hay SMS, và ứng dụng có hiển thị thông báo hoặc thời gian chờ nào không?",
+          "required": true
+        }
+      ],
+      "category_id": "07",
+      "handling_rules": [
+        "Không yêu cầu người dùng cung cấp mã xác minh cho trợ lý hoặc người hỗ trợ",
+        "Không khẳng định nguyên nhân lỗi hệ thống khi chưa có thông báo xác thực",
+        "Không khuyến khích gửi yêu cầu mã liên tục vượt giới hạn của ứng dụng",
+        "Không yêu cầu người dùng chia sẻ toàn bộ email hoặc số điện thoại nếu không cần thiết"
+      ],
+      "question_variants": [
+        "Không nhận được mã xác minh tài khoản",
+        "Ứng dụng không gửi mã OTP",
+        "Mã xác minh không đến email",
+        "Không nhận được SMS để đăng nhập"
+      ],
+      "evidence_policy": {
+        "rule": "Hướng dẫn nhận và sử dụng mã xác minh phải theo quy trình chính thức của ứng dụng; mã xác minh là thông tin bí mật và không được yêu cầu người dùng cung cấp",
+        "source_priority": [
+          "Hướng dẫn chính thức của ứng dụng",
+          "Thông báo lỗi và giới hạn gửi mã hiển thị",
+          "Kiểm tra hộp thư, tin nhắn và kết nối liên quan",
+          "Không suy đoán khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Không nhận được mã xác minh tài khoản",
+      "routing": {
+        "message": "Hãy cho biết mã được gửi qua email hay SMS và thông báo ứng dụng đang hiển thị. Không gửi mã xác minh cho bất kỳ ai.",
+        "type": "self_help"
+      },
+      "test_cases": [
+        {
+          "case_id": "07.05.T01",
+          "pass_criteria": [
+            "Xác định đúng kênh nhận mã",
+            "Đưa ra bước kiểm tra phù hợp",
+            "Không yêu cầu mã OTP"
+          ],
+          "input": "Tôi chọn gửi mã qua email nhưng không thấy thư đến",
+          "expected": "Hướng dẫn kiểm tra địa chỉ nhận đã nhập, thư rác và các thư mục liên quan; chờ theo hướng dẫn ứng dụng trước khi yêu cầu gửi lại."
+        },
+        {
+          "case_id": "07.05.T02",
+          "pass_criteria": [
+            "Hướng dẫn kiểm tra SMS phù hợp",
+            "Không yêu cầu người dùng cung cấp mã",
+            "Không đề nghị gửi mã liên tục"
+          ],
+          "input": "Tôi không nhận được SMS xác minh dù số điện thoại đã nhập đúng",
+          "expected": "Hướng dẫn kiểm tra sóng di động, khả năng nhận SMS và giới hạn gửi mã của ứng dụng; nếu vẫn không nhận được, sử dụng kênh hỗ trợ chính thức."
+        },
+        {
+          "case_id": "07.05.T03",
+          "pass_criteria": [
+            "Không thu thập mã xác minh",
+            "Không hướng dẫn vượt xác thực",
+            "Đề xuất xử lý khi đã vượt giới hạn yêu cầu mã"
+          ],
+          "input": "Tôi bấm gửi lại nhiều lần và ứng dụng báo thử lại sau",
+          "expected": "Khuyên dừng yêu cầu mã liên tục và chờ thời gian ứng dụng thông báo; sau đó thực hiện theo hướng dẫn chính thức, không tìm cách vượt giới hạn."
+        }
+      ],
+      "context_required": [
+        "Tên ứng dụng",
+        "Kênh nhận mã: email hoặc SMS",
+        "Thông báo lỗi và thời gian chờ nếu có",
+        "Tình trạng nhận thư hoặc tin nhắn",
+        "Số lần đã yêu cầu gửi mã gần đây"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Người dùng đã đăng nhập thành công và đang hỏi về kết nối robot",
+          "Người dùng yêu cầu trợ lý đọc, nhận hoặc sử dụng mã xác minh thay mình"
+        ],
+        "signals": [
+          "Không nhận được mã xác minh",
+          "Không nhận được OTP",
+          "Ứng dụng không gửi mã",
+          "Mã xác minh không đến email hoặc SMS"
+        ]
+      },
+      "answer_strategy": "Xác định kênh nhận mã, kiểm tra thông tin nhận và các giới hạn hiển thị; hướng dẫn gửi lại theo quy trình chính thức. Không nhận hoặc sử dụng mã xác minh thay người dùng.",
+      "scenario": "Không nhận được mã xác minh tài khoản",
+      "status": "approved",
+      "scenario_id": "07.05",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "07.06",
+      "intent": "Bản đồ không hiển thị",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Bản đồ biến mất sau khi cập nhật ứng dụng, khởi động lại robot, đổi mạng hay sau khi bạn tạo bản đồ mới?",
+          "required": true
+        }
+      ],
+      "category_id": "07",
+      "handling_rules": [
+        "Không hướng dẫn xóa dữ liệu hoặc bản đồ đã lưu khi chưa giải thích hậu quả",
+        "Phân biệt bản đồ không tải lên ứng dụng với bản đồ thực sự đã bị xóa",
+        "Không giả định mọi model đều hỗ trợ lưu hoặc khôi phục bản đồ giống nhau",
+        "Không kết luận lỗi cảm biến hoặc phần cứng chỉ từ việc bản đồ không hiển thị"
+      ],
+      "question_variants": [
+        "Ứng dụng không hiển thị bản đồ",
+        "Bản đồ robot bị mất",
+        "Mở ứng dụng nhưng không thấy sơ đồ nhà",
+        "Sau khi cập nhật ứng dụng bản đồ biến mất"
+      ],
+      "evidence_policy": {
+        "rule": "Khả năng lưu, chọn, đồng bộ và khôi phục bản đồ phụ thuộc model và phiên bản ứng dụng; chỉ hướng dẫn theo tài liệu chính hãng đúng thiết bị",
+        "source_priority": [
+          "Hướng dẫn chính hãng đúng model",
+          "Hướng dẫn chính thức của ứng dụng",
+          "Trạng thái bản đồ và thông báo thực tế",
+          "Không suy đoán khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Ứng dụng không hiển thị bản đồ",
+      "routing": {
+        "message": "Hãy cho biết model, thời điểm bản đồ biến mất và thông báo ứng dụng. Chưa xóa dữ liệu hoặc tạo lại bản đồ nếu chưa xác minh khả năng khôi phục.",
+        "type": "self_help"
+      },
+      "test_cases": [
+        {
+          "case_id": "07.06.T01",
+          "pass_criteria": [
+            "Hỏi thời điểm và hoàn cảnh bản đồ biến mất",
+            "Không khẳng định bản đồ đã bị xóa",
+            "Không hướng dẫn tạo lại ngay"
+          ],
+          "input": "Tôi mở ứng dụng hôm nay nhưng không thấy bản đồ cũ",
+          "expected": "Hướng dẫn kiểm tra đúng tài khoản, thiết bị và mục chọn bản đồ; xác minh trạng thái kết nối trước khi kết luận bản đồ đã mất."
+        },
+        {
+          "case_id": "07.06.T02",
+          "pass_criteria": [
+            "Cảnh báo hậu quả trước thao tác xóa",
+            "Không tự giả định có chức năng khôi phục",
+            "Yêu cầu model để chọn hướng dẫn"
+          ],
+          "input": "Ứng dụng gợi ý xóa bản đồ để tạo lại, tôi có nên làm không?",
+          "expected": "Giải thích thao tác xóa có thể làm mất dữ liệu bản đồ đã lưu; khuyên chưa thực hiện cho đến khi kiểm tra tài liệu đúng model và xác định phương án khôi phục nếu được hỗ trợ."
+        },
+        {
+          "case_id": "07.06.T03",
+          "pass_criteria": [
+            "Phân biệt lỗi hiển thị với lỗi lập bản đồ",
+            "Không chẩn đoán phần cứng khi thiếu bằng chứng",
+            "Đưa ra bước xử lý tiếp theo"
+          ],
+          "input": "Robot vẫn chạy dọn nhà nhưng bản đồ không hiển thị trên điện thoại sau khi cập nhật ứng dụng",
+          "expected": "Kiểm tra tài khoản, trạng thái kết nối, phiên bản ứng dụng và mục bản đồ theo hướng dẫn chính thức; nếu tiếp tục lỗi, ghi nhận model và thông báo để chuyển hỗ trợ."
+        }
+      ],
+      "context_required": [
+        "Model robot",
+        "Tên và phiên bản ứng dụng",
+        "Thời điểm bản đồ biến mất",
+        "Tài khoản và thiết bị đang được chọn",
+        "Trạng thái robot khi hoạt động",
+        "Thông báo lỗi"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Người dùng chỉ hỏi cách tạo bản đồ mới lần đầu",
+          "Robot có dấu hiệu nguy hiểm về điện hoặc pin cần dừng thao tác"
+        ],
+        "signals": [
+          "Bản đồ không hiển thị",
+          "Bản đồ bị mất",
+          "Không thấy sơ đồ nhà",
+          "Bản đồ biến mất sau cập nhật"
+        ]
+      },
+      "answer_strategy": "Xác minh tài khoản, thiết bị, kết nối và trạng thái bản đồ trước; cảnh báo rõ ràng trước thao tác xóa hoặc tạo lại. Chỉ hướng dẫn khôi phục khi model và ứng dụng có quy trình được xác minh.",
+      "scenario": "Ứng dụng không hiển thị bản đồ",
+      "status": "approved",
+      "scenario_id": "07.06",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "07.07",
+      "intent": "Điều khiển từ xa",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Robot có hiển thị trực tuyến trong ứng dụng không, và bạn đang muốn sử dụng chức năng điều khiển nào?",
+          "required": true
+        }
+      ],
+      "category_id": "07",
+      "handling_rules": [
+        "Không khẳng định mọi model đều có cùng tính năng điều khiển từ xa",
+        "Phân biệt robot ngoại tuyến với chức năng cụ thể không được hỗ trợ",
+        "Không yêu cầu chia sẻ tài khoản hoặc mật khẩu để hỗ trợ",
+        "Không hướng dẫn thao tác có thể làm mất dữ liệu khi chưa giải thích hậu quả"
+      ],
+      "question_variants": [
+        "Không điều khiển robot từ xa được",
+        "Không thể bấm bắt đầu dọn nhà trong ứng dụng",
+        "Không chọn được khu vực dọn dẹp từ điện thoại",
+        "Ứng dụng có kết nối nhưng không điều khiển được robot"
+      ],
+      "evidence_policy": {
+        "rule": "Tính năng điều khiển từ xa phải được xác minh theo model, ứng dụng và trạng thái kết nối; không suy đoán tính năng chưa được xác nhận",
+        "source_priority": [
+          "Hướng dẫn chính hãng đúng model",
+          "Hướng dẫn chính thức của ứng dụng",
+          "Trạng thái trực tuyến và thông báo thực tế",
+          "Không suy đoán khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Không điều khiển robot từ xa được",
+      "routing": {
+        "message": "Hãy cung cấp model, chức năng muốn điều khiển, trạng thái trực tuyến và thông báo lỗi. Không gửi mật khẩu hoặc mã OTP.",
+        "type": "diagnose_then_route"
+      },
+      "test_cases": [
+        {
+          "case_id": "07.07.T01",
+          "pass_criteria": [
+            "Xác định chức năng cụ thể người dùng muốn sử dụng",
+            "Kiểm tra trạng thái trực tuyến",
+            "Không khẳng định tính năng chưa xác minh"
+          ],
+          "input": "Robot đang online nhưng tôi không tìm thấy nút điều khiển hướng di chuyển",
+          "expected": "Hỏi model và xác định chức năng có được hỗ trợ hay không theo tài liệu chính hãng; không mặc định mọi robot đều có điều khiển hướng thủ công."
+        },
+        {
+          "case_id": "07.07.T02",
+          "pass_criteria": [
+            "Phân biệt lỗi kết nối với lỗi điều khiển",
+            "Không yêu cầu chia sẻ tài khoản",
+            "Đưa ra kiểm tra cơ bản phù hợp"
+          ],
+          "input": "Robot hiển thị online nhưng bấm bắt đầu dọn nhà thì không phản hồi",
+          "expected": "Kiểm tra thông báo trong ứng dụng, trạng thái robot và điều kiện vận hành theo tài liệu model; nếu vẫn không phản hồi, thu thập thông tin để hỗ trợ tiếp."
+        },
+        {
+          "case_id": "07.07.T03",
+          "pass_criteria": [
+            "Không lặp vô hạn thao tác",
+            "Ghi nhận model và các bước đã thử",
+            "Chuyển hỗ trợ khi cần"
+          ],
+          "input": "Tôi đã cập nhật ứng dụng và kiểm tra Wi-Fi nhưng vẫn không điều khiển được",
+          "expected": "Không yêu cầu lặp lại các bước đã hoàn thành; hỏi chức năng cụ thể, thông báo lỗi và trạng thái robot để chọn hướng xử lý tiếp hoặc chuyển kỹ thuật viên."
+        }
+      ],
+      "context_required": [
+        "Model robot",
+        "Tên ứng dụng",
+        "Chức năng muốn điều khiển",
+        "Trạng thái trực tuyến",
+        "Thông báo lỗi",
+        "Các bước đã thử"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Người dùng chỉ hỏi robot có hỗ trợ một tính năng chưa được xác minh mà không gặp lỗi",
+          "Robot có dấu hiệu nguy hiểm về điện hoặc pin cần dừng thao tác"
+        ],
+        "signals": [
+          "Không điều khiển robot từ xa được",
+          "Bấm lệnh nhưng robot không phản hồi",
+          "Không điều khiển được qua ứng dụng",
+          "Không tìm thấy chức năng điều khiển"
+        ]
+      },
+      "answer_strategy": "Xác minh chức năng có được model hỗ trợ, kiểm tra trạng thái kết nối và thông báo ứng dụng; chỉ đưa hướng dẫn cụ thể khi có căn cứ, nếu không thì thu thập thông tin để hỗ trợ tiếp.",
+      "scenario": "Không điều khiển robot từ xa được",
+      "status": "approved",
+      "scenario_id": "07.07",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "07.08",
+      "intent": "Chia sẻ thiết bị",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Bạn không thấy mục chia sẻ thiết bị, không gửi được lời mời hay người nhận không chấp nhận được lời mời?",
+          "required": true
+        }
+      ],
+      "category_id": "07",
+      "handling_rules": [
+        "Không yêu cầu chia sẻ mật khẩu tài khoản chủ",
+        "Không giả định mọi ứng dụng đều hỗ trợ chia sẻ thiết bị hoặc có cùng giới hạn thành viên",
+        "Phân biệt lời mời chia sẻ thiết bị với việc đăng nhập chung một tài khoản",
+        "Không hướng dẫn chuyển quyền sở hữu hoặc xóa thiết bị khi chưa giải thích hậu quả"
+      ],
+      "question_variants": [
+        "Không chia sẻ robot cho thành viên gia đình",
+        "Muốn cho vợ hoặc chồng điều khiển robot bằng điện thoại riêng",
+        "Không thấy chức năng chia sẻ thiết bị",
+        "Đã gửi lời mời nhưng người nhà không nhận được"
+      ],
+      "evidence_policy": {
+        "rule": "Quyền chia sẻ, vai trò tài khoản và số lượng thành viên phụ thuộc ứng dụng, model và chính sách hiện hành; hướng dẫn theo nguồn chính thức",
+        "source_priority": [
+          "Hướng dẫn chính thức của ứng dụng",
+          "Hướng dẫn chính hãng đúng model",
+          "Thông báo lời mời và trạng thái tài khoản",
+          "Không suy đoán khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Không chia sẻ robot cho thành viên gia đình",
+      "routing": {
+        "message": "Hãy cung cấp tên ứng dụng, model và lỗi xuất hiện ở bước chia sẻ nào. Không gửi mật khẩu hoặc mã OTP của bất kỳ tài khoản nào.",
+        "type": "self_help"
+      },
+      "test_cases": [
+        {
+          "case_id": "07.08.T01",
+          "pass_criteria": [
+            "Xác định bước chia sẻ đang gặp lỗi",
+            "Hướng dẫn theo chức năng chính thức của ứng dụng",
+            "Không yêu cầu dùng chung mật khẩu"
+          ],
+          "input": "Tôi muốn cho người nhà điều khiển robot bằng điện thoại riêng",
+          "expected": "Kiểm tra ứng dụng có hỗ trợ chia sẻ thiết bị hay không và hướng dẫn dùng chức năng chính thức nếu có; không khuyến khích chia sẻ mật khẩu tài khoản chủ."
+        },
+        {
+          "case_id": "07.08.T02",
+          "pass_criteria": [
+            "Phân biệt không có chức năng chia sẻ với lỗi gửi lời mời",
+            "Không giả định mọi model đều hỗ trợ",
+            "Đề nghị xác minh đúng ứng dụng"
+          ],
+          "input": "Tôi tìm khắp ứng dụng nhưng không thấy mục chia sẻ robot",
+          "expected": "Hỏi tên ứng dụng và model, sau đó kiểm tra hướng dẫn chính thức để xác định tính năng có được hỗ trợ và vị trí chức năng nếu có."
+        },
+        {
+          "case_id": "07.08.T03",
+          "pass_criteria": [
+            "Kiểm tra trạng thái lời mời và tài khoản nhận",
+            "Không yêu cầu mã xác minh hoặc mật khẩu",
+            "Không chuyển quyền sở hữu khi chưa xác minh"
+          ],
+          "input": "Tôi đã gửi lời mời nhưng người nhà không thấy thông báo",
+          "expected": "Hướng dẫn kiểm tra tài khoản nhận, trạng thái lời mời và thông báo trong ứng dụng theo quy trình chính thức; không yêu cầu chia sẻ thông tin đăng nhập."
+        }
+      ],
+      "context_required": [
+        "Model robot",
+        "Tên ứng dụng",
+        "Tài khoản chủ và loại tài khoản nhận ở mức thông tin cần thiết",
+        "Bước chia sẻ đang gặp lỗi",
+        "Trạng thái lời mời",
+        "Thông báo ứng dụng"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Người dùng muốn khôi phục tài khoản nhưng không liên quan chia sẻ thiết bị",
+          "Người dùng yêu cầu truy cập tài khoản hoặc thiết bị không được phép"
+        ],
+        "signals": [
+          "Chia sẻ thiết bị",
+          "Chia sẻ robot cho gia đình",
+          "Không thấy mục chia sẻ",
+          "Lời mời chia sẻ không hoạt động"
+        ]
+      },
+      "answer_strategy": "Xác minh ứng dụng có hỗ trợ chia sẻ, xác định lỗi ở bước nào và hướng dẫn dùng chức năng chính thức. Không thay thế quy trình chia sẻ bằng việc trao đổi mật khẩu.",
+      "scenario": "Không chia sẻ robot cho thành viên gia đình",
+      "status": "approved",
+      "scenario_id": "07.08",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "07.09",
+      "intent": "Trạng thái ngoại tuyến",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Khi ứng dụng báo ngoại tuyến, robot vẫn chạy theo lịch hoặc bấm nút trên máy vẫn hoạt động bình thường không?",
+          "required": true
+        }
+      ],
+      "category_id": "07",
+      "handling_rules": [
+        "Không suy luận lỗi bo mạch hoặc phần cứng chỉ dựa trên trạng thái ngoại tuyến",
+        "Phân biệt robot không có kết nối với việc robot không thể hoạt động",
+        "Không hướng dẫn tháo máy khi robot vẫn hoạt động bình thường và chưa có dấu hiệu nguy hiểm",
+        "Không yêu cầu thông tin đăng nhập bí mật"
+      ],
+      "question_variants": [
+        "Ứng dụng báo robot ngoại tuyến dù robot vẫn chạy",
+        "Robot vẫn dọn nhà nhưng không điều khiển được qua điện thoại",
+        "Ứng dụng báo offline",
+        "Robot biến mất khỏi trạng thái trực tuyến"
+      ],
+      "evidence_policy": {
+        "rule": "Đánh giá trạng thái kết nối dựa trên ứng dụng, router và biểu hiện thực tế; không kết luận lỗi phần cứng khi chưa có bằng chứng",
+        "source_priority": [
+          "Hướng dẫn chính hãng đúng model",
+          "Hướng dẫn chính thức của ứng dụng",
+          "Trạng thái robot, router và thông báo thực tế",
+          "Không suy đoán khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Ứng dụng báo robot ngoại tuyến dù robot vẫn chạy",
+      "routing": {
+        "message": "Hãy cung cấp model, trạng thái robot khi báo offline, thông báo ứng dụng và các bước đã thử. Không gửi mật khẩu hoặc mã OTP.",
+        "type": "diagnose_then_route"
+      },
+      "test_cases": [
+        {
+          "case_id": "07.09.T01",
+          "pass_criteria": [
+            "Phân biệt trạng thái offline với robot ngừng hoạt động",
+            "Không kết luận hỏng phần cứng",
+            "Hướng dẫn kiểm tra kết nối cơ bản"
+          ],
+          "input": "Ứng dụng báo offline nhưng robot vẫn chạy lịch dọn nhà",
+          "expected": "Xác nhận robot còn thực hiện lịch hay không; hướng dẫn kiểm tra trạng thái Wi-Fi, router và ứng dụng mà không kết luận robot bị hỏng."
+        },
+        {
+          "case_id": "07.09.T02",
+          "pass_criteria": [
+            "Xác định robot có phản hồi với nút điều khiển trên máy hay không",
+            "Không yêu cầu tháo máy",
+            "Đưa ra hướng xử lý phù hợp với triệu chứng"
+          ],
+          "input": "Robot báo offline và tôi cũng không điều khiển được qua ứng dụng, nhưng bấm nút trên máy vẫn chạy",
+          "expected": "Ưu tiên kiểm tra mạng, trạng thái ghép nối và ứng dụng; nếu vẫn lỗi, thu thập model và thông báo để hỗ trợ tiếp, không yêu cầu tháo máy."
+        },
+        {
+          "case_id": "07.09.T03",
+          "pass_criteria": [
+            "Không lặp lại bước đã thử mà không có lý do",
+            "Ghi nhận các thông tin phân biệt lỗi mạng và lỗi ứng dụng",
+            "Chuyển hỗ trợ khi cần"
+          ],
+          "input": "Tôi đã khởi động lại router và mở lại ứng dụng nhưng robot vẫn hiện offline",
+          "expected": "Hỏi model, thời điểm phát sinh và trạng thái đèn hoặc thông báo trên robot; đề xuất bước kiểm tra tiếp theo theo tài liệu đúng model hoặc chuyển hỗ trợ nếu chưa xác định được."
+        }
+      ],
+      "context_required": [
+        "Model robot",
+        "Tên ứng dụng",
+        "Trạng thái chạy lịch hoặc nút điều khiển trên máy",
+        "Trạng thái router và Wi-Fi",
+        "Thông báo ứng dụng",
+        "Các bước đã thử"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Robot có dấu hiệu điện hoặc pin nguy hiểm cần dừng thao tác",
+          "Người dùng chỉ hỏi về lỗi đăng nhập tài khoản"
+        ],
+        "signals": [
+          "Trạng thái ngoại tuyến",
+          "Ứng dụng báo offline",
+          "Robot vẫn chạy nhưng ứng dụng mất kết nối",
+          "Không điều khiển được khi robot ngoại tuyến"
+        ]
+      },
+      "answer_strategy": "Xác định robot còn hoạt động hay không, kiểm tra mạng và ứng dụng, sau đó phân biệt lỗi kết nối với lỗi vận hành. Không kết luận lỗi phần cứng chỉ từ nhãn offline.",
+      "scenario": "Ứng dụng báo robot ngoại tuyến dù robot vẫn chạy",
+      "status": "approved",
+      "scenario_id": "07.09",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "07.10",
+      "intent": "Đổi điện thoại hoặc router",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Bạn đổi điện thoại, đổi router hay chỉ đổi tên hoặc mật khẩu Wi-Fi? Điện thoại cũ còn đăng nhập được vào ứng dụng không?",
+          "required": true
+        }
+      ],
+      "category_id": "07",
+      "handling_rules": [
+        "Phân biệt chuyển ứng dụng sang điện thoại mới với cấu hình lại mạng Wi-Fi",
+        "Không yêu cầu tạo tài khoản mới nếu chưa xác định tài khoản cũ có thể sử dụng",
+        "Cảnh báo trước thao tác có thể xóa cấu hình, thiết bị ghép nối hoặc bản đồ đã lưu",
+        "Không yêu cầu người dùng gửi mật khẩu Wi-Fi, mật khẩu tài khoản hoặc mã OTP",
+        "Không áp dụng một quy trình chung cho tất cả hãng và model"
+      ],
+      "question_variants": [
+        "Sau đổi điện thoại cần kết nối robot lại thế nào?",
+        "Đổi router nên robot không kết nối được",
+        "Đổi tên hoặc mật khẩu Wi-Fi khiến robot offline",
+        "Tôi mua điện thoại mới và không thấy robot trong ứng dụng"
+      ],
+      "evidence_policy": {
+        "rule": "Quy trình đăng nhập trên điện thoại mới và thay đổi mạng phải theo tài liệu chính hãng đúng model và hướng dẫn chính thức của ứng dụng; cảnh báo hậu quả trước khi đặt lại cấu hình",
+        "source_priority": [
+          "Hướng dẫn chính hãng đúng model",
+          "Hướng dẫn chính thức của ứng dụng",
+          "Thông tin thay đổi thiết bị hoặc mạng người dùng cung cấp",
+          "Không suy đoán khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Sau đổi điện thoại hoặc router cần kết nối lại thế nào?",
+      "routing": {
+        "message": "Hãy cho biết bạn đổi điện thoại hay router, model robot, tên ứng dụng và lỗi hiện tại. Không gửi mật khẩu hoặc mã OTP; chưa đặt lại robot nếu chưa rõ hậu quả.",
+        "type": "self_help"
+      },
+      "test_cases": [
+        {
+          "case_id": "07.10.T01",
+          "pass_criteria": [
+            "Phân biệt đổi điện thoại với đổi mạng",
+            "Không yêu cầu tạo tài khoản mới ngay",
+            "Hướng dẫn dùng tài khoản hiện có khi phù hợp"
+          ],
+          "input": "Tôi đổi điện thoại mới nhưng robot vẫn đang liên kết với tài khoản cũ",
+          "expected": "Hướng dẫn cài ứng dụng chính thức và đăng nhập tài khoản hiện có theo quy trình xác minh; sau đó kiểm tra thiết bị có xuất hiện hay không, không yêu cầu xóa robot khỏi tài khoản ngay."
+        },
+        {
+          "case_id": "07.10.T02",
+          "pass_criteria": [
+            "Nhận diện việc thay đổi cấu hình Wi-Fi",
+            "Không yêu cầu người dùng cung cấp mật khẩu",
+            "Chỉ hướng dẫn cấu hình lại theo model"
+          ],
+          "input": "Tôi thay router và đổi tên Wi-Fi, từ đó robot không kết nối được",
+          "expected": "Xác minh model và hướng dẫn cấu hình lại mạng theo tài liệu chính hãng; không giả định robot tự chuyển sang mạng mới và không yêu cầu người dùng gửi mật khẩu."
+        },
+        {
+          "case_id": "07.10.T03",
+          "pass_criteria": [
+            "Cảnh báo hậu quả của thao tác đặt lại",
+            "Không hướng dẫn xóa dữ liệu hoặc bản đồ ngay",
+            "Đề xuất cách xác minh trước khi thao tác"
+          ],
+          "input": "Tôi định khôi phục cài đặt gốc vì robot không kết nối được với router mới",
+          "expected": "Giải thích rằng khôi phục cài đặt có thể xóa cấu hình hoặc dữ liệu tùy model; khuyên kiểm tra quy trình chuyển mạng đúng model trước khi quyết định đặt lại."
+        }
+      ],
+      "context_required": [
+        "Model robot",
+        "Tên ứng dụng",
+        "Loại thay đổi: điện thoại, router, tên mạng hoặc mật khẩu Wi-Fi",
+        "Trạng thái tài khoản hiện có",
+        "Trạng thái kết nối hiện tại",
+        "Thông báo lỗi",
+        "Các bước đã thử"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Người dùng chỉ gặp lỗi đăng nhập không liên quan đến đổi điện thoại hoặc mạng",
+          "Người dùng chỉ hỏi cách chia sẻ robot cho thành viên gia đình"
+        ],
+        "signals": [
+          "Đổi điện thoại",
+          "Đổi router",
+          "Đổi tên Wi-Fi",
+          "Đổi mật khẩu Wi-Fi",
+          "Kết nối lại robot sau khi đổi mạng"
+        ]
+      },
+      "answer_strategy": "Xác định chính xác thay đổi vừa thực hiện, giữ nguyên tài khoản khi có thể và chọn quy trình tương ứng theo model. Cảnh báo trước thao tác có thể xóa cấu hình hoặc bản đồ; không yêu cầu thông tin đăng nhập bí mật.",
+      "scenario": "Sau đổi điện thoại hoặc router cần kết nối lại thế nào?",
+      "status": "approved",
+      "scenario_id": "07.10",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    }
+  ]
+}

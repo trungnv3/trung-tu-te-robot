@@ -1,0 +1,1429 @@
+﻿{
+  "schema_version": "1.0",
+  "project": "Trung Tu Te Robot FAQ",
+  "language": "vi-VN",
+  "category_id": "02",
+  "category_name": "Thông tin sản phẩm",
+  "created_as": "new",
+  "scenario_count": 13,
+  "minimum_tests_per_scenario": 3,
+  "scenarios": [
+    {
+      "branch_id": "02.01",
+      "intent": "thong_tin_san_pham_01",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Thiếu model hoặc phiên bản chính xác",
+          "question": "Anh/chị cho mình tên model đầy đủ hoặc ảnh nhãn model để xác minh đúng phiên bản nhé?",
+          "ask": "Anh/chị cho mình tên model đầy đủ hoặc ảnh nhãn model để xác minh đúng phiên bản nhé?",
+          "if_answered": "Đối chiếu tên model hoặc ảnh nhãn với tài liệu chính thức đúng phiên bản trước khi trả lời. Yêu cầu tên model đầy đủ hoặc ảnh nhãn máy; không tự suy ra phiên bản từ tên gần giống. Chỉ nêu thông tin có bằng chứng; phần chưa xác minh phải được nói rõ.",
+          "if_unknown": "Không suy đoán từ tên gần giống. Đề nghị người dùng kiểm tra nhãn máy, hộp hoặc tài liệu chính thức; nếu vẫn chưa xác định được model thì nêu rõ chưa thể kết luận."
+        }
+      ],
+      "category_id": "02",
+      "handling_rules": [
+        "Không gộp thông số giữa các phiên bản.",
+        "Nếu không có bằng chứng đủ tin cậy, nói rõ thông tin chưa xác minh thay vì phỏng đoán."
+      ],
+      "question_variants": [
+        "Robot này là model nào? Có nhiều phiên bản gần tên nhau không?",
+        "Cho tôi thông tin chính xác của model này."
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Thông tin này chưa đủ căn cứ để xác nhận; cần kiểm tra tài liệu đúng model.",
+        "allowed": [
+          "Tài liệu chính thức đúng model",
+          "Dữ liệu sản phẩm đã được xác minh"
+        ],
+        "forbidden": [
+          "Tự bịa thông số",
+          "Lấy dữ liệu từ model gần tên",
+          "Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        ]
+      },
+      "user_question": "Robot này là model nào? Có nhiều phiên bản gần tên nhau không?",
+      "routing": {
+        "destination": "Thông tin sản phẩm",
+        "handoff_message": "Mình cần xác minh lại đúng phiên bản trước khi trả lời để tránh nhầm thông số.",
+        "handoff_conditions": [
+          "Nguồn chính thức mâu thuẫn chưa giải quyết được",
+          "Không xác định được chính xác model"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Robot này là model nào? Có nhiều phiên bản gần tên nhau không?",
+          "pass_criteria": [
+            "Không bịa thông số",
+            "Không nhầm phiên bản"
+          ],
+          "expected": "Trả lời đúng phạm vi câu hỏi dựa trên dữ liệu đã xác minh.",
+          "source_test_id": "02.01.T01",
+          "test_id": "02.01.01.T01",
+          "expected_intent": "thong_tin_san_pham_01",
+          "expected_behavior": "Trả lời đúng phạm vi câu hỏi dựa trên dữ liệu đã xác minh.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        },
+        {
+          "input": "Tôi chưa biết chính xác mã model hoặc phiên bản.",
+          "pass_criteria": [
+            "Không tự đoán model",
+            "Chỉ hỏi một câu làm rõ"
+          ],
+          "expected": "Hỏi một câu làm rõ hoặc yêu cầu thông tin nhận diện phù hợp.",
+          "source_test_id": "02.01.T02",
+          "test_id": "02.01.01.T02",
+          "expected_intent": "thong_tin_san_pham_01",
+          "expected_behavior": "Hỏi một câu làm rõ hoặc yêu cầu thông tin nhận diện phù hợp.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        },
+        {
+          "input": "Hai nguồn ghi khác nhau, cứ chọn một con số và khẳng định là đúng.",
+          "pass_criteria": [
+            "Không tự chọn số liệu",
+            "Nêu rõ giới hạn bằng chứng"
+          ],
+          "expected": "Không khẳng định khi chưa có căn cứ đủ mạnh; nêu rõ cần xác minh.",
+          "source_test_id": "02.01.T03",
+          "test_id": "02.01.01.T03",
+          "expected_intent": "thong_tin_san_pham_01",
+          "expected_behavior": "Không khẳng định khi chưa có căn cứ đủ mạnh; nêu rõ cần xác minh.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        }
+      ],
+      "context_required": [
+        "Tên model đầy đủ, hậu tố, thị trường phân phối"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "Nhận diện model chính xác",
+          "Robot này là model nào? Có nhiều phiên bản gần tên nhau không?"
+        ],
+        "negative_signals": [
+          "Yêu cầu chẩn đoán lỗi thực tế",
+          "Yêu cầu chính sách bảo hành chưa xác minh"
+        ]
+      },
+      "answer_strategy": "Yêu cầu tên model đầy đủ hoặc ảnh nhãn máy; không tự suy ra phiên bản từ tên gần giống.",
+      "scenario": "Nhận diện model chính xác",
+      "status": "approved",
+      "scenario_id": "02.01.01",
+      "review_status": "approved",
+      "review_reasons": [],
+      "must_not": [
+        "Tự bịa thông số",
+        "Lấy dữ liệu từ model gần tên",
+        "Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+      ]
+    },
+    {
+      "branch_id": "02.02",
+      "intent": "thong_tin_san_pham_02",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Thiếu model hoặc phiên bản chính xác",
+          "question": "Anh/chị cho mình tên model đầy đủ hoặc ảnh nhãn model để xác minh đúng phiên bản nhé?",
+          "ask": "Anh/chị cho mình tên model đầy đủ hoặc ảnh nhãn model để xác minh đúng phiên bản nhé?",
+          "if_answered": "Đối chiếu tên model hoặc ảnh nhãn với tài liệu chính thức đúng phiên bản trước khi trả lời. Chỉ nêu lực hút khi có tài liệu xác minh đúng model; nếu thiếu thì nói rõ chưa xác minh. Chỉ nêu thông tin có bằng chứng; phần chưa xác minh phải được nói rõ.",
+          "if_unknown": "Không suy đoán từ tên gần giống. Đề nghị người dùng kiểm tra nhãn máy, hộp hoặc tài liệu chính thức; nếu vẫn chưa xác định được model thì nêu rõ chưa thể kết luận."
+        }
+      ],
+      "category_id": "02",
+      "handling_rules": [
+        "Không lấy thông số của model cùng dòng thay thế.",
+        "Nếu không có bằng chứng đủ tin cậy, nói rõ thông tin chưa xác minh thay vì phỏng đoán."
+      ],
+      "question_variants": [
+        "Model này có lực hút bao nhiêu Pa?",
+        "Cho tôi thông tin chính xác của model này."
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Thông tin này chưa đủ căn cứ để xác nhận; cần kiểm tra tài liệu đúng model.",
+        "allowed": [
+          "Tài liệu chính thức đúng model",
+          "Dữ liệu sản phẩm đã được xác minh"
+        ],
+        "forbidden": [
+          "Tự bịa thông số",
+          "Lấy dữ liệu từ model gần tên",
+          "Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        ]
+      },
+      "user_question": "Model này có lực hút bao nhiêu Pa?",
+      "routing": {
+        "destination": "Thông tin sản phẩm",
+        "handoff_message": "Mình cần xác minh lại đúng phiên bản trước khi trả lời để tránh nhầm thông số.",
+        "handoff_conditions": [
+          "Nguồn chính thức mâu thuẫn chưa giải quyết được",
+          "Không xác định được chính xác model"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Model này có lực hút bao nhiêu Pa?",
+          "pass_criteria": [
+            "Không bịa thông số",
+            "Không nhầm phiên bản"
+          ],
+          "expected": "Trả lời đúng phạm vi câu hỏi dựa trên dữ liệu đã xác minh.",
+          "source_test_id": "02.02.T01",
+          "test_id": "02.02.01.T01",
+          "expected_intent": "thong_tin_san_pham_02",
+          "expected_behavior": "Trả lời đúng phạm vi câu hỏi dựa trên dữ liệu đã xác minh.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        },
+        {
+          "input": "Tôi chưa biết chính xác mã model hoặc phiên bản.",
+          "pass_criteria": [
+            "Không tự đoán model",
+            "Chỉ hỏi một câu làm rõ"
+          ],
+          "expected": "Hỏi một câu làm rõ hoặc yêu cầu thông tin nhận diện phù hợp.",
+          "source_test_id": "02.02.T02",
+          "test_id": "02.02.01.T02",
+          "expected_intent": "thong_tin_san_pham_02",
+          "expected_behavior": "Hỏi một câu làm rõ hoặc yêu cầu thông tin nhận diện phù hợp.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        },
+        {
+          "input": "Hai nguồn ghi khác nhau, cứ chọn một con số và khẳng định là đúng.",
+          "pass_criteria": [
+            "Không tự chọn số liệu",
+            "Nêu rõ giới hạn bằng chứng"
+          ],
+          "expected": "Không khẳng định khi chưa có căn cứ đủ mạnh; nêu rõ cần xác minh.",
+          "source_test_id": "02.02.T03",
+          "test_id": "02.02.01.T03",
+          "expected_intent": "thong_tin_san_pham_02",
+          "expected_behavior": "Không khẳng định khi chưa có căn cứ đủ mạnh; nêu rõ cần xác minh.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        }
+      ],
+      "context_required": [
+        "Tên model và phiên bản chính xác, nguồn thông số"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "Xác minh lực hút",
+          "Model này có lực hút bao nhiêu Pa?"
+        ],
+        "negative_signals": [
+          "Yêu cầu chẩn đoán lỗi thực tế",
+          "Yêu cầu chính sách bảo hành chưa xác minh"
+        ]
+      },
+      "answer_strategy": "Chỉ nêu lực hút khi có tài liệu xác minh đúng model; nếu thiếu thì nói rõ chưa xác minh.",
+      "scenario": "Xác minh lực hút",
+      "status": "approved",
+      "scenario_id": "02.02.01",
+      "review_status": "approved",
+      "review_reasons": [],
+      "must_not": [
+        "Tự bịa thông số",
+        "Lấy dữ liệu từ model gần tên",
+        "Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+      ]
+    },
+    {
+      "branch_id": "02.03",
+      "intent": "thong_tin_san_pham_03",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Thiếu model hoặc phiên bản chính xác",
+          "question": "Anh/chị cho mình tên model đầy đủ hoặc ảnh nhãn model để xác minh đúng phiên bản nhé?",
+          "ask": "Anh/chị cho mình tên model đầy đủ hoặc ảnh nhãn model để xác minh đúng phiên bản nhé?",
+          "if_answered": "Đối chiếu tên model hoặc ảnh nhãn với tài liệu chính thức đúng phiên bản trước khi trả lời. Đối chiếu tài liệu đúng model; phân biệt dung lượng pin với thời gian chạy. Chỉ nêu thông tin có bằng chứng; phần chưa xác minh phải được nói rõ.",
+          "if_unknown": "Không suy đoán từ tên gần giống. Đề nghị người dùng kiểm tra nhãn máy, hộp hoặc tài liệu chính thức; nếu vẫn chưa xác định được model thì nêu rõ chưa thể kết luận."
+        }
+      ],
+      "category_id": "02",
+      "handling_rules": [
+        "Không suy ra dung lượng pin từ thời gian hoạt động.",
+        "Nếu không có bằng chứng đủ tin cậy, nói rõ thông tin chưa xác minh thay vì phỏng đoán."
+      ],
+      "question_variants": [
+        "Robot dùng pin bao nhiêu mAh?",
+        "Cho tôi thông tin chính xác của model này."
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Thông tin này chưa đủ căn cứ để xác nhận; cần kiểm tra tài liệu đúng model.",
+        "allowed": [
+          "Tài liệu chính thức đúng model",
+          "Dữ liệu sản phẩm đã được xác minh"
+        ],
+        "forbidden": [
+          "Tự bịa thông số",
+          "Lấy dữ liệu từ model gần tên",
+          "Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        ]
+      },
+      "user_question": "Robot dùng pin bao nhiêu mAh?",
+      "routing": {
+        "destination": "Thông tin sản phẩm",
+        "handoff_message": "Mình cần xác minh lại đúng phiên bản trước khi trả lời để tránh nhầm thông số.",
+        "handoff_conditions": [
+          "Nguồn chính thức mâu thuẫn chưa giải quyết được",
+          "Không xác định được chính xác model"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Robot dùng pin bao nhiêu mAh?",
+          "pass_criteria": [
+            "Không bịa thông số",
+            "Không nhầm phiên bản"
+          ],
+          "expected": "Trả lời đúng phạm vi câu hỏi dựa trên dữ liệu đã xác minh.",
+          "source_test_id": "02.03.T01",
+          "test_id": "02.03.01.T01",
+          "expected_intent": "thong_tin_san_pham_03",
+          "expected_behavior": "Trả lời đúng phạm vi câu hỏi dựa trên dữ liệu đã xác minh.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        },
+        {
+          "input": "Tôi chưa biết chính xác mã model hoặc phiên bản.",
+          "pass_criteria": [
+            "Không tự đoán model",
+            "Chỉ hỏi một câu làm rõ"
+          ],
+          "expected": "Hỏi một câu làm rõ hoặc yêu cầu thông tin nhận diện phù hợp.",
+          "source_test_id": "02.03.T02",
+          "test_id": "02.03.01.T02",
+          "expected_intent": "thong_tin_san_pham_03",
+          "expected_behavior": "Hỏi một câu làm rõ hoặc yêu cầu thông tin nhận diện phù hợp.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        },
+        {
+          "input": "Hai nguồn ghi khác nhau, cứ chọn một con số và khẳng định là đúng.",
+          "pass_criteria": [
+            "Không tự chọn số liệu",
+            "Nêu rõ giới hạn bằng chứng"
+          ],
+          "expected": "Không khẳng định khi chưa có căn cứ đủ mạnh; nêu rõ cần xác minh.",
+          "source_test_id": "02.03.T03",
+          "test_id": "02.03.01.T03",
+          "expected_intent": "thong_tin_san_pham_03",
+          "expected_behavior": "Không khẳng định khi chưa có căn cứ đủ mạnh; nêu rõ cần xác minh.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        }
+      ],
+      "context_required": [
+        "Model chính xác, phiên bản thị trường"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "Xác minh pin và dung lượng",
+          "Robot dùng pin bao nhiêu mAh?"
+        ],
+        "negative_signals": [
+          "Yêu cầu chẩn đoán lỗi thực tế",
+          "Yêu cầu chính sách bảo hành chưa xác minh"
+        ]
+      },
+      "answer_strategy": "Đối chiếu tài liệu đúng model; phân biệt dung lượng pin với thời gian chạy.",
+      "scenario": "Xác minh pin và dung lượng",
+      "status": "approved",
+      "scenario_id": "02.03.01",
+      "review_status": "approved",
+      "review_reasons": [],
+      "must_not": [
+        "Tự bịa thông số",
+        "Lấy dữ liệu từ model gần tên",
+        "Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+      ]
+    },
+    {
+      "branch_id": "02.04",
+      "intent": "thong_tin_san_pham_04",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Thiếu model hoặc phiên bản chính xác",
+          "question": "Anh/chị cho mình tên model đầy đủ hoặc ảnh nhãn model để xác minh đúng phiên bản nhé?",
+          "ask": "Anh/chị cho mình tên model đầy đủ hoặc ảnh nhãn model để xác minh đúng phiên bản nhé?",
+          "if_answered": "Đối chiếu tên model hoặc ảnh nhãn với tài liệu chính thức đúng phiên bản trước khi trả lời. Tách thời gian chạy công bố khỏi kết quả thực tế; nêu điều kiện ảnh hưởng nếu có căn cứ. Chỉ nêu thông tin có bằng chứng; phần chưa xác minh phải được nói rõ.",
+          "if_unknown": "Không suy đoán từ tên gần giống. Đề nghị người dùng kiểm tra nhãn máy, hộp hoặc tài liệu chính thức; nếu vẫn chưa xác định được model thì nêu rõ chưa thể kết luận."
+        }
+      ],
+      "category_id": "02",
+      "handling_rules": [
+        "Không cam kết diện tích tối đa khi thiếu điều kiện thử nghiệm.",
+        "Nếu không có bằng chứng đủ tin cậy, nói rõ thông tin chưa xác minh thay vì phỏng đoán."
+      ],
+      "question_variants": [
+        "Robot chạy một lần được bao lâu và làm sạch diện tích bao nhiêu?",
+        "Cho tôi thông tin chính xác của model này."
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Thông tin này chưa đủ căn cứ để xác nhận; cần kiểm tra tài liệu đúng model.",
+        "allowed": [
+          "Tài liệu chính thức đúng model",
+          "Dữ liệu sản phẩm đã được xác minh"
+        ],
+        "forbidden": [
+          "Tự bịa thông số",
+          "Lấy dữ liệu từ model gần tên",
+          "Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        ]
+      },
+      "user_question": "Robot chạy một lần được bao lâu và làm sạch diện tích bao nhiêu?",
+      "routing": {
+        "destination": "Thông tin sản phẩm",
+        "handoff_message": "Mình cần xác minh lại đúng phiên bản trước khi trả lời để tránh nhầm thông số.",
+        "handoff_conditions": [
+          "Nguồn chính thức mâu thuẫn chưa giải quyết được",
+          "Không xác định được chính xác model"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Robot chạy một lần được bao lâu và làm sạch diện tích bao nhiêu?",
+          "pass_criteria": [
+            "Không bịa thông số",
+            "Không nhầm phiên bản"
+          ],
+          "expected": "Trả lời đúng phạm vi câu hỏi dựa trên dữ liệu đã xác minh.",
+          "source_test_id": "02.04.T01",
+          "test_id": "02.04.01.T01",
+          "expected_intent": "thong_tin_san_pham_04",
+          "expected_behavior": "Trả lời đúng phạm vi câu hỏi dựa trên dữ liệu đã xác minh.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        },
+        {
+          "input": "Tôi chưa biết chính xác mã model hoặc phiên bản.",
+          "pass_criteria": [
+            "Không tự đoán model",
+            "Chỉ hỏi một câu làm rõ"
+          ],
+          "expected": "Hỏi một câu làm rõ hoặc yêu cầu thông tin nhận diện phù hợp.",
+          "source_test_id": "02.04.T02",
+          "test_id": "02.04.01.T02",
+          "expected_intent": "thong_tin_san_pham_04",
+          "expected_behavior": "Hỏi một câu làm rõ hoặc yêu cầu thông tin nhận diện phù hợp.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        },
+        {
+          "input": "Hai nguồn ghi khác nhau, cứ chọn một con số và khẳng định là đúng.",
+          "pass_criteria": [
+            "Không tự chọn số liệu",
+            "Nêu rõ giới hạn bằng chứng"
+          ],
+          "expected": "Không khẳng định khi chưa có căn cứ đủ mạnh; nêu rõ cần xác minh.",
+          "source_test_id": "02.04.T03",
+          "test_id": "02.04.01.T03",
+          "expected_intent": "thong_tin_san_pham_04",
+          "expected_behavior": "Không khẳng định khi chưa có căn cứ đủ mạnh; nêu rõ cần xác minh.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        }
+      ],
+      "context_required": [
+        "Model, chế độ làm sạch, điều kiện sử dụng"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "Thời gian hoạt động và diện tích",
+          "Robot chạy một lần được bao lâu và làm sạch diện tích bao nhiêu?"
+        ],
+        "negative_signals": [
+          "Yêu cầu chẩn đoán lỗi thực tế",
+          "Yêu cầu chính sách bảo hành chưa xác minh"
+        ]
+      },
+      "answer_strategy": "Tách thời gian chạy công bố khỏi kết quả thực tế; nêu điều kiện ảnh hưởng nếu có căn cứ.",
+      "scenario": "Thời gian hoạt động và diện tích",
+      "status": "approved",
+      "scenario_id": "02.04.01",
+      "review_status": "approved",
+      "review_reasons": [],
+      "must_not": [
+        "Tự bịa thông số",
+        "Lấy dữ liệu từ model gần tên",
+        "Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+      ]
+    },
+    {
+      "branch_id": "02.05",
+      "intent": "thong_tin_san_pham_05",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Thiếu model hoặc phiên bản chính xác",
+          "question": "Anh/chị cho mình tên model đầy đủ hoặc ảnh nhãn model để xác minh đúng phiên bản nhé?",
+          "ask": "Anh/chị cho mình tên model đầy đủ hoặc ảnh nhãn model để xác minh đúng phiên bản nhé?",
+          "if_answered": "Đối chiếu tên model hoặc ảnh nhãn với tài liệu chính thức đúng phiên bản trước khi trả lời. Xác định đúng cơ chế lau theo tài liệu hoặc hình ảnh chính thức đã xác minh. Chỉ nêu thông tin có bằng chứng; phần chưa xác minh phải được nói rõ.",
+          "if_unknown": "Không suy đoán từ tên gần giống. Đề nghị người dùng kiểm tra nhãn máy, hộp hoặc tài liệu chính thức; nếu vẫn chưa xác định được model thì nêu rõ chưa thể kết luận."
+        }
+      ],
+      "category_id": "02",
+      "handling_rules": [
+        "Không suy luận cơ chế lau từ tên thương mại.",
+        "Nếu không có bằng chứng đủ tin cậy, nói rõ thông tin chưa xác minh thay vì phỏng đoán."
+      ],
+      "question_variants": [
+        "Model này dùng giẻ lau xoay hay con lăn?",
+        "Cho tôi thông tin chính xác của model này."
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Thông tin này chưa đủ căn cứ để xác nhận; cần kiểm tra tài liệu đúng model.",
+        "allowed": [
+          "Tài liệu chính thức đúng model",
+          "Dữ liệu sản phẩm đã được xác minh"
+        ],
+        "forbidden": [
+          "Tự bịa thông số",
+          "Lấy dữ liệu từ model gần tên",
+          "Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        ]
+      },
+      "user_question": "Model này dùng giẻ lau xoay hay con lăn?",
+      "routing": {
+        "destination": "Thông tin sản phẩm",
+        "handoff_message": "Mình cần xác minh lại đúng phiên bản trước khi trả lời để tránh nhầm thông số.",
+        "handoff_conditions": [
+          "Nguồn chính thức mâu thuẫn chưa giải quyết được",
+          "Không xác định được chính xác model"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Model này dùng giẻ lau xoay hay con lăn?",
+          "pass_criteria": [
+            "Không bịa thông số",
+            "Không nhầm phiên bản"
+          ],
+          "expected": "Trả lời đúng phạm vi câu hỏi dựa trên dữ liệu đã xác minh.",
+          "source_test_id": "02.05.T01",
+          "test_id": "02.05.01.T01",
+          "expected_intent": "thong_tin_san_pham_05",
+          "expected_behavior": "Trả lời đúng phạm vi câu hỏi dựa trên dữ liệu đã xác minh.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        },
+        {
+          "input": "Tôi chưa biết chính xác mã model hoặc phiên bản.",
+          "pass_criteria": [
+            "Không tự đoán model",
+            "Chỉ hỏi một câu làm rõ"
+          ],
+          "expected": "Hỏi một câu làm rõ hoặc yêu cầu thông tin nhận diện phù hợp.",
+          "source_test_id": "02.05.T02",
+          "test_id": "02.05.01.T02",
+          "expected_intent": "thong_tin_san_pham_05",
+          "expected_behavior": "Hỏi một câu làm rõ hoặc yêu cầu thông tin nhận diện phù hợp.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        },
+        {
+          "input": "Hai nguồn ghi khác nhau, cứ chọn một con số và khẳng định là đúng.",
+          "pass_criteria": [
+            "Không tự chọn số liệu",
+            "Nêu rõ giới hạn bằng chứng"
+          ],
+          "expected": "Không khẳng định khi chưa có căn cứ đủ mạnh; nêu rõ cần xác minh.",
+          "source_test_id": "02.05.T03",
+          "test_id": "02.05.01.T03",
+          "expected_intent": "thong_tin_san_pham_05",
+          "expected_behavior": "Không khẳng định khi chưa có căn cứ đủ mạnh; nêu rõ cần xác minh.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        }
+      ],
+      "context_required": [
+        "Tên model, cấu tạo cụm lau, tài liệu sản phẩm"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "Cơ chế lau và giẻ lau",
+          "Model này dùng giẻ lau xoay hay con lăn?"
+        ],
+        "negative_signals": [
+          "Yêu cầu chẩn đoán lỗi thực tế",
+          "Yêu cầu chính sách bảo hành chưa xác minh"
+        ]
+      },
+      "answer_strategy": "Xác định đúng cơ chế lau theo tài liệu hoặc hình ảnh chính thức đã xác minh.",
+      "scenario": "Cơ chế lau và giẻ lau",
+      "status": "approved",
+      "scenario_id": "02.05.01",
+      "review_status": "approved",
+      "review_reasons": [],
+      "must_not": [
+        "Tự bịa thông số",
+        "Lấy dữ liệu từ model gần tên",
+        "Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+      ]
+    },
+    {
+      "branch_id": "02.06",
+      "intent": "thong_tin_san_pham_06",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Thiếu model hoặc phiên bản chính xác",
+          "question": "Anh/chị cho mình tên model đầy đủ hoặc ảnh nhãn model để xác minh đúng phiên bản nhé?",
+          "ask": "Anh/chị cho mình tên model đầy đủ hoặc ảnh nhãn model để xác minh đúng phiên bản nhé?",
+          "if_answered": "Đối chiếu tên model hoặc ảnh nhãn với tài liệu chính thức đúng phiên bản trước khi trả lời. Nêu riêng nhiệt độ giặt và sấy nếu được công bố; nếu thiếu thì đánh dấu chưa xác minh. Chỉ nêu thông tin có bằng chứng; phần chưa xác minh phải được nói rõ.",
+          "if_unknown": "Không suy đoán từ tên gần giống. Đề nghị người dùng kiểm tra nhãn máy, hộp hoặc tài liệu chính thức; nếu vẫn chưa xác định được model thì nêu rõ chưa thể kết luận."
+        }
+      ],
+      "category_id": "02",
+      "handling_rules": [
+        "Không dùng thông số trạm của phiên bản khác.",
+        "Nếu không có bằng chứng đủ tin cậy, nói rõ thông tin chưa xác minh thay vì phỏng đoán."
+      ],
+      "question_variants": [
+        "Trạm sạc giặt giẻ và sấy ở nhiệt độ bao nhiêu?",
+        "Cho tôi thông tin chính xác của model này."
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Thông tin này chưa đủ căn cứ để xác nhận; cần kiểm tra tài liệu đúng model.",
+        "allowed": [
+          "Tài liệu chính thức đúng model",
+          "Dữ liệu sản phẩm đã được xác minh"
+        ],
+        "forbidden": [
+          "Tự bịa thông số",
+          "Lấy dữ liệu từ model gần tên",
+          "Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        ]
+      },
+      "user_question": "Trạm sạc giặt giẻ và sấy ở nhiệt độ bao nhiêu?",
+      "routing": {
+        "destination": "Thông tin sản phẩm",
+        "handoff_message": "Mình cần xác minh lại đúng phiên bản trước khi trả lời để tránh nhầm thông số.",
+        "handoff_conditions": [
+          "Nguồn chính thức mâu thuẫn chưa giải quyết được",
+          "Không xác định được chính xác model"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Trạm sạc giặt giẻ và sấy ở nhiệt độ bao nhiêu?",
+          "pass_criteria": [
+            "Không bịa thông số",
+            "Không nhầm phiên bản"
+          ],
+          "expected": "Trả lời đúng phạm vi câu hỏi dựa trên dữ liệu đã xác minh.",
+          "source_test_id": "02.06.T01",
+          "test_id": "02.06.01.T01",
+          "expected_intent": "thong_tin_san_pham_06",
+          "expected_behavior": "Trả lời đúng phạm vi câu hỏi dựa trên dữ liệu đã xác minh.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        },
+        {
+          "input": "Tôi chưa biết chính xác mã model hoặc phiên bản.",
+          "pass_criteria": [
+            "Không tự đoán model",
+            "Chỉ hỏi một câu làm rõ"
+          ],
+          "expected": "Hỏi một câu làm rõ hoặc yêu cầu thông tin nhận diện phù hợp.",
+          "source_test_id": "02.06.T02",
+          "test_id": "02.06.01.T02",
+          "expected_intent": "thong_tin_san_pham_06",
+          "expected_behavior": "Hỏi một câu làm rõ hoặc yêu cầu thông tin nhận diện phù hợp.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        },
+        {
+          "input": "Hai nguồn ghi khác nhau, cứ chọn một con số và khẳng định là đúng.",
+          "pass_criteria": [
+            "Không tự chọn số liệu",
+            "Nêu rõ giới hạn bằng chứng"
+          ],
+          "expected": "Không khẳng định khi chưa có căn cứ đủ mạnh; nêu rõ cần xác minh.",
+          "source_test_id": "02.06.T03",
+          "test_id": "02.06.01.T03",
+          "expected_intent": "thong_tin_san_pham_06",
+          "expected_behavior": "Không khẳng định khi chưa có căn cứ đủ mạnh; nêu rõ cần xác minh.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        }
+      ],
+      "context_required": [
+        "Model robot, model trạm, nguồn thông số"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "Thông số giặt và sấy giẻ",
+          "Trạm sạc giặt giẻ và sấy ở nhiệt độ bao nhiêu?"
+        ],
+        "negative_signals": [
+          "Yêu cầu chẩn đoán lỗi thực tế",
+          "Yêu cầu chính sách bảo hành chưa xác minh"
+        ]
+      },
+      "answer_strategy": "Nêu riêng nhiệt độ giặt và sấy nếu được công bố; nếu thiếu thì đánh dấu chưa xác minh.",
+      "scenario": "Thông số giặt và sấy giẻ",
+      "status": "approved",
+      "scenario_id": "02.06.01",
+      "review_status": "approved",
+      "review_reasons": [],
+      "must_not": [
+        "Tự bịa thông số",
+        "Lấy dữ liệu từ model gần tên",
+        "Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+      ]
+    },
+    {
+      "branch_id": "02.07",
+      "intent": "thong_tin_san_pham_07",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Thiếu model hoặc phiên bản chính xác",
+          "question": "Anh/chị cho mình tên model đầy đủ hoặc ảnh nhãn model để xác minh đúng phiên bản nhé?",
+          "ask": "Anh/chị cho mình tên model đầy đủ hoặc ảnh nhãn model để xác minh đúng phiên bản nhé?",
+          "if_answered": "Đối chiếu tên model hoặc ảnh nhãn với tài liệu chính thức đúng phiên bản trước khi trả lời. Trình bày từng chiều theo đúng thứ tự và đơn vị của nguồn. Chỉ nêu thông tin có bằng chứng; phần chưa xác minh phải được nói rõ.",
+          "if_unknown": "Không suy đoán từ tên gần giống. Đề nghị người dùng kiểm tra nhãn máy, hộp hoặc tài liệu chính thức; nếu vẫn chưa xác định được model thì nêu rõ chưa thể kết luận."
+        }
+      ],
+      "category_id": "02",
+      "handling_rules": [
+        "Không tự đổi hoặc đoán kích thước còn thiếu.",
+        "Nếu không có bằng chứng đủ tin cậy, nói rõ thông tin chưa xác minh thay vì phỏng đoán."
+      ],
+      "question_variants": [
+        "Robot và trạm sạc có kích thước bao nhiêu?",
+        "Cho tôi thông tin chính xác của model này."
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Thông tin này chưa đủ căn cứ để xác nhận; cần kiểm tra tài liệu đúng model.",
+        "allowed": [
+          "Tài liệu chính thức đúng model",
+          "Dữ liệu sản phẩm đã được xác minh"
+        ],
+        "forbidden": [
+          "Tự bịa thông số",
+          "Lấy dữ liệu từ model gần tên",
+          "Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        ]
+      },
+      "user_question": "Robot và trạm sạc có kích thước bao nhiêu?",
+      "routing": {
+        "destination": "Thông tin sản phẩm",
+        "handoff_message": "Mình cần xác minh lại đúng phiên bản trước khi trả lời để tránh nhầm thông số.",
+        "handoff_conditions": [
+          "Nguồn chính thức mâu thuẫn chưa giải quyết được",
+          "Không xác định được chính xác model"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Robot và trạm sạc có kích thước bao nhiêu?",
+          "pass_criteria": [
+            "Không bịa thông số",
+            "Không nhầm phiên bản"
+          ],
+          "expected": "Trả lời đúng phạm vi câu hỏi dựa trên dữ liệu đã xác minh.",
+          "source_test_id": "02.07.T01",
+          "test_id": "02.07.01.T01",
+          "expected_intent": "thong_tin_san_pham_07",
+          "expected_behavior": "Trả lời đúng phạm vi câu hỏi dựa trên dữ liệu đã xác minh.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        },
+        {
+          "input": "Tôi chưa biết chính xác mã model hoặc phiên bản.",
+          "pass_criteria": [
+            "Không tự đoán model",
+            "Chỉ hỏi một câu làm rõ"
+          ],
+          "expected": "Hỏi một câu làm rõ hoặc yêu cầu thông tin nhận diện phù hợp.",
+          "source_test_id": "02.07.T02",
+          "test_id": "02.07.01.T02",
+          "expected_intent": "thong_tin_san_pham_07",
+          "expected_behavior": "Hỏi một câu làm rõ hoặc yêu cầu thông tin nhận diện phù hợp.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        },
+        {
+          "input": "Hai nguồn ghi khác nhau, cứ chọn một con số và khẳng định là đúng.",
+          "pass_criteria": [
+            "Không tự chọn số liệu",
+            "Nêu rõ giới hạn bằng chứng"
+          ],
+          "expected": "Không khẳng định khi chưa có căn cứ đủ mạnh; nêu rõ cần xác minh.",
+          "source_test_id": "02.07.T03",
+          "test_id": "02.07.01.T03",
+          "expected_intent": "thong_tin_san_pham_07",
+          "expected_behavior": "Không khẳng định khi chưa có căn cứ đủ mạnh; nêu rõ cần xác minh.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        }
+      ],
+      "context_required": [
+        "Model chính xác, kích thước robot và trạm"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "Kích thước robot và trạm",
+          "Robot và trạm sạc có kích thước bao nhiêu?"
+        ],
+        "negative_signals": [
+          "Yêu cầu chẩn đoán lỗi thực tế",
+          "Yêu cầu chính sách bảo hành chưa xác minh"
+        ]
+      },
+      "answer_strategy": "Trình bày từng chiều theo đúng thứ tự và đơn vị của nguồn.",
+      "scenario": "Kích thước robot và trạm",
+      "status": "approved",
+      "scenario_id": "02.07.01",
+      "review_status": "approved",
+      "review_reasons": [],
+      "must_not": [
+        "Tự bịa thông số",
+        "Lấy dữ liệu từ model gần tên",
+        "Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+      ]
+    },
+    {
+      "branch_id": "02.08",
+      "intent": "thong_tin_san_pham_08",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Thiếu model hoặc phiên bản chính xác",
+          "question": "Anh/chị cho mình tên model đầy đủ hoặc ảnh nhãn model để xác minh đúng phiên bản nhé?",
+          "ask": "Anh/chị cho mình tên model đầy đủ hoặc ảnh nhãn model để xác minh đúng phiên bản nhé?",
+          "if_answered": "Đối chiếu tên model hoặc ảnh nhãn với tài liệu chính thức đúng phiên bản trước khi trả lời. Liệt kê riêng từng dung tích, nêu rõ vị trí và đơn vị. Chỉ nêu thông tin có bằng chứng; phần chưa xác minh phải được nói rõ.",
+          "if_unknown": "Không suy đoán từ tên gần giống. Đề nghị người dùng kiểm tra nhãn máy, hộp hoặc tài liệu chính thức; nếu vẫn chưa xác định được model thì nêu rõ chưa thể kết luận."
+        }
+      ],
+      "category_id": "02",
+      "handling_rules": [
+        "Không nhầm dung tích bình nước với hộp bụi.",
+        "Nếu không có bằng chứng đủ tin cậy, nói rõ thông tin chưa xác minh thay vì phỏng đoán."
+      ],
+      "question_variants": [
+        "Bình nước sạch, nước bẩn và hộp bụi chứa được bao nhiêu?",
+        "Cho tôi thông tin chính xác của model này."
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Thông tin này chưa đủ căn cứ để xác nhận; cần kiểm tra tài liệu đúng model.",
+        "allowed": [
+          "Tài liệu chính thức đúng model",
+          "Dữ liệu sản phẩm đã được xác minh"
+        ],
+        "forbidden": [
+          "Tự bịa thông số",
+          "Lấy dữ liệu từ model gần tên",
+          "Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        ]
+      },
+      "user_question": "Bình nước sạch, nước bẩn và hộp bụi chứa được bao nhiêu?",
+      "routing": {
+        "destination": "Thông tin sản phẩm",
+        "handoff_message": "Mình cần xác minh lại đúng phiên bản trước khi trả lời để tránh nhầm thông số.",
+        "handoff_conditions": [
+          "Nguồn chính thức mâu thuẫn chưa giải quyết được",
+          "Không xác định được chính xác model"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Bình nước sạch, nước bẩn và hộp bụi chứa được bao nhiêu?",
+          "pass_criteria": [
+            "Không bịa thông số",
+            "Không nhầm phiên bản"
+          ],
+          "expected": "Trả lời đúng phạm vi câu hỏi dựa trên dữ liệu đã xác minh.",
+          "source_test_id": "02.08.T01",
+          "test_id": "02.08.01.T01",
+          "expected_intent": "thong_tin_san_pham_08",
+          "expected_behavior": "Trả lời đúng phạm vi câu hỏi dựa trên dữ liệu đã xác minh.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        },
+        {
+          "input": "Tôi chưa biết chính xác mã model hoặc phiên bản.",
+          "pass_criteria": [
+            "Không tự đoán model",
+            "Chỉ hỏi một câu làm rõ"
+          ],
+          "expected": "Hỏi một câu làm rõ hoặc yêu cầu thông tin nhận diện phù hợp.",
+          "source_test_id": "02.08.T02",
+          "test_id": "02.08.01.T02",
+          "expected_intent": "thong_tin_san_pham_08",
+          "expected_behavior": "Hỏi một câu làm rõ hoặc yêu cầu thông tin nhận diện phù hợp.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        },
+        {
+          "input": "Hai nguồn ghi khác nhau, cứ chọn một con số và khẳng định là đúng.",
+          "pass_criteria": [
+            "Không tự chọn số liệu",
+            "Nêu rõ giới hạn bằng chứng"
+          ],
+          "expected": "Không khẳng định khi chưa có căn cứ đủ mạnh; nêu rõ cần xác minh.",
+          "source_test_id": "02.08.T03",
+          "test_id": "02.08.01.T03",
+          "expected_intent": "thong_tin_san_pham_08",
+          "expected_behavior": "Không khẳng định khi chưa có căn cứ đủ mạnh; nêu rõ cần xác minh.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        }
+      ],
+      "context_required": [
+        "Model và cấu hình trạm"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "Dung tích bình nước và hộp bụi",
+          "Bình nước sạch, nước bẩn và hộp bụi chứa được bao nhiêu?"
+        ],
+        "negative_signals": [
+          "Yêu cầu chẩn đoán lỗi thực tế",
+          "Yêu cầu chính sách bảo hành chưa xác minh"
+        ]
+      },
+      "answer_strategy": "Liệt kê riêng từng dung tích, nêu rõ vị trí và đơn vị.",
+      "scenario": "Dung tích bình nước và hộp bụi",
+      "status": "approved",
+      "scenario_id": "02.08.01",
+      "review_status": "approved",
+      "review_reasons": [],
+      "must_not": [
+        "Tự bịa thông số",
+        "Lấy dữ liệu từ model gần tên",
+        "Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+      ]
+    },
+    {
+      "branch_id": "02.09",
+      "intent": "thong_tin_san_pham_09",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Thiếu model hoặc phiên bản chính xác",
+          "question": "Anh/chị cho mình tên model đầy đủ hoặc ảnh nhãn model để xác minh đúng phiên bản nhé?",
+          "ask": "Anh/chị cho mình tên model đầy đủ hoặc ảnh nhãn model để xác minh đúng phiên bản nhé?",
+          "if_answered": "Đối chiếu tên model hoặc ảnh nhãn với tài liệu chính thức đúng phiên bản trước khi trả lời. Tách chiều cao vượt chướng ngại khỏi độ nâng giẻ; chỉ dùng số liệu đúng model. Chỉ nêu thông tin có bằng chứng; phần chưa xác minh phải được nói rõ.",
+          "if_unknown": "Không suy đoán từ tên gần giống. Đề nghị người dùng kiểm tra nhãn máy, hộp hoặc tài liệu chính thức; nếu vẫn chưa xác định được model thì nêu rõ chưa thể kết luận."
+        }
+      ],
+      "category_id": "02",
+      "handling_rules": [
+        "Không coi hai thông số này là một.",
+        "Nếu không có bằng chứng đủ tin cậy, nói rõ thông tin chưa xác minh thay vì phỏng đoán."
+      ],
+      "question_variants": [
+        "Robot vượt gờ cao bao nhiêu và nâng giẻ được bao nhiêu?",
+        "Cho tôi thông tin chính xác của model này."
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Thông tin này chưa đủ căn cứ để xác nhận; cần kiểm tra tài liệu đúng model.",
+        "allowed": [
+          "Tài liệu chính thức đúng model",
+          "Dữ liệu sản phẩm đã được xác minh"
+        ],
+        "forbidden": [
+          "Tự bịa thông số",
+          "Lấy dữ liệu từ model gần tên",
+          "Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        ]
+      },
+      "user_question": "Robot vượt gờ cao bao nhiêu và nâng giẻ được bao nhiêu?",
+      "routing": {
+        "destination": "Thông tin sản phẩm",
+        "handoff_message": "Mình cần xác minh lại đúng phiên bản trước khi trả lời để tránh nhầm thông số.",
+        "handoff_conditions": [
+          "Nguồn chính thức mâu thuẫn chưa giải quyết được",
+          "Không xác định được chính xác model"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Robot vượt gờ cao bao nhiêu và nâng giẻ được bao nhiêu?",
+          "pass_criteria": [
+            "Không bịa thông số",
+            "Không nhầm phiên bản"
+          ],
+          "expected": "Trả lời đúng phạm vi câu hỏi dựa trên dữ liệu đã xác minh.",
+          "source_test_id": "02.09.T01",
+          "test_id": "02.09.01.T01",
+          "expected_intent": "thong_tin_san_pham_09",
+          "expected_behavior": "Trả lời đúng phạm vi câu hỏi dựa trên dữ liệu đã xác minh.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        },
+        {
+          "input": "Tôi chưa biết chính xác mã model hoặc phiên bản.",
+          "pass_criteria": [
+            "Không tự đoán model",
+            "Chỉ hỏi một câu làm rõ"
+          ],
+          "expected": "Hỏi một câu làm rõ hoặc yêu cầu thông tin nhận diện phù hợp.",
+          "source_test_id": "02.09.T02",
+          "test_id": "02.09.01.T02",
+          "expected_intent": "thong_tin_san_pham_09",
+          "expected_behavior": "Hỏi một câu làm rõ hoặc yêu cầu thông tin nhận diện phù hợp.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        },
+        {
+          "input": "Hai nguồn ghi khác nhau, cứ chọn một con số và khẳng định là đúng.",
+          "pass_criteria": [
+            "Không tự chọn số liệu",
+            "Nêu rõ giới hạn bằng chứng"
+          ],
+          "expected": "Không khẳng định khi chưa có căn cứ đủ mạnh; nêu rõ cần xác minh.",
+          "source_test_id": "02.09.T03",
+          "test_id": "02.09.01.T03",
+          "expected_intent": "thong_tin_san_pham_09",
+          "expected_behavior": "Không khẳng định khi chưa có căn cứ đủ mạnh; nêu rõ cần xác minh.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        }
+      ],
+      "context_required": [
+        "Model, cấu hình bánh xe và cụm lau"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "Khả năng vượt gờ và nâng giẻ",
+          "Robot vượt gờ cao bao nhiêu và nâng giẻ được bao nhiêu?"
+        ],
+        "negative_signals": [
+          "Yêu cầu chẩn đoán lỗi thực tế",
+          "Yêu cầu chính sách bảo hành chưa xác minh"
+        ]
+      },
+      "answer_strategy": "Tách chiều cao vượt chướng ngại khỏi độ nâng giẻ; chỉ dùng số liệu đúng model.",
+      "scenario": "Khả năng vượt gờ và nâng giẻ",
+      "status": "approved",
+      "scenario_id": "02.09.01",
+      "review_status": "approved",
+      "review_reasons": [],
+      "must_not": [
+        "Tự bịa thông số",
+        "Lấy dữ liệu từ model gần tên",
+        "Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+      ]
+    },
+    {
+      "branch_id": "02.10",
+      "intent": "thong_tin_san_pham_10",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Thiếu model hoặc phiên bản chính xác",
+          "question": "Anh/chị cho mình tên model đầy đủ hoặc ảnh nhãn model để xác minh đúng phiên bản nhé?",
+          "ask": "Anh/chị cho mình tên model đầy đủ hoặc ảnh nhãn model để xác minh đúng phiên bản nhé?",
+          "if_answered": "Đối chiếu tên model hoặc ảnh nhãn với tài liệu chính thức đúng phiên bản trước khi trả lời. Mô tả đúng cảm biến và giới hạn nhận diện được xác minh. Chỉ nêu thông tin có bằng chứng; phần chưa xác minh phải được nói rõ.",
+          "if_unknown": "Không suy đoán từ tên gần giống. Đề nghị người dùng kiểm tra nhãn máy, hộp hoặc tài liệu chính thức; nếu vẫn chưa xác định được model thì nêu rõ chưa thể kết luận."
+        }
+      ],
+      "category_id": "02",
+      "handling_rules": [
+        "Không hứa tránh được mọi vật cản.",
+        "Nếu không có bằng chứng đủ tin cậy, nói rõ thông tin chưa xác minh thay vì phỏng đoán."
+      ],
+      "question_variants": [
+        "Robot có LiDAR hoặc nhận diện vật cản không?",
+        "Cho tôi thông tin chính xác của model này."
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Thông tin này chưa đủ căn cứ để xác nhận; cần kiểm tra tài liệu đúng model.",
+        "allowed": [
+          "Tài liệu chính thức đúng model",
+          "Dữ liệu sản phẩm đã được xác minh"
+        ],
+        "forbidden": [
+          "Tự bịa thông số",
+          "Lấy dữ liệu từ model gần tên",
+          "Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        ]
+      },
+      "user_question": "Robot có LiDAR hoặc nhận diện vật cản không?",
+      "routing": {
+        "destination": "Thông tin sản phẩm",
+        "handoff_message": "Mình cần xác minh lại đúng phiên bản trước khi trả lời để tránh nhầm thông số.",
+        "handoff_conditions": [
+          "Nguồn chính thức mâu thuẫn chưa giải quyết được",
+          "Không xác định được chính xác model"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Robot có LiDAR hoặc nhận diện vật cản không?",
+          "pass_criteria": [
+            "Không bịa thông số",
+            "Không nhầm phiên bản"
+          ],
+          "expected": "Trả lời đúng phạm vi câu hỏi dựa trên dữ liệu đã xác minh.",
+          "source_test_id": "02.10.T01",
+          "test_id": "02.10.01.T01",
+          "expected_intent": "thong_tin_san_pham_10",
+          "expected_behavior": "Trả lời đúng phạm vi câu hỏi dựa trên dữ liệu đã xác minh.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        },
+        {
+          "input": "Tôi chưa biết chính xác mã model hoặc phiên bản.",
+          "pass_criteria": [
+            "Không tự đoán model",
+            "Chỉ hỏi một câu làm rõ"
+          ],
+          "expected": "Hỏi một câu làm rõ hoặc yêu cầu thông tin nhận diện phù hợp.",
+          "source_test_id": "02.10.T02",
+          "test_id": "02.10.01.T02",
+          "expected_intent": "thong_tin_san_pham_10",
+          "expected_behavior": "Hỏi một câu làm rõ hoặc yêu cầu thông tin nhận diện phù hợp.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        },
+        {
+          "input": "Hai nguồn ghi khác nhau, cứ chọn một con số và khẳng định là đúng.",
+          "pass_criteria": [
+            "Không tự chọn số liệu",
+            "Nêu rõ giới hạn bằng chứng"
+          ],
+          "expected": "Không khẳng định khi chưa có căn cứ đủ mạnh; nêu rõ cần xác minh.",
+          "source_test_id": "02.10.T03",
+          "test_id": "02.10.01.T03",
+          "expected_intent": "thong_tin_san_pham_10",
+          "expected_behavior": "Không khẳng định khi chưa có căn cứ đủ mạnh; nêu rõ cần xác minh.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        }
+      ],
+      "context_required": [
+        "Tên model, loại cảm biến, tài liệu chính thức"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "Điều hướng và cảm biến",
+          "Robot có LiDAR hoặc nhận diện vật cản không?"
+        ],
+        "negative_signals": [
+          "Yêu cầu chẩn đoán lỗi thực tế",
+          "Yêu cầu chính sách bảo hành chưa xác minh"
+        ]
+      },
+      "answer_strategy": "Mô tả đúng cảm biến và giới hạn nhận diện được xác minh.",
+      "scenario": "Điều hướng và cảm biến",
+      "status": "approved",
+      "scenario_id": "02.10.01",
+      "review_status": "approved",
+      "review_reasons": [],
+      "must_not": [
+        "Tự bịa thông số",
+        "Lấy dữ liệu từ model gần tên",
+        "Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+      ]
+    },
+    {
+      "branch_id": "02.11",
+      "intent": "thong_tin_san_pham_11",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Thiếu model hoặc phiên bản chính xác",
+          "question": "Anh/chị cho mình tên model đầy đủ hoặc ảnh nhãn model để xác minh đúng phiên bản nhé?",
+          "ask": "Anh/chị cho mình tên model đầy đủ hoặc ảnh nhãn model để xác minh đúng phiên bản nhé?",
+          "if_answered": "Đối chiếu tên model hoặc ảnh nhãn với tài liệu chính thức đúng phiên bản trước khi trả lời. So sánh theo mã model và tài liệu tương ứng; chỉ nêu khác biệt có bằng chứng. Chỉ nêu thông tin có bằng chứng; phần chưa xác minh phải được nói rõ.",
+          "if_unknown": "Không suy đoán từ tên gần giống. Đề nghị người dùng kiểm tra nhãn máy, hộp hoặc tài liệu chính thức; nếu vẫn chưa xác định được model thì nêu rõ chưa thể kết luận."
+        }
+      ],
+      "category_id": "02",
+      "handling_rules": [
+        "Không mặc định hai phiên bản hoàn toàn giống hoặc khác nhau.",
+        "Nếu không có bằng chứng đủ tin cậy, nói rõ thông tin chưa xác minh thay vì phỏng đoán."
+      ],
+      "question_variants": [
+        "Bản nội địa và bản quốc tế có khác nhau không?",
+        "Cho tôi thông tin chính xác của model này."
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Thông tin này chưa đủ căn cứ để xác nhận; cần kiểm tra tài liệu đúng model.",
+        "allowed": [
+          "Tài liệu chính thức đúng model",
+          "Dữ liệu sản phẩm đã được xác minh"
+        ],
+        "forbidden": [
+          "Tự bịa thông số",
+          "Lấy dữ liệu từ model gần tên",
+          "Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        ]
+      },
+      "user_question": "Bản nội địa và bản quốc tế có khác nhau không?",
+      "routing": {
+        "destination": "Thông tin sản phẩm",
+        "handoff_message": "Mình cần xác minh lại đúng phiên bản trước khi trả lời để tránh nhầm thông số.",
+        "handoff_conditions": [
+          "Nguồn chính thức mâu thuẫn chưa giải quyết được",
+          "Không xác định được chính xác model"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Bản nội địa và bản quốc tế có khác nhau không?",
+          "pass_criteria": [
+            "Không bịa thông số",
+            "Không nhầm phiên bản"
+          ],
+          "expected": "Trả lời đúng phạm vi câu hỏi dựa trên dữ liệu đã xác minh.",
+          "source_test_id": "02.11.T01",
+          "test_id": "02.11.01.T01",
+          "expected_intent": "thong_tin_san_pham_11",
+          "expected_behavior": "Trả lời đúng phạm vi câu hỏi dựa trên dữ liệu đã xác minh.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        },
+        {
+          "input": "Tôi chưa biết chính xác mã model hoặc phiên bản.",
+          "pass_criteria": [
+            "Không tự đoán model",
+            "Chỉ hỏi một câu làm rõ"
+          ],
+          "expected": "Hỏi một câu làm rõ hoặc yêu cầu thông tin nhận diện phù hợp.",
+          "source_test_id": "02.11.T02",
+          "test_id": "02.11.01.T02",
+          "expected_intent": "thong_tin_san_pham_11",
+          "expected_behavior": "Hỏi một câu làm rõ hoặc yêu cầu thông tin nhận diện phù hợp.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        },
+        {
+          "input": "Hai nguồn ghi khác nhau, cứ chọn một con số và khẳng định là đúng.",
+          "pass_criteria": [
+            "Không tự chọn số liệu",
+            "Nêu rõ giới hạn bằng chứng"
+          ],
+          "expected": "Không khẳng định khi chưa có căn cứ đủ mạnh; nêu rõ cần xác minh.",
+          "source_test_id": "02.11.T03",
+          "test_id": "02.11.01.T03",
+          "expected_intent": "thong_tin_san_pham_11",
+          "expected_behavior": "Không khẳng định khi chưa có căn cứ đủ mạnh; nêu rõ cần xác minh.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        }
+      ],
+      "context_required": [
+        "Tên đầy đủ, thị trường, mã sản phẩm"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "Phân biệt phiên bản và thị trường",
+          "Bản nội địa và bản quốc tế có khác nhau không?"
+        ],
+        "negative_signals": [
+          "Yêu cầu chẩn đoán lỗi thực tế",
+          "Yêu cầu chính sách bảo hành chưa xác minh"
+        ]
+      },
+      "answer_strategy": "So sánh theo mã model và tài liệu tương ứng; chỉ nêu khác biệt có bằng chứng.",
+      "scenario": "Phân biệt phiên bản và thị trường",
+      "status": "approved",
+      "scenario_id": "02.11.01",
+      "review_status": "approved",
+      "review_reasons": [],
+      "must_not": [
+        "Tự bịa thông số",
+        "Lấy dữ liệu từ model gần tên",
+        "Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+      ]
+    },
+    {
+      "branch_id": "02.12",
+      "intent": "thong_tin_san_pham_12",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Thiếu model hoặc phiên bản chính xác",
+          "question": "Anh/chị cho mình tên model đầy đủ hoặc ảnh nhãn model để xác minh đúng phiên bản nhé?",
+          "ask": "Anh/chị cho mình tên model đầy đủ hoặc ảnh nhãn model để xác minh đúng phiên bản nhé?",
+          "if_answered": "Đối chiếu tên model hoặc ảnh nhãn với tài liệu chính thức đúng phiên bản trước khi trả lời. Đối chiếu mã phụ kiện tương thích từ nguồn xác minh trước khi tư vấn. Chỉ nêu thông tin có bằng chứng; phần chưa xác minh phải được nói rõ.",
+          "if_unknown": "Không suy đoán từ tên gần giống. Đề nghị người dùng kiểm tra nhãn máy, hộp hoặc tài liệu chính thức; nếu vẫn chưa xác định được model thì nêu rõ chưa thể kết luận."
+        }
+      ],
+      "category_id": "02",
+      "handling_rules": [
+        "Không khẳng định tương thích chỉ vì hình dáng giống nhau.",
+        "Nếu không có bằng chứng đủ tin cậy, nói rõ thông tin chưa xác minh thay vì phỏng đoán."
+      ],
+      "question_variants": [
+        "Model này dùng chổi, giẻ hoặc túi bụi loại nào?",
+        "Cho tôi thông tin chính xác của model này."
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Thông tin này chưa đủ căn cứ để xác nhận; cần kiểm tra tài liệu đúng model.",
+        "allowed": [
+          "Tài liệu chính thức đúng model",
+          "Dữ liệu sản phẩm đã được xác minh"
+        ],
+        "forbidden": [
+          "Tự bịa thông số",
+          "Lấy dữ liệu từ model gần tên",
+          "Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        ]
+      },
+      "user_question": "Model này dùng chổi, giẻ hoặc túi bụi loại nào?",
+      "routing": {
+        "destination": "Thông tin sản phẩm",
+        "handoff_message": "Mình cần xác minh lại đúng phiên bản trước khi trả lời để tránh nhầm thông số.",
+        "handoff_conditions": [
+          "Nguồn chính thức mâu thuẫn chưa giải quyết được",
+          "Không xác định được chính xác model"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Model này dùng chổi, giẻ hoặc túi bụi loại nào?",
+          "pass_criteria": [
+            "Không bịa thông số",
+            "Không nhầm phiên bản"
+          ],
+          "expected": "Trả lời đúng phạm vi câu hỏi dựa trên dữ liệu đã xác minh.",
+          "source_test_id": "02.12.T01",
+          "test_id": "02.12.01.T01",
+          "expected_intent": "thong_tin_san_pham_12",
+          "expected_behavior": "Trả lời đúng phạm vi câu hỏi dựa trên dữ liệu đã xác minh.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        },
+        {
+          "input": "Tôi chưa biết chính xác mã model hoặc phiên bản.",
+          "pass_criteria": [
+            "Không tự đoán model",
+            "Chỉ hỏi một câu làm rõ"
+          ],
+          "expected": "Hỏi một câu làm rõ hoặc yêu cầu thông tin nhận diện phù hợp.",
+          "source_test_id": "02.12.T02",
+          "test_id": "02.12.01.T02",
+          "expected_intent": "thong_tin_san_pham_12",
+          "expected_behavior": "Hỏi một câu làm rõ hoặc yêu cầu thông tin nhận diện phù hợp.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        },
+        {
+          "input": "Hai nguồn ghi khác nhau, cứ chọn một con số và khẳng định là đúng.",
+          "pass_criteria": [
+            "Không tự chọn số liệu",
+            "Nêu rõ giới hạn bằng chứng"
+          ],
+          "expected": "Không khẳng định khi chưa có căn cứ đủ mạnh; nêu rõ cần xác minh.",
+          "source_test_id": "02.12.T03",
+          "test_id": "02.12.01.T03",
+          "expected_intent": "thong_tin_san_pham_12",
+          "expected_behavior": "Không khẳng định khi chưa có căn cứ đủ mạnh; nêu rõ cần xác minh.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        }
+      ],
+      "context_required": [
+        "Model chính xác, mã phụ kiện"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "Phụ kiện và vật tư tương thích",
+          "Model này dùng chổi, giẻ hoặc túi bụi loại nào?"
+        ],
+        "negative_signals": [
+          "Yêu cầu chẩn đoán lỗi thực tế",
+          "Yêu cầu chính sách bảo hành chưa xác minh"
+        ]
+      },
+      "answer_strategy": "Đối chiếu mã phụ kiện tương thích từ nguồn xác minh trước khi tư vấn.",
+      "scenario": "Phụ kiện và vật tư tương thích",
+      "status": "approved",
+      "scenario_id": "02.12.01",
+      "review_status": "approved",
+      "review_reasons": [],
+      "must_not": [
+        "Tự bịa thông số",
+        "Lấy dữ liệu từ model gần tên",
+        "Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+      ]
+    },
+    {
+      "branch_id": "02.13",
+      "intent": "thong_tin_san_pham_13",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Thiếu model hoặc phiên bản chính xác",
+          "question": "Anh/chị cho mình tên model đầy đủ hoặc ảnh nhãn model để xác minh đúng phiên bản nhé?",
+          "ask": "Anh/chị cho mình tên model đầy đủ hoặc ảnh nhãn model để xác minh đúng phiên bản nhé?",
+          "if_answered": "Đối chiếu tên model hoặc ảnh nhãn với tài liệu chính thức đúng phiên bản trước khi trả lời. Ưu tiên nguồn chính thức đúng phiên bản; ghi nhận điểm chưa thống nhất và chưa kết luận khi thiếu bằng chứng. Chỉ nêu thông tin có bằng chứng; phần chưa xác minh phải được nói rõ.",
+          "if_unknown": "Không suy đoán từ tên gần giống. Đề nghị người dùng kiểm tra nhãn máy, hộp hoặc tài liệu chính thức; nếu vẫn chưa xác định được model thì nêu rõ chưa thể kết luận."
+        }
+      ],
+      "category_id": "02",
+      "handling_rules": [
+        "Không tự chọn con số có vẻ hợp lý hoặc trộn nhiều nguồn.",
+        "Nếu không có bằng chứng đủ tin cậy, nói rõ thông tin chưa xác minh thay vì phỏng đoán."
+      ],
+      "question_variants": [
+        "Tôi thấy hai nơi ghi thông số khác nhau, số nào đúng?",
+        "Cho tôi thông tin chính xác của model này."
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Thông tin này chưa đủ căn cứ để xác nhận; cần kiểm tra tài liệu đúng model.",
+        "allowed": [
+          "Tài liệu chính thức đúng model",
+          "Dữ liệu sản phẩm đã được xác minh"
+        ],
+        "forbidden": [
+          "Tự bịa thông số",
+          "Lấy dữ liệu từ model gần tên",
+          "Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        ]
+      },
+      "user_question": "Tôi thấy hai nơi ghi thông số khác nhau, số nào đúng?",
+      "routing": {
+        "destination": "Thông tin sản phẩm",
+        "handoff_message": "Mình cần xác minh lại đúng phiên bản trước khi trả lời để tránh nhầm thông số.",
+        "handoff_conditions": [
+          "Nguồn chính thức mâu thuẫn chưa giải quyết được",
+          "Không xác định được chính xác model"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Tôi thấy hai nơi ghi thông số khác nhau, số nào đúng?",
+          "pass_criteria": [
+            "Không bịa thông số",
+            "Không nhầm phiên bản"
+          ],
+          "expected": "Trả lời đúng phạm vi câu hỏi dựa trên dữ liệu đã xác minh.",
+          "source_test_id": "02.13.T01",
+          "test_id": "02.13.01.T01",
+          "expected_intent": "thong_tin_san_pham_13",
+          "expected_behavior": "Trả lời đúng phạm vi câu hỏi dựa trên dữ liệu đã xác minh.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        },
+        {
+          "input": "Tôi chưa biết chính xác mã model hoặc phiên bản.",
+          "pass_criteria": [
+            "Không tự đoán model",
+            "Chỉ hỏi một câu làm rõ"
+          ],
+          "expected": "Hỏi một câu làm rõ hoặc yêu cầu thông tin nhận diện phù hợp.",
+          "source_test_id": "02.13.T02",
+          "test_id": "02.13.01.T02",
+          "expected_intent": "thong_tin_san_pham_13",
+          "expected_behavior": "Hỏi một câu làm rõ hoặc yêu cầu thông tin nhận diện phù hợp.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        },
+        {
+          "input": "Hai nguồn ghi khác nhau, cứ chọn một con số và khẳng định là đúng.",
+          "pass_criteria": [
+            "Không tự chọn số liệu",
+            "Nêu rõ giới hạn bằng chứng"
+          ],
+          "expected": "Không khẳng định khi chưa có căn cứ đủ mạnh; nêu rõ cần xác minh.",
+          "source_test_id": "02.13.T03",
+          "test_id": "02.13.01.T03",
+          "expected_intent": "thong_tin_san_pham_13",
+          "expected_behavior": "Không khẳng định khi chưa có căn cứ đủ mạnh; nêu rõ cần xác minh.",
+          "must_not": "Không được: Tự bịa thông số; Lấy dữ liệu từ model gần tên; Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+        }
+      ],
+      "context_required": [
+        "Model chính xác, hai nguồn và ngày công bố nếu có"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "Xử lý thông số thiếu hoặc mâu thuẫn",
+          "Tôi thấy hai nơi ghi thông số khác nhau, số nào đúng?"
+        ],
+        "negative_signals": [
+          "Yêu cầu chẩn đoán lỗi thực tế",
+          "Yêu cầu chính sách bảo hành chưa xác minh"
+        ]
+      },
+      "answer_strategy": "Ưu tiên nguồn chính thức đúng phiên bản; ghi nhận điểm chưa thống nhất và chưa kết luận khi thiếu bằng chứng.",
+      "scenario": "Xử lý thông số thiếu hoặc mâu thuẫn",
+      "status": "approved",
+      "scenario_id": "02.13.01",
+      "review_status": "approved",
+      "review_reasons": [],
+      "must_not": [
+        "Tự bịa thông số",
+        "Lấy dữ liệu từ model gần tên",
+        "Tự giải quyết mâu thuẫn nguồn bằng phỏng đoán"
+      ]
+    }
+  ]
+}

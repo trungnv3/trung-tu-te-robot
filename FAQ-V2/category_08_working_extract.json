@@ -1,0 +1,1273 @@
+﻿{
+  "schema_version": "1.0",
+  "project": "Trung Tu Te Robot FAQ V2",
+  "language": "vi-VN",
+  "category_id": "08",
+  "category_name": "Tư vấn dịch vụ, tiếp nhận yêu cầu và tình huống khác",
+  "created_as": "new",
+  "scenario_count": 14,
+  "minimum_tests_per_scenario": 3,
+  "scenarios": [
+    {
+      "branch_id": "08.01",
+      "intent": "Tư vấn chọn robot",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Nhà bạn khoảng bao nhiêu mét vuông và ưu tiên quan trọng nhất là gì?",
+          "required": true
+        }
+      ],
+      "category_id": "08",
+      "handling_rules": [
+        "Không đề xuất model hoặc thông số chưa được xác minh",
+        "Trả lời rõ ràng, ngắn gọn và không khẳng định hành động chưa thực hiện",
+        "Chỉ hỏi thêm thông tin cần thiết để thu hẹp lựa chọn; không hỏi dồn nhiều câu",
+        "Không kết luận một model phù hợp nhất khi chưa biết các tiêu chí quan trọng"
+      ],
+      "question_variants": [
+        "Tôi muốn được tư vấn chọn robot phù hợp",
+        "Nhà tôi cần robot lau nhà, nhờ tư vấn theo nhu cầu",
+        "Tôi muốn được tư vấn chọn robot phù hợp"
+      ],
+      "evidence_policy": {
+        "rule": "Chỉ dùng thông số sản phẩm có nguồn đáng tin cậy; nêu rõ khi chưa đủ dữ liệu để so sánh",
+        "source_priority": [
+          "Dữ liệu sản phẩm và dịch vụ đã xác minh",
+          "Thông tin chính thức từ đơn vị phụ trách",
+          "Không suy đoán khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Tôi muốn được tư vấn chọn robot phù hợp",
+      "routing": {
+        "message": "Tóm tắt nhu cầu và cung cấp thông tin cần thiết cho kênh tiếp nhận tư vấn phù hợp",
+        "type": "consultation"
+      },
+      "test_cases": [
+        {
+          "case_id": "08.01.T01",
+          "pass_criteria": [
+            "Nhận diện đúng nhu cầu tư vấn chọn robot",
+            "Không bịa dữ liệu sản phẩm",
+            "Nêu bước tiếp theo rõ ràng"
+          ],
+          "input": "Tôi có nhà 85 m², sàn gạch và nuôi một chó nhỏ. Tôi nên chọn robot nào?",
+          "expected": "Hỏi thêm ngân sách hoặc ưu tiên còn thiếu; chỉ so sánh model có thông số đã xác minh và nêu lý do phù hợp."
+        },
+        {
+          "case_id": "08.01.T02",
+          "pass_criteria": [
+            "Chỉ hỏi thông tin còn thiếu có ích nhất",
+            "Không suy đoán dữ kiện chưa được cung cấp",
+            "Không yêu cầu thông tin nhạy cảm không cần thiết"
+          ],
+          "input": "Tôi chưa biết diện tích chính xác và chưa chốt ngân sách.",
+          "expected": "Hỏi một câu ưu tiên nhất, chẳng hạn ngân sách dự kiến; không tự chọn phân khúc thay khách."
+        },
+        {
+          "case_id": "08.01.T03",
+          "pass_criteria": [
+            "Không khẳng định model tốt nhất khi thiếu căn cứ",
+            "Giải thích rõ giới hạn của dữ liệu",
+            "Nêu tiêu chí cần xác minh tiếp theo"
+          ],
+          "input": "Bạn cứ khẳng định một model là tốt nhất cho mọi nhà đi.",
+          "expected": "Giải thích không có model tốt nhất cho mọi nhu cầu; đưa tiêu chí so sánh và không bịa thông số."
+        }
+      ],
+      "context_required": [
+        "Diện tích; loại sàn; vật nuôi; ngân sách; nhu cầu lau và hút"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Có dấu hiệu kỹ thuật nguy hiểm cần ưu tiên hướng dẫn an toàn"
+        ],
+        "signals": [
+          "Tư vấn chọn robot",
+          "Tôi muốn được tư vấn chọn robot phù hợp"
+        ]
+      },
+      "answer_strategy": "Thu thập nhu cầu chính, sau đó so sánh các model có dữ liệu đã xác minh theo tiêu chí phù hợp",
+      "scenario": "Tôi muốn được tư vấn chọn robot phù hợp",
+      "status": "approved",
+      "scenario_id": "08.01",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "08.02",
+      "intent": "Hỏi giá sản phẩm",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Bạn muốn hỏi giá model mới hay máy đã qua sử dụng?",
+          "required": true
+        }
+      ],
+      "category_id": "08",
+      "handling_rules": [
+        "Không tự đặt giá hoặc khẳng định còn hàng khi chưa xác nhận",
+        "Trả lời rõ ràng, ngắn gọn và không khẳng định hành động chưa thực hiện",
+        "Xác định đúng model và phiên bản trước khi cung cấp giá",
+        "Phân biệt giá tham khảo với giá hiện hành đã được xác nhận"
+      ],
+      "question_variants": [
+        "Tôi muốn hỏi giá một model robot",
+        "Robot này hiện có giá bao nhiêu?",
+        "Tôi muốn hỏi giá một model robot"
+      ],
+      "evidence_policy": {
+        "rule": "Giá và tồn kho cần thông tin cập nhật từ đơn vị bán",
+        "source_priority": [
+          "Dữ liệu sản phẩm và dịch vụ đã xác minh",
+          "Thông tin chính thức từ đơn vị phụ trách",
+          "Không suy đoán khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Tôi muốn hỏi giá một model robot",
+      "routing": {
+        "message": "Xác nhận model, tình trạng sản phẩm và cung cấp thông tin cần thiết cho kênh bán hàng",
+        "type": "sales_support"
+      },
+      "test_cases": [
+        {
+          "case_id": "08.02.T01",
+          "pass_criteria": [
+            "Xác định đúng model và tình trạng sản phẩm",
+            "Không bịa giá hiện hành",
+            "Nêu rõ cách xác nhận giá nếu chưa có dữ liệu"
+          ],
+          "input": "Cho tôi xin giá Dreame [model cụ thể] bản mới.",
+          "expected": "Xác nhận đúng model và phiên bản; chỉ báo giá nếu có dữ liệu hiện hành, nếu không hướng dẫn kênh xác nhận."
+        },
+        {
+          "case_id": "08.02.T02",
+          "pass_criteria": [
+            "Chỉ hỏi thông tin còn thiếu có ích nhất",
+            "Không suy đoán giá theo tên dòng",
+            "Không yêu cầu thông tin không liên quan"
+          ],
+          "input": "Tôi chỉ nhớ robot Dreame dòng L, không nhớ mã model.",
+          "expected": "Hỏi mã đầy đủ hoặc ảnh tem/model; không đoán giá theo dòng sản phẩm."
+        },
+        {
+          "case_id": "08.02.T03",
+          "pass_criteria": [
+            "Không tự xác nhận giá hoặc giữ hàng khi chưa kiểm tra",
+            "Nêu rõ bước xác nhận tiếp theo",
+            "Không tạo thông tin giao dịch giả"
+          ],
+          "input": "Bạn báo chắc chắn giá hiện tại và giữ hàng giúp tôi nhé.",
+          "expected": "Không tự xác nhận giá hoặc giữ hàng nếu chưa có thao tác/hệ thống xác nhận; nói rõ bước liên hệ tiếp theo."
+        }
+      ],
+      "context_required": [
+        "Tên model; phiên bản; tình trạng hàng; khu vực mua"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Người dùng đang báo lỗi kỹ thuật cần ưu tiên xử lý an toàn"
+        ],
+        "signals": [
+          "Hỏi giá sản phẩm",
+          "Giá model robot",
+          "Giá máy mới hoặc máy đã qua sử dụng"
+        ]
+      },
+      "answer_strategy": "Xác nhận đúng model và tình trạng trước khi tra cứu giá hiện hành hoặc chuyển tư vấn viên",
+      "scenario": "Tôi muốn hỏi giá một model robot",
+      "status": "approved",
+      "scenario_id": "08.02",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "08.03",
+      "intent": "Kiểm tra tồn kho",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Bạn cần model và phiên bản nào, nhận hàng ở khu vực nào?",
+          "required": true
+        }
+      ],
+      "category_id": "08",
+      "handling_rules": [
+        "Không hứa giao hàng hoặc tồn kho nếu chưa xác nhận",
+        "Trả lời rõ ràng, ngắn gọn và không khẳng định hành động chưa thực hiện",
+        "Không nhầm lẫn giữa thông tin sản phẩm còn được bán trên thị trường và tồn kho thực tế",
+        "Nếu chưa có dữ liệu tồn kho, hướng dẫn xác nhận với kênh bán hàng"
+      ],
+      "question_variants": [
+        "Tôi muốn kiểm tra tình trạng hàng",
+        "Model này hiện còn hàng không?",
+        "Tôi muốn kiểm tra tình trạng hàng"
+      ],
+      "evidence_policy": {
+        "rule": "Tồn kho là thông tin biến động, cần xác nhận trực tiếp",
+        "source_priority": [
+          "Dữ liệu sản phẩm và dịch vụ đã xác minh",
+          "Thông tin chính thức từ đơn vị phụ trách",
+          "Không suy đoán khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Tôi muốn kiểm tra tình trạng hàng",
+      "routing": {
+        "message": "Thu thập model chính xác rồi chuyển kênh bán hàng kiểm tra tồn kho",
+        "type": "sales_support"
+      },
+      "test_cases": [
+        {
+          "case_id": "08.03.T01",
+          "pass_criteria": [
+            "Ghi nhận đúng model và khu vực nhận hàng",
+            "Không tự khẳng định tồn kho",
+            "Nêu bước xác nhận rõ ràng"
+          ],
+          "input": "Model [tên đầy đủ] hiện còn hàng không, tôi ở Đắk Lắk.",
+          "expected": "Ghi nhận model/phiên bản và khu vực; kiểm tra qua kênh phụ trách, không tự khẳng định tồn kho."
+        },
+        {
+          "case_id": "08.03.T02",
+          "pass_criteria": [
+            "Làm rõ model hoặc phiên bản còn thiếu",
+            "Không suy đoán từ nhu cầu chung",
+            "Không hỏi dồn nhiều câu không cần thiết"
+          ],
+          "input": "Tôi muốn mua bản mới nhưng chưa biết phiên bản nào.",
+          "expected": "Hỏi model hoặc nhu cầu để xác định đúng sản phẩm trước khi kiểm tra kho."
+        },
+        {
+          "case_id": "08.03.T03",
+          "pass_criteria": [
+            "Không hứa tồn kho hoặc giao hàng khi chưa xác nhận",
+            "Không giả vờ đã kiểm tra hệ thống",
+            "Nêu cách xác nhận tiếp theo"
+          ],
+          "input": "Bạn xác nhận còn hàng và giao hôm nay được không?",
+          "expected": "Không hứa tồn kho hoặc thời gian giao khi chưa xác nhận; hướng dẫn cách kiểm tra trực tiếp."
+        }
+      ],
+      "context_required": [
+        "Model; phiên bản; khu vực nhận hàng"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Người dùng hỏi tình trạng một đơn sửa chữa đã tiếp nhận"
+        ],
+        "signals": [
+          "Kiểm tra tồn kho",
+          "Còn hàng không",
+          "Tình trạng hàng"
+        ]
+      },
+      "answer_strategy": "Thu thập model chính xác rồi chuyển kênh bán hàng kiểm tra tồn kho",
+      "scenario": "Tôi muốn kiểm tra tình trạng hàng",
+      "status": "approved",
+      "scenario_id": "08.03",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "08.04",
+      "intent": "Đặt lịch kiểm tra tại nhà",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Bạn ở khu vực nào và robot đang gặp biểu hiện gì?",
+          "required": true
+        }
+      ],
+      "category_id": "08",
+      "handling_rules": [
+        "Không tự xác nhận lịch hẹn khi chưa có xác nhận thực tế",
+        "Thu thập khu vực, model, triệu chứng và thời gian mong muốn",
+        "Không hứa phục vụ tại khu vực chưa được xác nhận",
+        "Nếu có dấu hiệu nguy hiểm, ưu tiên hướng dẫn an toàn trước việc đặt lịch"
+      ],
+      "question_variants": [
+        "Tôi muốn đặt lịch kiểm tra robot tại nhà",
+        "Kỹ thuật viên có thể đến kiểm tra robot tại nhà không?",
+        "Tôi muốn đặt lịch kiểm tra robot tại nhà"
+      ],
+      "evidence_policy": {
+        "rule": "Phạm vi phục vụ và lịch hẹn cần được đơn vị phụ trách xác nhận",
+        "source_priority": [
+          "Dữ liệu sản phẩm và dịch vụ đã xác minh",
+          "Thông tin chính thức từ đơn vị phụ trách",
+          "Không suy đoán khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Tôi muốn đặt lịch kiểm tra robot tại nhà",
+      "routing": {
+        "message": "Thu thập thông tin tối thiểu để nhân viên xác nhận phạm vi phục vụ và lịch hẹn",
+        "type": "service_intake"
+      },
+      "test_cases": [
+        {
+          "case_id": "08.04.T01",
+          "pass_criteria": [
+            "Thu thập model, triệu chứng và khu vực cần hỗ trợ",
+            "Không tự khẳng định đã đặt lịch",
+            "Nêu rõ lịch cần được xác nhận"
+          ],
+          "input": "Robot của tôi báo lỗi và tôi muốn đặt lịch kiểm tra tại nhà ở khu vực [địa chỉ/khu vực].",
+          "expected": "Hỏi model và biểu hiện chính nếu còn thiếu; ghi nhận khu vực/thời gian mong muốn, nói lịch cần được nhân viên xác nhận."
+        },
+        {
+          "case_id": "08.04.T02",
+          "pass_criteria": [
+            "Hỏi một thông tin cần thiết tiếp theo",
+            "Không tự chọn ngày giờ thay khách",
+            "Không tuyên bố đã tạo lịch"
+          ],
+          "input": "Tôi muốn đặt lịch nhưng chưa biết chính xác ngày nào.",
+          "expected": "Hỏi khung ngày hoặc thời gian thuận tiện nhất; không khẳng định đã đặt lịch."
+        },
+        {
+          "case_id": "08.04.T03",
+          "pass_criteria": [
+            "Ưu tiên an toàn trước việc đặt lịch",
+            "Không hướng dẫn tiếp tục thử máy nguy hiểm",
+            "Chuyển người phụ trách xác nhận hỗ trợ"
+          ],
+          "input": "Robot có mùi khét hoặc nóng bất thường, tôi muốn kỹ thuật viên đến ngay.",
+          "expected": "Ưu tiên hướng dẫn ngừng sử dụng và ngắt nguồn an toàn nếu có thể; không tiếp tục thử máy, chuyển người phụ trách xác nhận hỗ trợ."
+        }
+      ],
+      "context_required": [
+        "Khu vực; model; triệu chứng; thời gian mong muốn"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Người dùng chỉ cần hướng dẫn sử dụng thông thường và không yêu cầu dịch vụ tại nhà"
+        ],
+        "signals": [
+          "Đặt lịch kiểm tra tại nhà",
+          "Kỹ thuật viên đến nhà",
+          "Kiểm tra robot tại nhà"
+        ]
+      },
+      "answer_strategy": "Thu thập thông tin tối thiểu để nhân viên xác nhận phạm vi phục vụ và lịch hẹn",
+      "scenario": "Tôi muốn đặt lịch kiểm tra robot tại nhà",
+      "status": "approved",
+      "scenario_id": "08.04",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "08.05",
+      "intent": "Tiếp nhận sửa chữa",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Robot của bạn là model nào và đang gặp biểu hiện gì?",
+          "required": true
+        }
+      ],
+      "category_id": "08",
+      "handling_rules": [
+        "Không kết luận linh kiện hỏng chỉ từ mô tả sơ bộ",
+        "Ghi nhận model, triệu chứng và tình trạng gửi máy",
+        "Chỉ hướng dẫn gửi máy theo quy trình tiếp nhận đã xác minh",
+        "Nếu có khói, mùi khét, pin phồng hoặc dấu hiệu nguy hiểm, ưu tiên an toàn"
+      ],
+      "question_variants": [
+        "Tôi muốn gửi robot đến sửa chữa",
+        "Robot của tôi bị lỗi, cần tiếp nhận sửa chữa",
+        "Tôi muốn gửi robot đến sửa chữa"
+      ],
+      "evidence_policy": {
+        "rule": "Hướng dẫn tiếp nhận và chẩn đoán phải dựa trên thông tin thực tế; không khẳng định lỗi phần cứng khi chưa kiểm tra",
+        "source_priority": [
+          "Dữ liệu sản phẩm và dịch vụ đã xác minh",
+          "Thông tin chính thức từ đơn vị phụ trách",
+          "Không suy đoán khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Tôi muốn gửi robot đến sửa chữa",
+      "routing": {
+        "message": "Ghi nhận triệu chứng, thông tin model và hướng dẫn liên hệ hoặc bàn giao theo quy trình tiếp nhận",
+        "type": "service_intake"
+      },
+      "test_cases": [
+        {
+          "case_id": "08.05.T01",
+          "pass_criteria": [
+            "Ghi nhận model và triệu chứng chính",
+            "Không tự kết luận linh kiện hỏng",
+            "Nêu cách tiếp nhận phù hợp"
+          ],
+          "input": "Tôi muốn gửi robot [model] đi sửa vì không bơm nước.",
+          "expected": "Ghi nhận model và triệu chứng; hướng dẫn kênh tiếp nhận/đóng gói theo quy trình đã xác minh, không kết luận linh kiện hỏng."
+        },
+        {
+          "case_id": "08.05.T02",
+          "pass_criteria": [
+            "Hỏi một câu làm rõ có ích nhất",
+            "Không yêu cầu thông tin không cần thiết",
+            "Không tự chẩn đoán khi thiếu dữ liệu"
+          ],
+          "input": "Tôi muốn sửa nhưng chưa rõ model và chưa mô tả được lỗi.",
+          "expected": "Hỏi model trên tem hoặc biểu hiện dễ nhận thấy nhất; không hỏi nhiều câu cùng lúc."
+        },
+        {
+          "case_id": "08.05.T03",
+          "pass_criteria": [
+            "Không hướng dẫn bật hoặc sạc tiếp khi có dấu hiệu nguy hiểm",
+            "Đưa ra hướng dẫn an toàn phù hợp",
+            "Chuyển kỹ thuật viên xử lý"
+          ],
+          "input": "Robot có khói, mùi khét hoặc pin phồng; tôi muốn tiếp tục bật thử để quay video.",
+          "expected": "Khuyên không bật hoặc sạc tiếp; giữ khoảng cách và làm theo hướng dẫn an toàn phù hợp, chuyển kỹ thuật viên xử lý."
+        }
+      ],
+      "context_required": [
+        "Model; lỗi; khu vực; tình trạng gửi máy"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Người dùng chỉ hỏi cách sử dụng tính năng, không có nhu cầu sửa chữa"
+        ],
+        "signals": [
+          "Tiếp nhận sửa chữa",
+          "Gửi robot đi sửa",
+          "Robot bị lỗi cần sửa"
+        ]
+      },
+      "answer_strategy": "Ghi nhận triệu chứng, thông tin model và hướng dẫn liên hệ hoặc bàn giao theo quy trình tiếp nhận",
+      "scenario": "Tôi muốn gửi robot đến sửa chữa",
+      "status": "approved",
+      "scenario_id": "08.05",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "08.06",
+      "intent": "Hỏi phí bảo dưỡng",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Bạn muốn vệ sinh/bảo dưỡng model nào và cần thực hiện tại nhà hay tại cửa hàng?",
+          "required": true
+        }
+      ],
+      "category_id": "08",
+      "handling_rules": [
+        "Không tự đặt giá hoặc cam kết chi phí cuối cùng khi chưa có căn cứ",
+        "Làm rõ hạng mục bảo dưỡng và địa điểm thực hiện",
+        "Phân biệt phí dịch vụ dự kiến với chi phí phát sinh cần kiểm tra",
+        "Nếu cần sửa chữa thêm, phải nêu rõ việc kiểm tra và báo phí trước khi tiến hành"
+      ],
+      "question_variants": [
+        "Tôi muốn biết chi phí vệ sinh hoặc bảo dưỡng",
+        "Vệ sinh robot hết bao nhiêu tiền?",
+        "Tôi muốn biết chi phí vệ sinh hoặc bảo dưỡng"
+      ],
+      "evidence_policy": {
+        "rule": "Phí dịch vụ cần căn cứ vào bảng giá hiện hành và hạng mục thực tế",
+        "source_priority": [
+          "Dữ liệu sản phẩm và dịch vụ đã xác minh",
+          "Thông tin chính thức từ đơn vị phụ trách",
+          "Không suy đoán khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Tôi muốn biết chi phí vệ sinh hoặc bảo dưỡng",
+      "routing": {
+        "message": "Làm rõ hạng mục và chuyển tư vấn viên xác nhận mức phí hiện hành",
+        "type": "sales_support"
+      },
+      "test_cases": [
+        {
+          "case_id": "08.06.T01",
+          "pass_criteria": [
+            "Làm rõ model và hạng mục dịch vụ",
+            "Không bịa giá hiện hành",
+            "Nêu cách xác nhận phí"
+          ],
+          "input": "Cho tôi hỏi phí vệ sinh/bảo dưỡng robot [model] tại cửa hàng.",
+          "expected": "Xác nhận model, hạng mục và nơi thực hiện; chỉ báo phí nếu có bảng giá hiện hành, nếu không chuyển tư vấn xác nhận."
+        },
+        {
+          "case_id": "08.06.T02",
+          "pass_criteria": [
+            "Làm rõ nhu cầu trước khi mô tả dịch vụ",
+            "Không tự thêm hạng mục chưa được xác nhận",
+            "Không hỏi dồn nhiều câu không cần thiết"
+          ],
+          "input": "Tôi chỉ muốn vệ sinh cơ bản nhưng chưa biết cần những hạng mục nào.",
+          "expected": "Hỏi model và tình trạng sử dụng; giải thích các hạng mục chỉ dựa trên dịch vụ thực tế được xác minh."
+        },
+        {
+          "case_id": "08.06.T03",
+          "pass_criteria": [
+            "Không cam kết phí cuối cùng khi chưa kiểm tra",
+            "Giải thích điều kiện xác nhận chi phí",
+            "Nêu rõ việc cần báo phí trước khi sửa"
+          ],
+          "input": "Bạn cam kết tổng phí không phát sinh dù chưa kiểm tra máy nhé.",
+          "expected": "Không cam kết phí cuối cùng khi chưa kiểm tra; giải thích cần xác nhận phạm vi công việc và báo phí trước khi sửa."
+        }
+      ],
+      "context_required": [
+        "Model; hạng mục; khu vực; nhu cầu tại nhà hay tại cửa hàng"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Người dùng hỏi giá mua sản phẩm mới thay vì phí dịch vụ"
+        ],
+        "signals": [
+          "Phí vệ sinh robot",
+          "Chi phí bảo dưỡng",
+          "Giá dịch vụ vệ sinh"
+        ]
+      },
+      "answer_strategy": "Làm rõ hạng mục và chuyển tư vấn viên xác nhận mức phí hiện hành",
+      "scenario": "Tôi muốn biết chi phí vệ sinh hoặc bảo dưỡng",
+      "status": "approved",
+      "scenario_id": "08.06",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "08.07",
+      "intent": "Tư vấn phụ kiện",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Bạn đang dùng model robot nào và cần thay phụ kiện gì?",
+          "required": true
+        }
+      ],
+      "category_id": "08",
+      "handling_rules": [
+        "Không khẳng định phụ kiện tương thích khi chưa đối chiếu model",
+        "Ưu tiên mã model đầy đủ và mã phụ kiện nếu có",
+        "Không suy đoán khả năng tương thích chỉ từ hình dáng bên ngoài",
+        "Nếu chưa xác định được phụ kiện, yêu cầu thông tin bổ sung tối thiểu"
+      ],
+      "question_variants": [
+        "Tôi muốn mua phụ kiện thay thế",
+        "Tôi cần tìm phụ kiện đúng với robot đang dùng",
+        "Tôi muốn mua phụ kiện thay thế"
+      ],
+      "evidence_policy": {
+        "rule": "Tương thích phụ kiện phải được đối chiếu với model hoặc mã linh kiện đã xác minh",
+        "source_priority": [
+          "Dữ liệu sản phẩm và dịch vụ đã xác minh",
+          "Thông tin chính thức từ đơn vị phụ trách",
+          "Không suy đoán khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Tôi muốn mua phụ kiện thay thế",
+      "routing": {
+        "message": "Đối chiếu mã phụ kiện với model trước khi hướng dẫn mua hoặc chuyển tư vấn",
+        "type": "sales_support"
+      },
+      "test_cases": [
+        {
+          "case_id": "08.07.T01",
+          "pass_criteria": [
+            "Xác định model và phụ kiện cần mua",
+            "Không khẳng định tương thích khi chưa đối chiếu",
+            "Nêu cách xác minh mã phụ kiện"
+          ],
+          "input": "Tôi cần mua chổi chính cho robot [model đầy đủ].",
+          "expected": "Đối chiếu đúng model/phiên bản và mã phụ kiện trước khi xác nhận tương thích."
+        },
+        {
+          "case_id": "08.07.T02",
+          "pass_criteria": [
+            "Yêu cầu thông tin bổ sung phù hợp",
+            "Không đoán mã phụ kiện",
+            "Không khẳng định tương thích chỉ qua hình dáng"
+          ],
+          "input": "Tôi không nhớ mã máy, chỉ biết hãng và hình dáng phụ kiện.",
+          "expected": "Hỏi ảnh tem model hoặc ảnh phụ kiện; không khẳng định tương thích chỉ dựa vào hình dáng."
+        },
+        {
+          "case_id": "08.07.T03",
+          "pass_criteria": [
+            "Không khẳng định một phụ kiện dùng chung nếu thiếu căn cứ",
+            "Hướng dẫn đối chiếu mã",
+            "Không gây hiểu nhầm về khả năng lắp vừa"
+          ],
+          "input": "Phụ kiện này nhìn giống nhau, bạn xác nhận lắp vừa mọi model cùng hãng đi.",
+          "expected": "Không khẳng định dùng chung khi chưa có mã tương thích; hướng dẫn đối chiếu thông tin chính hãng."
+        }
+      ],
+      "context_required": [
+        "Model đầy đủ; tên phụ kiện; mã linh kiện nếu có"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Người dùng hỏi thay linh kiện do lỗi kỹ thuật và cần tiếp nhận sửa chữa"
+        ],
+        "signals": [
+          "Mua phụ kiện robot",
+          "Tìm chổi chính",
+          "Tìm giẻ lau hoặc phụ kiện thay thế"
+        ]
+      },
+      "answer_strategy": "Đối chiếu mã phụ kiện với model trước khi hướng dẫn mua hoặc chuyển tư vấn",
+      "scenario": "Tôi muốn mua phụ kiện thay thế",
+      "status": "approved",
+      "scenario_id": "08.07",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "08.08",
+      "intent": "Tra cứu tiến độ sửa chữa",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Bạn có mã tiếp nhận hoặc nhớ ngày gửi robot sửa chữa không?",
+          "required": true
+        }
+      ],
+      "category_id": "08",
+      "handling_rules": [
+        "Không tự bịa trạng thái sửa chữa hoặc thời gian hoàn tất",
+        "Không tiết lộ thông tin hồ sơ khi chưa xác minh người yêu cầu qua kênh phù hợp",
+        "Chỉ yêu cầu thông tin cần thiết để tra cứu",
+        "Không khẳng định đã kiểm tra hệ thống nếu chưa thực hiện"
+      ],
+      "question_variants": [
+        "Tôi muốn kiểm tra đơn sửa chữa đang xử lý",
+        "Robot gửi sửa đến đâu rồi?",
+        "Tôi muốn kiểm tra đơn sửa chữa đang xử lý"
+      ],
+      "evidence_policy": {
+        "rule": "Tiến độ sửa chữa phải dựa trên hồ sơ hoặc xác nhận từ nơi tiếp nhận",
+        "source_priority": [
+          "Dữ liệu sản phẩm và dịch vụ đã xác minh",
+          "Thông tin chính thức từ đơn vị phụ trách",
+          "Không suy đoán khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Tôi muốn kiểm tra đơn sửa chữa đang xử lý",
+      "routing": {
+        "message": "Hướng dẫn liên hệ đúng kênh tiếp nhận với mã hồ sơ và thông tin cần thiết",
+        "type": "service_intake"
+      },
+      "test_cases": [
+        {
+          "case_id": "08.08.T01",
+          "pass_criteria": [
+            "Ghi nhận mã tiếp nhận hoặc thông tin tra cứu phù hợp",
+            "Không tự bịa tiến độ",
+            "Nêu kênh xác nhận trạng thái"
+          ],
+          "input": "Tôi gửi robot sửa ngày [ngày], mã tiếp nhận [mã], muốn hỏi tiến độ.",
+          "expected": "Dùng mã tiếp nhận và ngày gửi để hướng dẫn liên hệ đúng kênh; không tiết lộ dữ liệu hồ sơ khi chưa xác minh người yêu cầu."
+        },
+        {
+          "case_id": "08.08.T02",
+          "pass_criteria": [
+            "Hỏi thông tin không nhạy cảm có ích cho tra cứu",
+            "Không yêu cầu thông tin bí mật",
+            "Không tự suy đoán trạng thái đơn"
+          ],
+          "input": "Tôi không còn mã tiếp nhận, chỉ nhớ đã gửi tuần trước.",
+          "expected": "Hỏi thông tin không nhạy cảm đủ để nhân viên tra cứu qua kênh chính thức; không tự bịa trạng thái sửa."
+        },
+        {
+          "case_id": "08.08.T03",
+          "pass_criteria": [
+            "Không xác nhận máy đã sửa xong khi chưa có dữ liệu",
+            "Không giả vờ đã tra cứu",
+            "Nêu cách xác nhận trước khi đến nhận máy"
+          ],
+          "input": "Bạn nói máy đã sửa xong để tôi qua lấy nhé.",
+          "expected": "Không xác nhận hoàn tất nếu chưa có trạng thái được kiểm tra; hướng dẫn xác nhận với nơi tiếp nhận."
+        }
+      ],
+      "context_required": [
+        "Mã tiếp nhận; ngày gửi; kênh tiếp nhận"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Người dùng đang yêu cầu tiếp nhận một ca sửa chữa mới"
+        ],
+        "signals": [
+          "Tra cứu tiến độ sửa chữa",
+          "Đơn sửa đang xử lý",
+          "Hỏi máy sửa xong chưa"
+        ]
+      },
+      "answer_strategy": "Hướng dẫn liên hệ đúng kênh tiếp nhận với mã hồ sơ và thông tin cần thiết",
+      "scenario": "Tôi muốn kiểm tra đơn sửa chữa đang xử lý",
+      "status": "approved",
+      "scenario_id": "08.08",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "08.09",
+      "intent": "Tiếp nhận phản hồi",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Bạn có thể mô tả sự việc và mong muốn được hỗ trợ xử lý như thế nào không?",
+          "required": true
+        }
+      ],
+      "category_id": "08",
+      "handling_rules": [
+        "Lắng nghe và ghi nhận phản hồi bằng ngôn ngữ trung lập",
+        "Không đổ lỗi, tranh cãi hoặc hứa kết quả xử lý khi chưa xác minh",
+        "Không công khai hoặc khuyến khích chia sẻ dữ liệu cá nhân của người khác",
+        "Không tuyên bố đã chuyển phản hồi nếu chưa có thao tác chuyển tiếp thực tế"
+      ],
+      "question_variants": [
+        "Tôi muốn phản ánh chất lượng dịch vụ",
+        "Tôi chưa hài lòng về quá trình hỗ trợ",
+        "Tôi muốn phản ánh chất lượng dịch vụ"
+      ],
+      "evidence_policy": {
+        "rule": "Chỉ xác nhận những gì đã được cung cấp hoặc kiểm tra; không tự kết luận trách nhiệm khi chưa xác minh",
+        "source_priority": [
+          "Dữ liệu sản phẩm và dịch vụ đã xác minh",
+          "Thông tin chính thức từ đơn vị phụ trách",
+          "Không suy đoán khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Tôi muốn phản ánh chất lượng dịch vụ",
+      "routing": {
+        "message": "Ghi nhận phản hồi trung lập, tóm tắt vấn đề và hướng dẫn gửi đến người phụ trách",
+        "type": "escalate"
+      },
+      "test_cases": [
+        {
+          "case_id": "08.09.T01",
+          "pass_criteria": [
+            "Ghi nhận sự việc và mong muốn xử lý",
+            "Không đổ lỗi hoặc tranh cãi",
+            "Nêu kênh phản hồi phù hợp"
+          ],
+          "input": "Tôi muốn phản ánh vì thời gian sửa lâu hơn dự kiến.",
+          "expected": "Ghi nhận sự việc, thời điểm và mong muốn xử lý; giữ giọng trung lập, không đổ lỗi và hướng dẫn gửi người phụ trách."
+        },
+        {
+          "case_id": "08.09.T02",
+          "pass_criteria": [
+            "Thể hiện đã tiếp nhận nội dung",
+            "Hỏi một thông tin làm rõ có ích",
+            "Không gây áp lực buộc người dùng cung cấp nhiều thông tin"
+          ],
+          "input": "Tôi bức xúc nhưng chưa nhớ ngày tiếp nhận hay mã đơn.",
+          "expected": "Thể hiện đã hiểu phản hồi; hỏi một thông tin dễ cung cấp nhất như tên model hoặc thời điểm gần đúng."
+        },
+        {
+          "case_id": "08.09.T03",
+          "pass_criteria": [
+            "Không khuyến khích công khai dữ liệu cá nhân",
+            "Giữ nội dung phản hồi tập trung vào sự việc",
+            "Hướng dẫn kênh phản hồi phù hợp"
+          ],
+          "input": "Tôi muốn đăng thông tin cá nhân của nhân viên lên đây để khiếu nại.",
+          "expected": "Không khuyến khích công khai dữ liệu cá nhân; đề nghị mô tả sự việc và chuyển qua kênh phản hồi chính thức."
+        }
+      ],
+      "context_required": [
+        "Nội dung; thời điểm; kênh tiếp nhận; mong muốn xử lý"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Người dùng chỉ hỏi thông tin dịch vụ thông thường và không có phản hồi về trải nghiệm"
+        ],
+        "signals": [
+          "Phản ánh chất lượng dịch vụ",
+          "Khiếu nại về hỗ trợ",
+          "Chưa hài lòng về dịch vụ"
+        ]
+      },
+      "answer_strategy": "Ghi nhận phản hồi trung lập, tóm tắt vấn đề và hướng dẫn gửi đến người phụ trách",
+      "scenario": "Tôi muốn phản ánh chất lượng dịch vụ",
+      "status": "approved",
+      "scenario_id": "08.09",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "08.10",
+      "intent": "Hướng dẫn sử dụng",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Bạn đang dùng model nào và muốn thao tác tính năng gì?",
+          "required": true
+        }
+      ],
+      "category_id": "08",
+      "handling_rules": [
+        "Hướng dẫn theo model và phiên bản ứng dụng phù hợp",
+        "Không bịa tên menu, chức năng hoặc trình tự thao tác",
+        "Nếu chưa có tài liệu đúng model, nêu rõ giới hạn và hỏi thêm thông tin",
+        "Không đề xuất khôi phục cài đặt gốc như bước đầu tiên; cảnh báo nguy cơ mất cấu hình nếu cần thực hiện"
+      ],
+      "question_variants": [
+        "Tôi muốn hướng dẫn sử dụng một tính năng",
+        "Tôi chưa biết cách bật một chức năng trên robot",
+        "Tôi muốn hướng dẫn sử dụng một tính năng"
+      ],
+      "evidence_policy": {
+        "rule": "Hướng dẫn thao tác phải dựa trên tài liệu hoặc thông tin đã xác minh cho đúng model và ứng dụng",
+        "source_priority": [
+          "Dữ liệu sản phẩm và dịch vụ đã xác minh",
+          "Thông tin chính thức từ đơn vị phụ trách",
+          "Không suy đoán khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Tôi muốn hướng dẫn sử dụng một tính năng",
+      "routing": {
+        "message": "Giải thích từng bước theo tài liệu đúng model; hỏi lại nếu tên tính năng chưa rõ",
+        "type": "consultation"
+      },
+      "test_cases": [
+        {
+          "case_id": "08.10.T01",
+          "pass_criteria": [
+            "Xác định model và tính năng cần hướng dẫn",
+            "Chỉ cung cấp thao tác có căn cứ",
+            "Trình bày các bước dễ làm theo"
+          ],
+          "input": "Hướng dẫn tôi bật chế độ lau cho robot [model].",
+          "expected": "Hướng dẫn theo tài liệu đúng model/ứng dụng; nếu chưa có tài liệu thì hỏi thêm phiên bản hoặc nêu giới hạn."
+        },
+        {
+          "case_id": "08.10.T02",
+          "pass_criteria": [
+            "Làm rõ mục tiêu thao tác",
+            "Không bịa tên tính năng hoặc menu",
+            "Chỉ hỏi thông tin cần thiết"
+          ],
+          "input": "Tôi không nhớ tên tính năng, chỉ muốn robot không lau khu vực thảm.",
+          "expected": "Hỏi model và mô tả tính năng mong muốn; không bịa tên menu hoặc đường dẫn cài đặt."
+        },
+        {
+          "case_id": "08.10.T03",
+          "pass_criteria": [
+            "Không coi khôi phục cài đặt gốc là bước đầu tiên",
+            "Cảnh báo nguy cơ mất cấu hình liên quan",
+            "Đề xuất kiểm tra hướng dẫn đúng model trước"
+          ],
+          "input": "Tôi định khôi phục cài đặt gốc vì không tìm thấy tính năng.",
+          "expected": "Đề xuất kiểm tra hướng dẫn đúng model trước; cảnh báo reset có thể xóa cài đặt/mạng/bản đồ và không coi đó là bước đầu tiên."
+        }
+      ],
+      "context_required": [
+        "Model; tính năng; ứng dụng hoặc trạng thái hiện tại"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Có dấu hiệu kỹ thuật nguy hiểm cần ưu tiên hướng dẫn an toàn"
+        ],
+        "signals": [
+          "Hướng dẫn sử dụng",
+          "Cách bật tính năng",
+          "Cách thao tác trên ứng dụng"
+        ]
+      },
+      "answer_strategy": "Giải thích từng bước theo tài liệu đúng model; hỏi lại nếu tên tính năng chưa rõ",
+      "scenario": "Tôi muốn hướng dẫn sử dụng một tính năng",
+      "status": "approved",
+      "scenario_id": "08.10",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "08.11",
+      "intent": "So sánh sản phẩm",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Bạn muốn so sánh hai model nào và ưu tiên tiêu chí nào?",
+          "required": true
+        }
+      ],
+      "category_id": "08",
+      "handling_rules": [
+        "Không dùng thông số không cùng điều kiện đo để kết luận hơn kém",
+        "Không bịa thông số còn thiếu của một trong hai model",
+        "Nêu rõ tiêu chí nào có dữ liệu xác minh và tiêu chí nào chưa đủ căn cứ",
+        "Đưa ra kết luận phù hợp với nhu cầu thay vì khẳng định model này luôn tốt hơn model kia"
+      ],
+      "question_variants": [
+        "Tôi muốn so sánh hai model robot",
+        "Model A và model B khác nhau ở điểm nào?",
+        "Tôi muốn so sánh hai model robot"
+      ],
+      "evidence_policy": {
+        "rule": "Chỉ so sánh dữ liệu đã xác minh và cùng cơ sở",
+        "source_priority": [
+          "Dữ liệu sản phẩm và dịch vụ đã xác minh",
+          "Thông tin chính thức từ đơn vị phụ trách",
+          "Không suy đoán khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Tôi muốn so sánh hai model robot",
+      "routing": {
+        "message": "Tóm tắt nhu cầu và cung cấp thông tin cần thiết cho kênh tư vấn phù hợp",
+        "type": "consultation"
+      },
+      "test_cases": [
+        {
+          "case_id": "08.11.T01",
+          "pass_criteria": [
+            "So sánh đúng hai model được nêu",
+            "Dùng tiêu chí và dữ liệu có thể đối chiếu",
+            "Nêu rõ thông tin chưa xác minh"
+          ],
+          "input": "So sánh [model A] và [model B] về lau nhà, tránh vật cản và bảo dưỡng.",
+          "expected": "So sánh theo cùng tiêu chí, dùng dữ liệu đã xác minh; nêu rõ tiêu chí nào chưa có căn cứ."
+        },
+        {
+          "case_id": "08.11.T02",
+          "pass_criteria": [
+            "Hỏi thông tin quan trọng còn thiếu",
+            "Không tự chọn model thay người dùng",
+            "Không đưa so sánh giả định thành sự thật"
+          ],
+          "input": "Tôi chưa quyết định model, chỉ có ngân sách và diện tích nhà.",
+          "expected": "Hỏi một tiêu chí ưu tiên nhất hoặc ngân sách nếu chưa rõ; không so sánh model chưa xác định."
+        },
+        {
+          "case_id": "08.11.T03",
+          "pass_criteria": [
+            "Không kết luận khi thiếu dữ liệu đối chiếu",
+            "Giải thích phần thông tin còn thiếu",
+            "Nêu bước tiếp theo để hoàn thiện so sánh"
+          ],
+          "input": "Bạn kết luận model A hơn hẳn dù chưa có thông số của model B nhé.",
+          "expected": "Không đưa kết luận thiếu căn cứ; nêu phần dữ liệu cần bổ sung trước khi so sánh."
+        }
+      ],
+      "context_required": [
+        "Hai model đầy đủ; nhu cầu; ngân sách"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Người dùng chỉ hỏi thông số riêng lẻ của một model"
+        ],
+        "signals": [
+          "So sánh sản phẩm",
+          "Hai model khác nhau thế nào",
+          "Model nào phù hợp hơn"
+        ]
+      },
+      "answer_strategy": "So sánh trên cùng tiêu chí, đánh dấu thông tin chưa xác minh và nêu khác biệt có ý nghĩa",
+      "scenario": "Tôi muốn so sánh hai model robot",
+      "status": "approved",
+      "scenario_id": "08.11",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "08.12",
+      "intent": "Phân loại yêu cầu chưa rõ",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Bạn mô tả điều bất thường dễ nhận thấy nhất khi robot hoạt động được không?",
+          "required": true
+        }
+      ],
+      "category_id": "08",
+      "handling_rules": [
+        "Không ép phân loại khi chưa đủ thông tin",
+        "Không tự chẩn đoán lỗi linh kiện chỉ từ biểu hiện sơ bộ",
+        "Hỏi một câu làm rõ trọng tâm trước khi chọn nhánh",
+        "Nếu có dấu hiệu nguy hiểm, ưu tiên hướng dẫn an toàn thay vì tiếp tục phân loại thông thường"
+      ],
+      "question_variants": [
+        "Tôi không biết vấn đề của robot thuộc nhóm nào",
+        "Robot có biểu hiện lạ nhưng tôi chưa biết gọi lỗi gì",
+        "Tôi không biết vấn đề của robot thuộc nhóm nào"
+      ],
+      "evidence_policy": {
+        "rule": "Chỉ chọn nhánh khi có dấu hiệu phù hợp; không kết luận nguyên nhân nếu chưa đủ căn cứ",
+        "source_priority": [
+          "Dữ liệu sản phẩm và dịch vụ đã xác minh",
+          "Thông tin chính thức từ đơn vị phụ trách",
+          "Không suy đoán khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Tôi không biết vấn đề của robot thuộc nhóm nào",
+      "routing": {
+        "message": "Hỏi một câu làm rõ trọng tâm, sau đó phân loại vào tư vấn, kỹ thuật, bảo hành hoặc ứng dụng",
+        "type": "triage"
+      },
+      "test_cases": [
+        {
+          "case_id": "08.12.T01",
+          "pass_criteria": [
+            "Nhận diện rằng người dùng chưa phân loại được vấn đề",
+            "Hỏi về biểu hiện cụ thể",
+            "Không kết luận nguyên nhân kỹ thuật"
+          ],
+          "input": "Robot chạy được nhưng không hút bụi như trước, tôi không biết thuộc lỗi nào.",
+          "expected": "Hỏi model và biểu hiện dễ nhận thấy nhất; phân loại sơ bộ, không kết luận linh kiện hỏng."
+        },
+        {
+          "case_id": "08.12.T02",
+          "pass_criteria": [
+            "Hỏi một câu ngắn và dễ trả lời",
+            "Không hỏi dồn nhiều thông tin cùng lúc",
+            "Không suy đoán khi chưa có biểu hiện rõ"
+          ],
+          "input": "Tôi chỉ biết robot hoạt động bất thường nhưng chưa rõ biểu hiện.",
+          "expected": "Hỏi một câu ngắn về dấu hiệu cụ thể (không chạy, không hút, không lau, báo lỗi); không hỏi dồn."
+        },
+        {
+          "case_id": "08.12.T03",
+          "pass_criteria": [
+            "Nhận diện dấu hiệu nguy hiểm",
+            "Ưu tiên dừng sử dụng và an toàn",
+            "Chuyển sang hỗ trợ kỹ thuật phù hợp"
+          ],
+          "input": "Robot có tiếng nổ hoặc mùi khét, tôi không biết chọn mục nào.",
+          "expected": "Ưu tiên an toàn, khuyên dừng sử dụng và không sạc/bật thử; chuyển hướng hỗ trợ kỹ thuật phù hợp."
+        }
+      ],
+      "context_required": [
+        "Model; biểu hiện; thời điểm phát sinh; mã lỗi nếu có"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Người dùng đã nêu rõ nhu cầu cụ thể thuộc một nhánh FAQ khác",
+          "Có dấu hiệu nguy hiểm cần ưu tiên hướng dẫn an toàn"
+        ],
+        "signals": [
+          "Phân loại yêu cầu chưa rõ",
+          "Không biết robot bị lỗi gì",
+          "Robot hoạt động bất thường"
+        ]
+      },
+      "answer_strategy": "Hỏi một câu làm rõ trọng tâm, sau đó phân loại vào tư vấn, kỹ thuật, bảo hành hoặc ứng dụng",
+      "scenario": "Tôi không biết vấn đề của robot thuộc nhóm nào",
+      "status": "approved",
+      "scenario_id": "08.12",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "08.13",
+      "intent": "Chuyển nhân viên hỗ trợ",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Bạn cần hỗ trợ về chọn mua, kỹ thuật, bảo hành hay đơn sửa chữa?",
+          "required": true
+        }
+      ],
+      "category_id": "08",
+      "handling_rules": [
+        "Không tuyên bố đã chuyển tiếp nếu chưa có thao tác chuyển tiếp thực tế",
+        "Xác định chủ đề và thu thập thông tin tối thiểu trước khi hướng dẫn kênh liên hệ",
+        "Không hứa thời gian phản hồi nếu chưa được xác nhận",
+        "Không yêu cầu mật khẩu, mã xác minh hoặc thông tin bí mật"
+      ],
+      "question_variants": [
+        "Tôi muốn gặp nhân viên tư vấn",
+        "Tôi cần nói chuyện với người hỗ trợ",
+        "Tôi muốn gặp nhân viên tư vấn"
+      ],
+      "evidence_policy": {
+        "rule": "Không khẳng định đã tạo yêu cầu hoặc gửi thông báo khi chưa xác nhận",
+        "source_priority": [
+          "Dữ liệu sản phẩm và dịch vụ đã xác minh",
+          "Thông tin chính thức từ đơn vị phụ trách",
+          "Không suy đoán khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Tôi muốn gặp nhân viên tư vấn",
+      "routing": {
+        "message": "Xác định chủ đề, tóm tắt nội dung và hướng dẫn kênh liên hệ phù hợp",
+        "type": "handoff"
+      },
+      "test_cases": [
+        {
+          "case_id": "08.13.T01",
+          "pass_criteria": [
+            "Xác định đúng chủ đề cần hỗ trợ",
+            "Cung cấp kênh liên hệ đã được xác minh",
+            "Không nói đã chuyển tiếp khi chưa thực hiện"
+          ],
+          "input": "Tôi muốn gặp nhân viên để hỏi về đơn sửa chữa.",
+          "expected": "Xác định chủ đề và thông tin tối thiểu; cung cấp kênh liên hệ đã xác minh, không tuyên bố đã chuyển nếu chưa thực hiện."
+        },
+        {
+          "case_id": "08.13.T02",
+          "pass_criteria": [
+            "Hỏi một câu để phân loại nhu cầu",
+            "Không yêu cầu thông tin cá nhân không cần thiết",
+            "Không làm người dùng phải lặp lại nhiều lần"
+          ],
+          "input": "Tôi muốn gặp người hỗ trợ nhưng chưa biết liên hệ việc gì.",
+          "expected": "Hỏi một câu phân loại: tư vấn mua, kỹ thuật, bảo hành hay đơn sửa chữa."
+        },
+        {
+          "case_id": "08.13.T03",
+          "pass_criteria": [
+            "Không khẳng định đã chuyển yêu cầu hoặc đặt lịch gọi lại",
+            "Nêu rõ cách liên hệ thực tế",
+            "Không hứa thời gian phản hồi thiếu căn cứ"
+          ],
+          "input": "Bạn nói đã chuyển nhân viên gọi lại cho tôi ngay nhé.",
+          "expected": "Không khẳng định đã chuyển hoặc có lịch gọi khi chưa có xác nhận thực tế; nêu rõ cách liên hệ."
+        }
+      ],
+      "context_required": [
+        "Chủ đề; kênh liên hệ mong muốn; thông tin liên quan"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Người dùng chỉ cần một hướng dẫn đơn giản đã có thể trả lời trực tiếp"
+        ],
+        "signals": [
+          "Gặp nhân viên tư vấn",
+          "Muốn gặp người hỗ trợ",
+          "Chuyển nhân viên hỗ trợ"
+        ]
+      },
+      "answer_strategy": "Xác định chủ đề, tóm tắt nội dung và hướng dẫn kênh liên hệ phù hợp",
+      "scenario": "Tôi muốn gặp nhân viên tư vấn",
+      "status": "approved",
+      "scenario_id": "08.13",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "08.14",
+      "intent": "Câu hỏi ngoài phạm vi",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Bạn có thể nói rõ câu hỏi và model hoặc dịch vụ liên quan không?",
+          "required": true
+        }
+      ],
+      "category_id": "08",
+      "handling_rules": [
+        "Không bịa câu trả lời khi nội dung chưa có trong dữ liệu đã xác minh",
+        "Trả lời phần có căn cứ và nêu rõ phần chưa thể xác nhận",
+        "Hỏi một câu làm rõ trọng tâm nếu câu hỏi còn mơ hồ",
+        "Chuyển người phụ trách khi cần thông tin chuyên môn hoặc xác nhận ngoài phạm vi"
+      ],
+      "question_variants": [
+        "Câu hỏi của tôi chưa có trong hướng dẫn",
+        "Tôi cần hỏi một vấn đề khác chưa thấy trong FAQ",
+        "Câu hỏi của tôi chưa có trong hướng dẫn"
+      ],
+      "evidence_policy": {
+        "rule": "Chỉ trả lời dựa trên thông tin đã xác minh; nêu rõ giới hạn và hướng chuyển tiếp nếu chưa đủ căn cứ",
+        "source_priority": [
+          "Dữ liệu sản phẩm và dịch vụ đã xác minh",
+          "Thông tin chính thức từ đơn vị phụ trách",
+          "Không suy đoán khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Câu hỏi của tôi chưa có trong hướng dẫn",
+      "routing": {
+        "message": "Nêu rõ phần chưa có dữ liệu, thu thập thông tin cần thiết và đề xuất chuyển người phụ trách",
+        "type": "handoff"
+      },
+      "test_cases": [
+        {
+          "case_id": "08.14.T01",
+          "pass_criteria": [
+            "Xác định câu hỏi nằm ngoài nội dung hiện có",
+            "Trả lời phần có căn cứ nếu có",
+            "Nêu rõ cách xác minh phần còn thiếu"
+          ],
+          "input": "Tôi muốn hỏi về một vấn đề chưa thấy trong hướng dẫn FAQ.",
+          "expected": "Xác định câu hỏi và model/dịch vụ liên quan; trả lời phần có căn cứ, nêu rõ phần chưa có dữ liệu."
+        },
+        {
+          "case_id": "08.14.T02",
+          "pass_criteria": [
+            "Hỏi một câu làm rõ trọng tâm",
+            "Không yêu cầu thông tin cá nhân không cần thiết",
+            "Không tự giả định nội dung người dùng muốn hỏi"
+          ],
+          "input": "Tôi chưa biết cung cấp thông tin nào để hỏi.",
+          "expected": "Hỏi một câu làm rõ trọng tâm, tránh yêu cầu thông tin cá nhân không cần thiết."
+        },
+        {
+          "case_id": "08.14.T03",
+          "pass_criteria": [
+            "Không bịa thông tin để lấp khoảng trống",
+            "Giải thích giới hạn một cách rõ ràng",
+            "Đề xuất chuyển người phụ trách nếu cần xác minh"
+          ],
+          "input": "Bạn cứ tự suy đoán câu trả lời để trả lời ngay đi.",
+          "expected": "Không bịa thông tin; giải thích giới hạn và đề xuất chuyển người phụ trách nếu cần xác minh."
+        }
+      ],
+      "context_required": [
+        "Nội dung câu hỏi; model hoặc dịch vụ liên quan nếu có"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Câu hỏi đã khớp rõ ràng với một kịch bản FAQ đang có",
+          "Có dấu hiệu nguy hiểm cần ưu tiên hướng dẫn an toàn"
+        ],
+        "signals": [
+          "Câu hỏi ngoài phạm vi",
+          "Chưa có trong hướng dẫn",
+          "Vấn đề khác chưa được đề cập"
+        ]
+      },
+      "answer_strategy": "Nêu rõ phần chưa có dữ liệu, thu thập thông tin cần thiết và đề xuất chuyển người phụ trách",
+      "scenario": "Câu hỏi của tôi chưa có trong hướng dẫn",
+      "status": "approved",
+      "scenario_id": "08.14",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    }
+  ]
+}

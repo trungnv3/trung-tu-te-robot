@@ -1,0 +1,1168 @@
+﻿{
+  "schema_version": "1.0",
+  "project": "Trung Tu Te Robot FAQ V2",
+  "language": "vi-VN",
+  "category_id": "05",
+  "category_name": "Bảo dưỡng và sửa chữa",
+  "created_as": "new",
+  "scenario_count": 12,
+  "minimum_tests_per_scenario": 3,
+  "scenarios": [
+    {
+      "branch_id": "05.01",
+      "intent": "Tần suất vệ sinh robot",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Anh/chị cho mình biết model robot và tần suất sử dụng hằng ngày hoặc hằng tuần nhé?",
+          "required": true
+        }
+      ],
+      "category_id": "05",
+      "handling_rules": [
+        "Phân biệt vệ sinh sau mỗi lần sử dụng với vệ sinh, kiểm tra định kỳ các bộ phận.",
+        "Điều chỉnh khuyến nghị theo mức độ sử dụng, tóc hoặc lông thú cưng, bụi bẩn và môi trường; không áp dụng một lịch cố định cho mọi model.",
+        "Tắt robot trước khi vệ sinh các bộ phận theo hướng dẫn của hãng; không chạm vào bộ phận chuyển động khi robot đang hoạt động.",
+        "Nếu chưa rõ model hoặc cấu tạo, chỉ hướng dẫn các bước chung an toàn và hỏi thêm thông tin trước khi đưa chỉ dẫn cụ thể."
+      ],
+      "question_variants": [
+        "Bao lâu nên vệ sinh robot một lần?",
+        "Robot dùng hằng ngày thì cần vệ sinh những gì?",
+        "Tôi muốn biết lịch vệ sinh và bảo dưỡng robot lau nhà."
+      ],
+      "evidence_policy": {
+        "rule": "Chỉ nêu chu kỳ cụ thể khi có tài liệu phù hợp với model; nếu chưa có căn cứ, đưa nguyên tắc tham khảo và khuyên đối chiếu hướng dẫn của hãng.",
+        "source_priority": [
+          "Tài liệu chính hãng đúng model",
+          "Thông tin model và điều kiện sử dụng do người dùng cung cấp",
+          "Nguyên tắc vệ sinh chung an toàn",
+          "Không suy đoán khi thiếu dữ liệu"
+        ]
+      },
+      "user_question": "Bao lâu nên vệ sinh robot một lần?",
+      "routing": {
+        "message": "Nếu robot có dấu hiệu bất thường hoặc cần kiểm tra bên trong, anh/chị cung cấp model và biểu hiện cụ thể để kỹ thuật viên đánh giá.",
+        "when": false,
+        "type": "self_help"
+      },
+      "test_cases": [
+        {
+          "case_id": "05.01.T01",
+          "input": "Tôi dùng robot lau nhà mỗi ngày, bao lâu nên vệ sinh một lần?",
+          "expected": "Giải thích rằng cần vệ sinh các bộ phận bám bẩn thường xuyên, đồng thời kiểm tra chổi, bánh xe, cảm biến, hộp bụi hoặc trạm theo mức độ bẩn và hướng dẫn của model. Hỏi model nếu cần lịch cụ thể.",
+          "pass_criteria": [
+            "Phân biệt vệ sinh thường xuyên với bảo dưỡng định kỳ",
+            "Đưa khuyến nghị theo mức sử dụng và tình trạng bẩn",
+            "Không đặt ra thời hạn bắt buộc chung cho mọi model"
+          ]
+        },
+        {
+          "case_id": "05.01.T02",
+          "input": "Nhà tôi có hai con chó, robot thường bị quấn nhiều lông. Có cần vệ sinh thường xuyên hơn không?",
+          "expected": "Khuyên kiểm tra và loại bỏ lông bám ở chổi, bánh xe và các vị trí người dùng được phép vệ sinh thường xuyên hơn; xác minh model để chỉ rõ các bộ phận và cách tháo phù hợp.",
+          "pass_criteria": [
+            "Điều chỉnh khuyến nghị theo lượng lông và mức độ bẩn",
+            "Không hướng dẫn tháo bộ phận khi chưa xác minh cấu tạo",
+            "Không khẳng định lông thú cưng chắc chắn gây hỏng động cơ"
+          ]
+        },
+        {
+          "case_id": "05.01.T03",
+          "input": "Tôi vệ sinh robot rồi nhưng máy vẫn phát tiếng kêu lạ và di chuyển yếu hơn trước.",
+          "expected": "Không tiếp tục lặp lại lịch vệ sinh thông thường. Hỏi model, vị trí phát tiếng, thời điểm xuất hiện và dấu hiệu kèm theo; hướng dẫn dừng sử dụng nếu có tiếng cọ xát mạnh, nóng bất thường hoặc mùi khét và chuyển kỹ thuật khi cần.",
+          "pass_criteria": [
+            "Nhận diện đây là tình trạng bất thường, không chỉ là câu hỏi về lịch vệ sinh",
+            "Không kết luận linh kiện hỏng khi chưa kiểm tra",
+            "Nêu rõ điều kiện dừng sử dụng và chuyển kỹ thuật"
+          ]
+        }
+      ],
+      "context_required": [
+        "Model robot",
+        "Tần suất và thời lượng sử dụng",
+        "Loại sàn, lượng bụi, tóc hoặc lông thú cưng",
+        "Lịch vệ sinh gần nhất và tình trạng hiện tại"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Có khói, mùi khét, quá nhiệt, pin hư hỏng hoặc dấu hiệu nguy hiểm về điện cần ưu tiên xử lý an toàn",
+          "Người dùng mô tả lỗi vận hành cụ thể cần chuyển sang kịch bản chẩn đoán tương ứng"
+        ],
+        "signals": [
+          "Bao lâu nên vệ sinh robot?",
+          "Lịch vệ sinh robot",
+          "Robot dùng hằng ngày cần bảo dưỡng gì?"
+        ]
+      },
+      "answer_strategy": "Phân loại nhu cầu thành vệ sinh thường xuyên, vệ sinh theo tình trạng bẩn và kiểm tra định kỳ. Hỏi model khi cần hướng dẫn cụ thể; không tự đặt chu kỳ thay thế hoặc bảo dưỡng bắt buộc.",
+      "scenario": "Bao lâu nên vệ sinh robot một lần?",
+      "status": "approved",
+      "scenario_id": "05.01",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "05.02",
+      "intent": "Vệ sinh chổi robot",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Anh/chị cho biết model robot và chổi đang bị quấn tóc, bám bẩn, kẹt hay đã mòn hoặc hư hỏng nhé?",
+          "required": true
+        }
+      ],
+      "category_id": "05",
+      "handling_rules": [
+        "Yêu cầu dừng robot và tắt nguồn trước khi vệ sinh chổi theo hướng dẫn của hãng.",
+        "Chỉ hướng dẫn tháo nắp chổi hoặc chổi cạnh khi xác minh được cấu tạo của model.",
+        "Không kéo mạnh tóc quấn, dùng vật sắc gần lưỡi chổi hoặc làm hỏng trục, chốt và nắp giữ.",
+        "Nếu chổi bị biến dạng, nứt, trục kẹt hoặc phát tiếng bất thường sau vệ sinh, không ép vận hành."
+      ],
+      "question_variants": [
+        "Vệ sinh chổi chính và chổi cạnh thế nào?",
+        "Chổi robot bị quấn tóc thì xử lý ra sao?",
+        "Chổi chính không quay sau khi vệ sinh."
+      ],
+      "evidence_policy": {
+        "rule": "Cách tháo, vệ sinh và lắp chổi phải phù hợp với model; không mặc định mọi chổi đều tháo theo cùng một cách.",
+        "source_priority": [
+          "Hướng dẫn chính hãng đúng model",
+          "Hình ảnh hoặc mô tả cấu tạo chổi do người dùng cung cấp",
+          "Nguyên tắc vệ sinh bên ngoài an toàn",
+          "Không suy đoán khi thiếu dữ liệu"
+        ]
+      },
+      "user_question": "Vệ sinh chổi chính và chổi cạnh thế nào?",
+      "routing": {
+        "message": "Nếu chổi vẫn kẹt, không quay hoặc có tiếng bất thường sau khi làm sạch đúng hướng dẫn, anh/chị nên cung cấp model để kỹ thuật viên kiểm tra.",
+        "when": true,
+        "type": "diagnose_then_route"
+      },
+      "test_cases": [
+        {
+          "case_id": "05.02.T01",
+          "input": "Chổi chính robot quấn đầy tóc. Tôi nên làm sạch thế nào?",
+          "expected": "Hướng dẫn tắt robot, tháo cụm chổi theo tài liệu model, gỡ tóc cẩn thận, kiểm tra hai đầu trục và lắp lại đúng vị trí. Nếu chưa biết model, hỏi model trước khi mô tả cách tháo.",
+          "pass_criteria": [
+            "Đặt yêu cầu dừng robot trước khi vệ sinh",
+            "Không giả định cấu tạo chổi giống nhau giữa các model",
+            "Không khuyên dùng lực mạnh hoặc vật sắc gây hư hỏng"
+          ]
+        },
+        {
+          "case_id": "05.02.T02",
+          "input": "Tôi đã lấy tóc ra nhưng chổi chính vẫn không quay và robot báo lỗi chổi.",
+          "expected": "Hỏi mã lỗi và model; hướng dẫn kiểm tra bên ngoài xem chổi, nắp giữ hoặc trục có lắp lệch hay còn vật cản không, chỉ theo tài liệu phù hợp. Nếu lỗi còn tiếp diễn, chuyển kỹ thuật.",
+          "pass_criteria": [
+            "Phân biệt vệ sinh chổi với chẩn đoán lỗi cơ cấu quay",
+            "Không kết luận động cơ chổi đã hỏng",
+            "Có điều kiện chuyển kỹ thuật khi lỗi không hết"
+          ]
+        },
+        {
+          "case_id": "05.02.T03",
+          "input": "Chổi cạnh bị cong, nứt và có một sợi bị gãy. Tôi có nên tiếp tục dùng không?",
+          "expected": "Khuyên ngừng sử dụng chổi hư hỏng nếu có nguy cơ mắc kẹt hoặc làm ảnh hưởng hoạt động; xác minh model và mã phụ kiện trước khi đề xuất thay thế.",
+          "pass_criteria": [
+            "Nhận diện hư hỏng vật lý chứ không chỉ bám bẩn",
+            "Không khuyên tiếp tục dùng phụ kiện hư hỏng nghiêm trọng",
+            "Không đề xuất phụ kiện tương thích khi chưa xác minh model"
+          ]
+        }
+      ],
+      "context_required": [
+        "Model robot",
+        "Loại chổi và vị trí chổi",
+        "Tình trạng tóc, lông, bụi hoặc vật cản",
+        "Mã lỗi và tình trạng chổi sau vệ sinh"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Có dấu hiệu điện, pin hoặc quá nhiệt cần dừng thao tác",
+          "Câu hỏi chủ yếu về mua phụ kiện thay thế, cần xử lý theo kịch bản phụ kiện hao mòn"
+        ],
+        "signals": [
+          "Vệ sinh chổi chính",
+          "Chổi cạnh bị quấn tóc",
+          "Chổi robot không quay"
+        ]
+      },
+      "answer_strategy": "Xác định tình trạng chổi trước, hướng dẫn vệ sinh an toàn theo model, sau đó phân biệt vật cản còn sót, lắp sai và hư hỏng cần kiểm tra.",
+      "scenario": "Vệ sinh chổi chính và chổi cạnh thế nào?",
+      "status": "approved",
+      "scenario_id": "05.02",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "05.03",
+      "intent": "Thay giẻ lau",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Giẻ lau chỉ bẩn, có mùi, bị rách hay không còn bám và thấm nước như trước; model robot của anh/chị là gì?",
+          "required": true
+        }
+      ],
+      "category_id": "05",
+      "handling_rules": [
+        "Phân biệt giặt giẻ sau sử dụng với thay giẻ mới do hư hỏng hoặc xuống cấp.",
+        "Không quy định tuổi thọ chung cho mọi loại giẻ; tần suất thay phụ thuộc tình trạng, mức sử dụng và hướng dẫn của hãng.",
+        "Không dùng chất tẩy hoặc nhiệt độ giặt chưa được xác nhận phù hợp với vật liệu giẻ.",
+        "Kiểm tra đúng kiểu gắn giẻ và mã phụ kiện trước khi đề xuất thay."
+      ],
+      "question_variants": [
+        "Bao lâu cần thay giẻ lau?",
+        "Giẻ lau có mùi sau khi giặt thì phải làm sao?",
+        "Giẻ lau bị rách hoặc không lau sạch nữa."
+      ],
+      "evidence_policy": {
+        "rule": "Chỉ nêu thời hạn thay cụ thể khi có tài liệu đúng model hoặc loại phụ kiện; ưu tiên đánh giá tình trạng thực tế.",
+        "source_priority": [
+          "Tài liệu chính hãng đúng model",
+          "Mã phụ kiện và vật liệu giẻ đã xác minh",
+          "Tình trạng giẻ do người dùng mô tả",
+          "Không suy đoán khi thiếu dữ liệu"
+        ]
+      },
+      "user_question": "Bao lâu cần thay giẻ lau?",
+      "routing": {
+        "message": "Nếu giẻ đã được vệ sinh đúng cách nhưng robot vẫn không cấp nước hoặc lau bất thường, anh/chị cung cấp model và triệu chứng để kiểm tra riêng.",
+        "when": true,
+        "type": "diagnose_then_route"
+      },
+      "test_cases": [
+        {
+          "case_id": "05.03.T01",
+          "input": "Tôi dùng robot mỗi ngày. Bao lâu phải thay giẻ lau mới?",
+          "expected": "Giải thích rằng không có một thời hạn chung cho mọi giẻ. Khuyên giặt và làm khô theo hướng dẫn, theo dõi tình trạng sờn, rách, biến dạng hoặc giảm khả năng làm sạch; hỏi model nếu cần thời hạn chính thức.",
+          "pass_criteria": [
+            "Phân biệt giặt thường xuyên với thay mới",
+            "Dựa vào tình trạng giẻ và hướng dẫn model",
+            "Không bịa thời hạn thay cố định"
+          ]
+        },
+        {
+          "case_id": "05.03.T02",
+          "input": "Giẻ lau có mùi dù tôi đã giặt. Tôi nên xử lý thế nào?",
+          "expected": "Khuyên tháo giẻ theo hướng dẫn, giặt bằng phương pháp phù hợp và để khô hoàn toàn trước khi sử dụng; kiểm tra xem giẻ có bám cặn hoặc xuống cấp không. Không khuyến nghị trộn hóa chất hay dùng chất tẩy chưa xác minh.",
+          "pass_criteria": [
+            "Đưa ra cách xử lý mùi an toàn và thực tế",
+            "Không trộn hóa chất hoặc tự đề xuất dung dịch mạnh",
+            "Nêu dấu hiệu cần thay giẻ nếu giẻ vẫn có mùi hoặc hư hỏng"
+          ]
+        },
+        {
+          "case_id": "05.03.T03",
+          "input": "Giẻ lau còn nguyên nhưng robot lau vẫn để lại vệt và giẻ gần như khô.",
+          "expected": "Không kết luận giẻ cần thay ngay. Hỏi model, trạng thái cấp nước và cài đặt lau; hướng dẫn kiểm tra bình nước, lắp giẻ và cài đặt theo tài liệu phù hợp. Chuyển sang chẩn đoán cấp nước nếu tình trạng tiếp diễn.",
+          "pass_criteria": [
+            "Phân biệt vấn đề giẻ với vấn đề cấp nước hoặc cài đặt",
+            "Không đề nghị mua giẻ mới khi chưa có căn cứ",
+            "Xác định thông tin cần có để kiểm tra tiếp"
+          ]
+        }
+      ],
+      "context_required": [
+        "Model robot và loại giẻ",
+        "Tần suất sử dụng và cách giặt",
+        "Tình trạng mùi, rách, sờn hoặc biến dạng",
+        "Dấu hiệu cấp nước và hiệu quả lau"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Robot có rò nước hoặc dấu hiệu nguy hiểm cần xử lý an toàn trước",
+          "Vấn đề chính là robot không cấp nước, cần chuyển sang chẩn đoán hệ thống nước"
+        ],
+        "signals": [
+          "Bao lâu thay giẻ lau",
+          "Giẻ lau có mùi",
+          "Giẻ lau bị rách hoặc giảm hiệu quả"
+        ]
+      },
+      "answer_strategy": "Xác định giẻ cần giặt, làm khô, vệ sinh sâu hay thay mới. Nếu hiệu quả lau giảm nhưng giẻ vẫn tốt, kiểm tra thêm cấp nước và cài đặt trước khi đề xuất phụ kiện.",
+      "scenario": "Bao lâu cần thay giẻ lau?",
+      "status": "approved",
+      "scenario_id": "05.03",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "05.04",
+      "intent": "Thay bộ lọc",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Bộ lọc đang bám bụi, bị ẩm, rách, biến dạng hay ứng dụng báo cần thay; anh/chị dùng model nào?",
+          "required": true
+        }
+      ],
+      "category_id": "05",
+      "handling_rules": [
+        "Không rửa bộ lọc nếu chưa xác nhận nhà sản xuất cho phép vệ sinh bằng nước.",
+        "Không lắp lại bộ lọc còn ẩm nếu tài liệu model yêu cầu bộ lọc khô.",
+        "Không tự đặt chu kỳ thay lọc hoặc khẳng định mọi bộ lọc đều có thể giặt.",
+        "Xác minh đúng loại và mã phụ kiện tương thích trước khi đề xuất thay."
+      ],
+      "question_variants": [
+        "Khi nào cần thay bộ lọc bụi?",
+        "Bộ lọc robot có rửa nước được không?",
+        "Robot hút yếu dù tôi đã vệ sinh bộ lọc."
+      ],
+      "evidence_policy": {
+        "rule": "Khả năng rửa, cách vệ sinh và chu kỳ thay phải dựa vào tài liệu của đúng model hoặc loại bộ lọc đã xác minh.",
+        "source_priority": [
+          "Tài liệu chính hãng đúng model",
+          "Mã và loại bộ lọc đã xác minh",
+          "Tình trạng bộ lọc và cảnh báo thiết bị",
+          "Không suy đoán khi thiếu dữ liệu"
+        ]
+      },
+      "user_question": "Khi nào cần thay bộ lọc bụi?",
+      "routing": {
+        "message": "Nếu bộ lọc đã được vệ sinh hoặc thay đúng loại nhưng lực hút vẫn yếu hay máy tiếp tục báo lỗi, cung cấp model và biểu hiện để kỹ thuật viên kiểm tra thêm.",
+        "when": true,
+        "type": "diagnose_then_route"
+      },
+      "test_cases": [
+        {
+          "case_id": "05.04.T01",
+          "input": "Bộ lọc robot bám bụi nhiều. Tôi có thể rửa dưới vòi nước không?",
+          "expected": "Yêu cầu xác minh model và loại bộ lọc trước khi khẳng định có thể rửa. Nếu chưa xác minh, khuyên làm sạch theo phương pháp được hướng dẫn cho loại lọc đó và không làm ướt tùy ý.",
+          "pass_criteria": [
+            "Không mặc định bộ lọc nào cũng rửa được",
+            "Hỏi model hoặc xác minh tài liệu trước khi chỉ cách vệ sinh cụ thể",
+            "Không khuyến khích lắp lại bộ lọc ẩm"
+          ]
+        },
+        {
+          "case_id": "05.04.T02",
+          "input": "Bộ lọc bị rách nhưng robot vẫn chạy. Tôi có nên tiếp tục dùng không?",
+          "expected": "Giải thích rằng bộ lọc hư hỏng có thể làm giảm hiệu quả lọc hoặc khiến bụi đi vào các khu vực không mong muốn; khuyên ngừng sử dụng chế độ hút nếu cần và thay bằng phụ kiện đúng model theo hướng dẫn.",
+          "pass_criteria": [
+            "Nhận diện hư hỏng vật lý là dấu hiệu cần xử lý",
+            "Không khuyên dùng tiếp bộ lọc rách như bình thường",
+            "Không đề xuất mã phụ kiện khi chưa xác minh"
+          ]
+        },
+        {
+          "case_id": "05.04.T03",
+          "input": "Tôi đã vệ sinh bộ lọc nhưng robot vẫn hút yếu.",
+          "expected": "Hỏi model, cách vệ sinh, tình trạng khô của bộ lọc và biểu hiện hộp bụi, cửa hút hoặc chổi. Hướng dẫn kiểm tra các vị trí người dùng được phép tiếp cận theo tài liệu; nếu vẫn yếu thì chuyển chẩn đoán kỹ thuật.",
+          "pass_criteria": [
+            "Không kết luận bộ lọc là nguyên nhân duy nhất",
+            "Không hướng dẫn tháo động cơ hoặc mạch điện",
+            "Nêu rõ bước kiểm tra tiếp theo và điều kiện chuyển kỹ thuật"
+          ]
+        }
+      ],
+      "context_required": [
+        "Model robot và loại bộ lọc",
+        "Bộ lọc có cho phép rửa hay không",
+        "Tình trạng bám bụi, ẩm, rách hoặc biến dạng",
+        "Cảnh báo ứng dụng và hiệu quả hút hiện tại"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Có mùi khét, khói hoặc dấu hiệu nguy hiểm cần dừng sử dụng",
+          "Lỗi hút yếu cần được xử lý như chẩn đoán hiệu suất nếu không liên quan trực tiếp đến bộ lọc"
+        ],
+        "signals": [
+          "Khi nào thay bộ lọc",
+          "Bộ lọc có rửa được không",
+          "Bộ lọc bị rách hoặc bẩn"
+        ]
+      },
+      "answer_strategy": "Xác minh khả năng vệ sinh của bộ lọc, đánh giá tình trạng thực tế và chỉ đề xuất thay khi có căn cứ. Nếu hiệu suất không cải thiện sau vệ sinh đúng cách, kiểm tra các nguyên nhân bên ngoài khác và chuyển kỹ thuật khi cần.",
+      "scenario": "Khi nào cần thay bộ lọc bụi?",
+      "status": "approved",
+      "scenario_id": "05.04",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "05.05",
+      "intent": "Vệ sinh cảm biến",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Robot đang báo lỗi cảm biến cụ thể hay có biểu hiện như đi sai hướng, va chạm nhiều hoặc không nhận diện cầu thang?",
+          "required": true
+        }
+      ],
+      "category_id": "05",
+      "handling_rules": [
+        "Tắt robot trước khi vệ sinh các bề mặt cảm biến theo hướng dẫn của hãng.",
+        "Chỉ lau nhẹ các bề mặt người dùng được phép tiếp cận bằng vật liệu phù hợp; không đổ chất lỏng trực tiếp lên cảm biến.",
+        "Không dùng dung môi, vật liệu mài mòn hoặc tự tháo cụm cảm biến.",
+        "Nếu robot có biểu hiện không nhận diện mép cầu thang, không thử nghiệm tại nơi có nguy cơ rơi."
+      ],
+      "question_variants": [
+        "Có nên tự vệ sinh cảm biến robot không?",
+        "Robot va chạm nhiều dù nhà không có vật cản.",
+        "Robot báo lỗi cảm biến hoặc không nhận diện cầu thang."
+      ],
+      "evidence_policy": {
+        "rule": "Chỉ xác định vị trí, cách lau và cách kiểm tra cảm biến theo tài liệu của model; không suy luận cảm biến đã hỏng chỉ từ một biểu hiện.",
+        "source_priority": [
+          "Tài liệu chính hãng đúng model",
+          "Mã lỗi và triệu chứng do người dùng cung cấp",
+          "Kiểm tra bề mặt cảm biến bên ngoài an toàn",
+          "Không suy đoán khi thiếu dữ liệu"
+        ]
+      },
+      "user_question": "Có nên tự vệ sinh cảm biến không?",
+      "routing": {
+        "message": "Nếu robot vẫn định vị sai hoặc báo lỗi cảm biến sau khi vệ sinh đúng hướng dẫn, anh/chị nên cung cấp model và mã lỗi để kỹ thuật viên kiểm tra.",
+        "when": true,
+        "type": "diagnose_then_route"
+      },
+      "test_cases": [
+        {
+          "case_id": "05.05.T01",
+          "input": "Tôi muốn tự lau các cảm biến bên ngoài robot. Cần lưu ý gì?",
+          "expected": "Hướng dẫn tắt robot, xác định đúng vị trí cảm biến trong tài liệu model và lau nhẹ bằng vật liệu phù hợp, không phun nước hoặc dung dịch trực tiếp và không tháo cụm cảm biến.",
+          "pass_criteria": [
+            "Yêu cầu dừng robot trước khi vệ sinh",
+            "Không dùng chất lỏng trực tiếp hoặc hóa chất chưa xác minh",
+            "Không hướng dẫn mở cụm cảm biến"
+          ]
+        },
+        {
+          "case_id": "05.05.T02",
+          "input": "Tôi đã lau cảm biến nhưng robot vẫn va vào chân bàn và đi sai hướng.",
+          "expected": "Hỏi model, loại cảm biến hoặc mã lỗi và hoàn cảnh xảy ra; hướng dẫn kiểm tra bề mặt cảm biến, ánh sáng hoặc điều kiện môi trường chỉ khi tài liệu model nêu rõ. Nếu lỗi tiếp diễn, chuyển kỹ thuật.",
+          "pass_criteria": [
+            "Không kết luận cảm biến hỏng ngay lập tức",
+            "Không đưa nguyên nhân đặc thù khi chưa xác minh model",
+            "Đưa ra tiêu chí chuyển kiểm tra chuyên sâu"
+          ]
+        },
+        {
+          "case_id": "05.05.T03",
+          "input": "Robot không nhận diện mép cầu thang. Tôi muốn đặt robot chạy thử để kiểm tra.",
+          "expected": "Khuyên không thử robot ở gần cầu thang hoặc mép cao khi chức năng nhận diện đang nghi ngờ. Đặt robot trên mặt phẳng an toàn và chuyển kỹ thuật nếu không xác minh được chức năng cảm biến theo hướng dẫn chính thức.",
+          "pass_criteria": [
+            "Ưu tiên ngăn nguy cơ robot rơi",
+            "Không hướng dẫn thử nghiệm gần mép cao",
+            "Nêu rõ khi cần dừng thử và chuyển kỹ thuật"
+          ]
+        }
+      ],
+      "context_required": [
+        "Model robot",
+        "Mã lỗi nếu có",
+        "Triệu chứng định vị hoặc tránh vật cản",
+        "Các bước vệ sinh đã thực hiện và điều kiện môi trường"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Có nguy cơ rơi cầu thang cần ưu tiên ngừng thử nghiệm",
+          "Robot có dấu hiệu điện, pin hoặc quá nhiệt nguy hiểm"
+        ],
+        "signals": [
+          "Vệ sinh cảm biến robot",
+          "Robot va chạm nhiều",
+          "Robot không nhận diện cầu thang"
+        ]
+      },
+      "answer_strategy": "Phân biệt vệ sinh bề mặt cảm biến với lỗi định vị. Chỉ hướng dẫn thao tác ngoài thân máy theo model; ưu tiên an toàn nếu robot không nhận diện mép cao và chuyển kỹ thuật khi lỗi còn tiếp diễn.",
+      "scenario": "Có nên tự vệ sinh cảm biến không?",
+      "status": "approved",
+      "scenario_id": "05.05",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "05.06",
+      "intent": "Vệ sinh trạm sạc",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Anh/chị cho biết model robot hoặc trạm và vấn đề chính là khay giặt giẻ bẩn, cặn bám, nước đọng, mùi hay trạm không hoạt động nhé?",
+          "required": true
+        }
+      ],
+      "category_id": "05",
+      "handling_rules": [
+        "Xác định đúng loại trạm và bộ phận được phép tháo rửa theo tài liệu của model.",
+        "Ngắt nguồn điện trước khi vệ sinh trạm theo hướng dẫn; chỉ thao tác khi tay và khu vực cắm điện khô ráo, an toàn.",
+        "Không để nước vào cổng điện, tiếp điểm, bo mạch hoặc các bộ phận không được phép rửa.",
+        "Không dùng dụng cụ sắc để cạy cặn và không tự tháo các cụm bơm, van hoặc bộ phận điện."
+      ],
+      "question_variants": [
+        "Vệ sinh khay giặt giẻ và trạm sạc ra sao?",
+        "Khay giặt giẻ có cặn và mùi hôi.",
+        "Trạm sạc bị bẩn hoặc nước đọng sau khi vệ sinh."
+      ],
+      "evidence_policy": {
+        "rule": "Phải xác minh cấu tạo trạm và các bộ phận tháo rời được theo model; không mặc định mọi trạm đều có cùng khay hoặc cơ chế tự vệ sinh.",
+        "source_priority": [
+          "Hướng dẫn chính hãng đúng model robot và trạm",
+          "Mô tả hoặc hình ảnh bộ phận do người dùng cung cấp",
+          "Nguyên tắc vệ sinh ngoài và ngắt nguồn an toàn",
+          "Không suy đoán khi thiếu dữ liệu"
+        ]
+      },
+      "user_question": "Vệ sinh khay giặt giẻ và trạm sạc ra sao?",
+      "routing": {
+        "message": "Nếu trạm rò nước, có mùi khét, phát tiếng lạ hoặc không hoạt động sau vệ sinh đúng hướng dẫn, ngừng sử dụng khi cần và liên hệ kỹ thuật để kiểm tra.",
+        "when": true,
+        "type": "diagnose_then_route"
+      },
+      "test_cases": [
+        {
+          "case_id": "05.06.T01",
+          "input": "Khay giặt giẻ của trạm có nhiều cặn bẩn. Tôi muốn tự vệ sinh.",
+          "expected": "Hỏi model trạm và hướng dẫn ngắt nguồn, tháo khay chỉ khi người dùng được phép tháo, loại bỏ cặn bằng cách phù hợp và lau khô, lắp lại đúng vị trí theo tài liệu.",
+          "pass_criteria": [
+            "Xác minh model và bộ phận được phép tháo",
+            "Không để nước tiếp xúc với phần điện",
+            "Không khuyên cạy cặn bằng vật sắc hoặc tháo cụm bên trong"
+          ]
+        },
+        {
+          "case_id": "05.06.T02",
+          "input": "Tôi vệ sinh trạm xong thì thấy nước đọng gần khu vực dây điện.",
+          "expected": "Khuyên không chạm vào khu vực ẩm hoặc tiếp tục cắm điện. Chỉ ngắt nguồn nếu có thể thực hiện an toàn mà không tiếp xúc với nước hoặc phần điện nguy hiểm; nếu không, tránh xa và nhờ người có chuyên môn xử lý. Chuyển kỹ thuật kiểm tra trước khi dùng lại.",
+          "pass_criteria": [
+            "Ưu tiên an toàn điện",
+            "Không yêu cầu chạm vào phích cắm hoặc khu vực ẩm khi không an toàn",
+            "Không khuyên bật lại để thử"
+          ]
+        },
+        {
+          "case_id": "05.06.T03",
+          "input": "Tôi đã vệ sinh khay nhưng trạm vẫn không giặt giẻ và phát tiếng bơm lạ.",
+          "expected": "Hỏi model, biểu hiện và mã lỗi; hướng dẫn kiểm tra các bình, khay và vị trí lắp bên ngoài theo tài liệu. Nếu tiếng lạ hoặc lỗi tiếp diễn, ngừng thử lặp lại và chuyển kỹ thuật, không hướng dẫn tháo bơm.",
+          "pass_criteria": [
+            "Phân biệt vệ sinh trạm với lỗi hoạt động",
+            "Không kết luận bơm hỏng khi chưa kiểm tra",
+            "Không hướng dẫn tháo cụm điện hoặc bơm"
+          ]
+        }
+      ],
+      "context_required": [
+        "Model robot và trạm",
+        "Bộ phận cần vệ sinh",
+        "Tình trạng cặn, mùi, nước đọng hoặc mã lỗi",
+        "Các thao tác đã thực hiện"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Có nước gần phần điện hoặc nguy cơ điện giật cần ưu tiên an toàn",
+          "Có mùi khét, khói hoặc quá nhiệt"
+        ],
+        "signals": [
+          "Vệ sinh trạm sạc",
+          "Khay giặt giẻ bẩn",
+          "Trạm có cặn, mùi hoặc nước đọng"
+        ]
+      },
+      "answer_strategy": "Xác định đúng bộ phận và giới hạn thao tác người dùng được phép thực hiện. Ngắt nguồn an toàn trước vệ sinh; chuyển kỹ thuật nếu có nguy cơ điện, rò nước hoặc trạm tiếp tục lỗi.",
+      "scenario": "Vệ sinh khay giặt giẻ và trạm sạc ra sao?",
+      "status": "approved",
+      "scenario_id": "05.06",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "05.07",
+      "intent": "Vệ sinh bình nước",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Bình nước sạch hay bình nước bẩn đang có cặn, mùi, rò nước hoặc khó lắp kín; model robot của anh/chị là gì?",
+          "required": true
+        }
+      ],
+      "category_id": "05",
+      "handling_rules": [
+        "Phân biệt bình nước sạch với bình nước bẩn và xác minh bộ phận của model trước khi hướng dẫn.",
+        "Không sử dụng chất tẩy, dung môi, tinh dầu hoặc chất phụ gia chưa được hãng xác nhận tương thích.",
+        "Không đổ nước lên thân trạm hoặc các đầu nối điện; không ngâm các bộ phận không được phép ngâm.",
+        "Kiểm tra nắp, gioăng và vị trí lắp bên ngoài; nếu bình nứt hoặc rò tại vị trí hư hỏng, không tiếp tục sử dụng như bình thường."
+      ],
+      "question_variants": [
+        "Làm sạch bình nước sạch và bình nước bẩn thế nào?",
+        "Bình nước bẩn có mùi hôi.",
+        "Bình nước bị rò hoặc khó lắp vào trạm."
+      ],
+      "evidence_policy": {
+        "rule": "Chỉ khuyến nghị chất vệ sinh và cách làm sạch dựa trên tài liệu của đúng model; không mặc định mọi bình hoặc gioăng đều chịu được cùng hóa chất.",
+        "source_priority": [
+          "Tài liệu chính hãng đúng model",
+          "Thông tin cấu tạo bình và gioăng đã xác minh",
+          "Tình trạng cặn, mùi và rò nước do người dùng cung cấp",
+          "Không suy đoán khi thiếu dữ liệu"
+        ]
+      },
+      "user_question": "Làm sạch bình nước sạch và bình nước bẩn thế nào?",
+      "routing": {
+        "message": "Nếu bình bị nứt, rò nước không khắc phục được bằng cách lắp đúng hoặc trạm vẫn báo lỗi sau vệ sinh, anh/chị cung cấp model để kiểm tra tiếp.",
+        "when": true,
+        "type": "diagnose_then_route"
+      },
+      "test_cases": [
+        {
+          "case_id": "05.07.T01",
+          "input": "Bình nước bẩn có mùi hôi sau nhiều lần giặt giẻ. Tôi nên làm gì?",
+          "expected": "Hướng dẫn đổ bỏ nước bẩn, làm sạch bình theo cách được hãng cho phép, kiểm tra cặn ở các vị trí dễ tiếp cận và làm khô hoặc lắp lại theo tài liệu. Không khuyên dùng hóa chất mạnh chưa xác minh.",
+          "pass_criteria": [
+            "Phân biệt bình nước bẩn với bình nước sạch",
+            "Không đề xuất hóa chất tùy ý",
+            "Nêu việc kiểm tra cặn và lắp lại đúng hướng dẫn"
+          ]
+        },
+        {
+          "case_id": "05.07.T02",
+          "input": "Bình nước sạch có một lớp cặn. Tôi có thể cho giấm hoặc chất tẩy vào ngâm không?",
+          "expected": "Không khuyên dùng giấm hoặc chất tẩy khi chưa có xác nhận tương thích. Yêu cầu xác minh model và hướng dẫn hãng; tạm thời chỉ làm sạch bằng phương pháp được tài liệu cho phép.",
+          "pass_criteria": [
+            "Không tự khẳng định giấm hoặc chất tẩy an toàn",
+            "Xác minh model trước khi đề xuất dung dịch",
+            "Tránh nguy cơ làm hỏng bình, gioăng hoặc hệ thống nước"
+          ]
+        },
+        {
+          "case_id": "05.07.T03",
+          "input": "Bình nước sạch bị rò sau khi lắp vào trạm. Tôi đã tháo ra lắp lại nhưng vẫn rò.",
+          "expected": "Khuyên dừng sử dụng chức năng liên quan để tránh nước tràn vào khu vực không phù hợp. Kiểm tra bên ngoài nắp, gioăng và vết nứt khi đã tháo bình an toàn; nếu vẫn rò, chuyển kỹ thuật hoặc xác minh phụ kiện thay thế đúng model.",
+          "pass_criteria": [
+            "Không khuyên tiếp tục vận hành khi đang rò nước",
+            "Không hướng dẫn tháo van hoặc cụm bên trong",
+            "Nêu điều kiện chuyển kỹ thuật hoặc thay đúng bộ phận"
+          ]
+        }
+      ],
+      "context_required": [
+        "Model robot hoặc trạm",
+        "Bình nước sạch hay bình nước bẩn",
+        "Tình trạng cặn, mùi, nắp, gioăng và vết nứt",
+        "Vị trí rò và các thao tác đã thực hiện"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Nước rò tới phần điện hoặc dây nguồn, cần ưu tiên an toàn",
+          "Lỗi chính là trạm không bơm hoặc không thoát nước cần chuyển sang chẩn đoán chức năng"
+        ],
+        "signals": [
+          "Vệ sinh bình nước",
+          "Bình nước bẩn có mùi",
+          "Bình nước sạch bị rò"
+        ]
+      },
+      "answer_strategy": "Xác định loại bình và tình trạng cụ thể; hướng dẫn vệ sinh bằng phương pháp được hãng cho phép. Với rò nước hoặc hư hỏng vật lý, ngăn tiếp tục vận hành gây tràn và chuyển kỹ thuật khi cần.",
+      "scenario": "Làm sạch bình nước sạch và bình nước bẩn thế nào?",
+      "status": "approved",
+      "scenario_id": "05.07",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "05.08",
+      "intent": "Thay phụ kiện hao mòn",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Anh/chị cần thay chổi chính, chổi cạnh, giẻ lau, bộ lọc hay phụ kiện nào; model robot là gì và phụ kiện hiện tại có dấu hiệu hư hỏng nào?",
+          "required": true
+        }
+      ],
+      "category_id": "05",
+      "handling_rules": [
+        "Đánh giá dấu hiệu hao mòn thực tế, không kết luận cần thay chỉ dựa trên thời gian sử dụng.",
+        "Xác minh chính xác model, phiên bản và mã phụ kiện tương thích trước khi đề xuất.",
+        "Không khẳng định phụ kiện có cùng hình dáng hoặc kích thước là tương thích.",
+        "Phân biệt phụ kiện hao mòn với lỗi vận hành do nguyên nhân khác; không đề xuất mua mới nếu chưa có căn cứ."
+      ],
+      "question_variants": [
+        "Khi nào cần thay chổi hoặc phụ kiện hao mòn?",
+        "Làm sao biết giẻ lau hoặc bộ lọc đã cần thay?",
+        "Tôi muốn tìm phụ kiện đúng model robot."
+      ],
+      "evidence_policy": {
+        "rule": "Chỉ xác nhận mã phụ kiện tương thích khi có căn cứ từ tài liệu hoặc thông tin sản phẩm đã xác minh; không tự tạo mã hàng.",
+        "source_priority": [
+          "Danh mục phụ kiện chính hãng đúng model",
+          "Mã model và mã phụ kiện đang sử dụng",
+          "Tình trạng hao mòn do người dùng cung cấp",
+          "Không suy đoán khi thiếu dữ liệu"
+        ]
+      },
+      "user_question": "Khi nào cần thay chổi hoặc phụ kiện hao mòn?",
+      "routing": {
+        "message": "Anh/chị cung cấp model hoặc ảnh nhãn máy và phụ kiện đang dùng để đối chiếu. Nếu chưa xác định được mã tương thích, không nên đặt mua chỉ dựa vào hình dáng.",
+        "when": false,
+        "type": "self_help"
+      },
+      "test_cases": [
+        {
+          "case_id": "05.08.T01",
+          "input": "Chổi chính bị cong và sợi chổi mòn nhiều. Có cần thay không?",
+          "expected": "Đánh giá tình trạng cong, mòn và ảnh hưởng tới khả năng quay hoặc làm sạch. Nếu phụ kiện đã biến dạng hoặc không hoạt động đúng, khuyên thay đúng loại sau khi xác minh model và mã tương thích.",
+          "pass_criteria": [
+            "Dựa trên dấu hiệu hao mòn thực tế",
+            "Không áp dụng tuổi thọ chung cho mọi loại chổi",
+            "Xác minh model trước khi đề xuất phụ kiện thay"
+          ]
+        },
+        {
+          "case_id": "05.08.T02",
+          "input": "Tôi thấy một bộ chổi trên mạng giống chổi robot nhà mình. Có thể mua dùng thay không?",
+          "expected": "Yêu cầu model chính xác và mã phụ kiện hoặc thông tin sản phẩm; giải thích hình dáng tương tự chưa đủ chứng minh tương thích. Không xác nhận dùng được nếu chưa có căn cứ.",
+          "pass_criteria": [
+            "Không xác nhận tương thích chỉ từ hình dáng",
+            "Yêu cầu thông tin model và mã phụ kiện",
+            "Không bịa mã hàng hoặc khả năng lắp vừa"
+          ]
+        },
+        {
+          "case_id": "05.08.T03",
+          "input": "Robot hút yếu nhưng chổi và bộ lọc nhìn vẫn bình thường. Tôi có nên thay cả bộ phụ kiện không?",
+          "expected": "Không đề xuất thay cả bộ ngay. Hỏi model, triệu chứng và lịch vệ sinh; hướng dẫn kiểm tra hộp bụi, cửa hút, chổi và bộ lọc theo tài liệu. Nếu không cải thiện, chuyển chẩn đoán thay vì mua phụ kiện theo suy đoán.",
+          "pass_criteria": [
+            "Không khuyến khích thay hàng loạt khi chưa có bằng chứng",
+            "Phân biệt hao mòn phụ kiện với lỗi hiệu suất",
+            "Đưa ra bước kiểm tra phù hợp trước khi mua"
+          ]
+        }
+      ],
+      "context_required": [
+        "Model và phiên bản robot",
+        "Tên hoặc mã phụ kiện cần thay",
+        "Dấu hiệu hao mòn hoặc hư hỏng",
+        "Mã phụ kiện hiện tại hoặc thông tin sản phẩm đang cân nhắc"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Lỗi vận hành cần chẩn đoán trước khi xác định phụ kiện",
+          "Có dấu hiệu điện hoặc pin nguy hiểm cần dừng thao tác"
+        ],
+        "signals": [
+          "Thay chổi hoặc phụ kiện",
+          "Phụ kiện bị mòn hoặc hư hỏng",
+          "Tìm phụ kiện đúng model"
+        ]
+      },
+      "answer_strategy": "Xác định phụ kiện, đánh giá tình trạng và đối chiếu mã tương thích. Chỉ đề xuất thay khi có dấu hiệu phù hợp; nếu robot giảm hiệu suất nhưng phụ kiện chưa có dấu hiệu hỏng, chuyển sang kiểm tra nguyên nhân khác.",
+      "scenario": "Khi nào cần thay chổi hoặc phụ kiện hao mòn?",
+      "status": "approved",
+      "scenario_id": "05.08",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "05.09",
+      "intent": "Bảo dưỡng chuyên sâu",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Anh/chị muốn bảo dưỡng phòng ngừa hay robot đang có lỗi cụ thể; model và thời gian sử dụng của máy là gì?",
+          "required": true
+        }
+      ],
+      "category_id": "05",
+      "handling_rules": [
+        "Phân biệt vệ sinh thường xuyên do người dùng thực hiện với kiểm tra chuyên sâu cần kỹ thuật viên.",
+        "Không khẳng định mọi robot phải tháo máy bảo dưỡng theo một chu kỳ cố định nếu hãng không yêu cầu.",
+        "Giải thích phạm vi kiểm tra dựa trên model, mức sử dụng và triệu chứng; không hứa trước kết quả hoặc chi phí khi chưa đánh giá.",
+        "Nếu có mùi khét, khói, quá nhiệt, rò nước tới phần điện hoặc dấu hiệu pin nguy hiểm, ưu tiên ngừng sử dụng và xử lý an toàn."
+      ],
+      "question_variants": [
+        "Có cần bảo dưỡng robot định kỳ tại kỹ thuật viên không?",
+        "Robot dùng lâu năm có nên kiểm tra chuyên sâu?",
+        "Tôi muốn kiểm tra tổng thể robot dù máy vẫn hoạt động."
+      ],
+      "evidence_policy": {
+        "rule": "Không quy định chu kỳ tháo máy chung cho mọi model; nội dung bảo dưỡng và phạm vi kiểm tra cần căn cứ hướng dẫn hãng và tình trạng thiết bị.",
+        "source_priority": [
+          "Lịch bảo dưỡng chính hãng đúng model",
+          "Lịch sử sử dụng và sửa chữa do người dùng cung cấp",
+          "Triệu chứng và kết quả kiểm tra thực tế",
+          "Không cam kết kết quả trước khi đánh giá"
+        ]
+      },
+      "user_question": "Có cần bảo dưỡng robot định kỳ tại kỹ thuật viên?",
+      "routing": {
+        "message": "Anh/chị cung cấp model, thời gian sử dụng, lịch sử vệ sinh hoặc sửa chữa và triệu chứng hiện tại. Kỹ thuật viên sẽ đánh giá phạm vi cần kiểm tra trước khi đề xuất công việc.",
+        "when": true,
+        "type": "technician"
+      },
+      "test_cases": [
+        {
+          "case_id": "05.09.T01",
+          "input": "Robot vẫn chạy bình thường. Tôi có cần mang đi bảo dưỡng chuyên sâu định kỳ không?",
+          "expected": "Giải thích rằng nhu cầu phụ thuộc hướng dẫn của hãng, model, tần suất sử dụng và tình trạng máy. Khuyến nghị duy trì vệ sinh người dùng được phép thực hiện; không khẳng định bắt buộc tháo máy nếu không có căn cứ.",
+          "pass_criteria": [
+            "Phân biệt vệ sinh định kỳ với tháo máy chuyên sâu",
+            "Không đặt chu kỳ bắt buộc cho mọi model",
+            "Nêu thông tin cần thiết để tư vấn cụ thể"
+          ]
+        },
+        {
+          "case_id": "05.09.T02",
+          "input": "Robot đã dùng lâu, gần đây có tiếng kêu lạ và lực hút giảm. Tôi muốn bảo dưỡng tổng thể.",
+          "expected": "Ghi nhận đây là nhu cầu kiểm tra có triệu chứng, hỏi model, thời gian sử dụng, lịch sử sửa chữa và thời điểm phát sinh. Khuyên ngừng sử dụng nếu tiếng kêu mạnh hoặc có dấu hiệu nguy hiểm; đề xuất kỹ thuật kiểm tra trước khi báo phạm vi công việc.",
+          "pass_criteria": [
+            "Không xem đây chỉ là bảo dưỡng phòng ngừa",
+            "Không chẩn đoán linh kiện hỏng khi chưa kiểm tra",
+            "Không hứa trước chi phí hoặc kết quả sửa chữa"
+          ]
+        },
+        {
+          "case_id": "05.09.T03",
+          "input": "Tôi muốn tự tháo toàn bộ robot để vệ sinh bên trong và tra dầu các bộ phận.",
+          "expected": "Không hướng dẫn tháo toàn bộ máy hoặc tra dầu tùy ý. Khuyên chỉ vệ sinh các bộ phận người dùng được phép tiếp cận theo tài liệu; chuyển kỹ thuật nếu cần làm sạch hoặc kiểm tra bên trong.",
+          "pass_criteria": [
+            "Không hướng dẫn tháo máy hoặc bôi trơn không có căn cứ",
+            "Nêu rủi ro từ thao tác sai và khả năng ảnh hưởng bảo hành",
+            "Đề xuất lựa chọn an toàn thay thế"
+          ]
+        }
+      ],
+      "context_required": [
+        "Model robot",
+        "Thời gian và cường độ sử dụng",
+        "Lịch sử vệ sinh, bảo dưỡng và sửa chữa",
+        "Triệu chứng hoặc mục tiêu kiểm tra"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Có nguy cơ điện, pin, khói hoặc quá nhiệt cần xử lý an toàn ngay",
+          "Đã có lỗi cụ thể cần chuyển sang kịch bản chẩn đoán tương ứng"
+        ],
+        "signals": [
+          "Bảo dưỡng chuyên sâu",
+          "Kiểm tra tổng thể robot",
+          "Có cần bảo dưỡng tại kỹ thuật viên?"
+        ]
+      },
+      "answer_strategy": "Xác định nhu cầu phòng ngừa hay kiểm tra do lỗi. Không đề xuất tháo máy định kỳ khi chưa có căn cứ; giải thích phạm vi dự kiến và chuyển kỹ thuật khi cần đánh giá bên trong.",
+      "scenario": "Có cần bảo dưỡng robot định kỳ tại kỹ thuật viên?",
+      "status": "approved",
+      "scenario_id": "05.09",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "05.10",
+      "intent": "Hiệu quả giảm dần",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Hiệu quả giảm ở lực hút, khả năng lau, khả năng tự giặt giẻ hay thời gian hoạt động; model robot của anh/chị là gì?",
+          "required": true
+        }
+      ],
+      "category_id": "05",
+      "handling_rules": [
+        "Xác định biểu hiện giảm hiệu quả trước khi chọn hướng kiểm tra.",
+        "Ưu tiên kiểm tra các bộ phận người dùng được phép vệ sinh, cài đặt và vật tư tiêu hao theo đúng model.",
+        "Không quy ngay nguyên nhân cho pin, động cơ, bơm hoặc bo mạch khi chưa có bằng chứng.",
+        "Nếu có tiếng kêu bất thường mạnh, mùi khét, khói, quá nhiệt hoặc rò nước tới phần điện, yêu cầu dừng sử dụng và ưu tiên an toàn."
+      ],
+      "question_variants": [
+        "Robot bị giảm hiệu quả sau thời gian sử dụng.",
+        "Robot hút yếu hơn trước dù vẫn chạy.",
+        "Robot lau không sạch hoặc thời gian chạy ngắn hơn."
+      ],
+      "evidence_policy": {
+        "rule": "Phân biệt triệu chứng quan sát được với chẩn đoán đã xác nhận; chỉ đưa thông số hoặc quy trình kiểm tra đặc thù khi có tài liệu đúng model.",
+        "source_priority": [
+          "Tài liệu chính hãng đúng model",
+          "Mã lỗi và triệu chứng người dùng cung cấp",
+          "Lịch sử vệ sinh, thay phụ kiện và sửa chữa",
+          "Không suy đoán linh kiện hỏng"
+        ]
+      },
+      "user_question": "Robot bị giảm hiệu quả sau thời gian sử dụng",
+      "routing": {
+        "message": "Nếu các bước kiểm tra bên ngoài phù hợp với model không cải thiện tình trạng, anh/chị cung cấp model, triệu chứng và mã lỗi để kỹ thuật viên đánh giá.",
+        "when": true,
+        "type": "diagnose_then_route"
+      },
+      "test_cases": [
+        {
+          "case_id": "05.10.T01",
+          "input": "Robot hút yếu hơn trước nhưng không báo lỗi. Tôi nên kiểm tra gì?",
+          "expected": "Hỏi model và thời điểm bắt đầu giảm lực hút; hướng dẫn kiểm tra hộp bụi, cửa hút, chổi và bộ lọc theo tài liệu của model. Không kết luận động cơ hoặc pin hỏng chỉ từ dấu hiệu hút yếu.",
+          "pass_criteria": [
+            "Khoanh vùng theo biểu hiện lực hút",
+            "Ưu tiên kiểm tra bên ngoài an toàn",
+            "Không chẩn đoán động cơ hỏng khi chưa có bằng chứng"
+          ]
+        },
+        {
+          "case_id": "05.10.T02",
+          "input": "Robot lau kém hơn trước, giẻ thường khô và sàn vẫn còn vệt.",
+          "expected": "Xác minh model, loại hệ thống lau và cài đặt; hướng dẫn kiểm tra bình nước, lượng nước được chọn, tình trạng giẻ và các bộ phận cấp nước người dùng được phép kiểm tra. Nếu vẫn khô hoặc lau kém, chuyển sang kiểm tra hệ thống cấp nước.",
+          "pass_criteria": [
+            "Phân biệt hiệu quả lau với lực hút",
+            "Không kết luận bơm nước hỏng khi chưa kiểm tra",
+            "Không hướng dẫn tháo đường nước hoặc cụm bơm"
+          ]
+        },
+        {
+          "case_id": "05.10.T03",
+          "input": "Trước đây robot chạy được lâu hơn, nay nhanh hết pin dù lịch làm sạch không đổi.",
+          "expected": "Hỏi model, thời gian sử dụng, thời lượng hiện tại, cài đặt và điều kiện vận hành. Hướng dẫn kiểm tra trạng thái sạc, độ sạch tiếp điểm theo tài liệu và so sánh trong điều kiện tương tự; nếu suy giảm rõ rệt tiếp diễn, chuyển kỹ thuật đánh giá pin và hệ thống sạc.",
+          "pass_criteria": [
+            "Không kết luận pin hỏng chỉ từ thời lượng giảm",
+            "Thu thập dữ liệu so sánh phù hợp",
+            "Chuyển kỹ thuật nếu suy giảm tiếp diễn sau kiểm tra an toàn"
+          ]
+        }
+      ],
+      "context_required": [
+        "Model robot",
+        "Loại hiệu quả bị giảm",
+        "Thời điểm bắt đầu và mức độ thay đổi",
+        "Lịch vệ sinh, phụ kiện đã thay và mã lỗi",
+        "Cài đặt và điều kiện sử dụng hiện tại"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Có dấu hiệu nguy hiểm về điện, pin hoặc quá nhiệt cần dừng sử dụng",
+          "Người dùng chỉ hỏi lịch vệ sinh thông thường, không mô tả suy giảm hiệu quả"
+        ],
+        "signals": [
+          "Robot hút yếu hơn trước",
+          "Robot lau kém",
+          "Thời gian hoạt động giảm",
+          "Hiệu quả giảm sau thời gian sử dụng"
+        ]
+      },
+      "answer_strategy": "Phân loại suy giảm theo hút, lau, trạm hoặc thời lượng hoạt động; kiểm tra từng nguyên nhân bên ngoài có thể xác minh. Không thay linh kiện theo suy đoán; chuyển kỹ thuật nếu lỗi còn tiếp diễn hoặc cần đo kiểm bên trong.",
+      "scenario": "Robot bị giảm hiệu quả sau thời gian sử dụng",
+      "status": "approved",
+      "scenario_id": "05.10",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "05.11",
+      "intent": "Tự thay linh kiện",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Anh/chị định thay bộ phận nào, model robot là gì và máy còn trong thời hạn bảo hành hoặc có điều kiện bảo hành liên quan không?",
+          "required": true
+        }
+      ],
+      "category_id": "05",
+      "handling_rules": [
+        "Phân biệt phụ kiện người dùng có thể thay theo hướng dẫn với linh kiện bên trong cần kỹ thuật viên.",
+        "Không hướng dẫn mở bộ pin, sửa mạch, chập nối dây hoặc thao tác với bộ phận điện nguy hiểm.",
+        "Khuyên kiểm tra điều kiện bảo hành trước khi tự tháo hoặc thay linh kiện.",
+        "Xác minh mã linh kiện tương thích trước khi lắp; không khuyến nghị linh kiện không rõ nguồn gốc."
+      ],
+      "question_variants": [
+        "Có thể tự thay pin hoặc linh kiện không?",
+        "Tôi muốn tự thay chổi, bánh xe hoặc bộ phận bên trong.",
+        "Robot hết bảo hành thì tôi có thể tự sửa không?"
+      ],
+      "evidence_policy": {
+        "rule": "Chỉ hướng dẫn thao tác thay thế mà tài liệu chính hãng cho phép người dùng thực hiện; không đưa quy trình tháo pin hoặc sửa mạch khi chưa có căn cứ an toàn.",
+        "source_priority": [
+          "Hướng dẫn chính hãng đúng model",
+          "Điều kiện bảo hành áp dụng cho thiết bị",
+          "Mã linh kiện và phụ kiện tương thích đã xác minh",
+          "Không suy đoán hoặc hướng dẫn thao tác điện nguy hiểm"
+        ]
+      },
+      "user_question": "Có thể tự thay pin hoặc linh kiện không?",
+      "routing": {
+        "message": "Anh/chị cung cấp model và tên linh kiện cần thay để xác định đây là phụ kiện người dùng được phép thay hay bộ phận cần kỹ thuật viên. Nên kiểm tra điều kiện bảo hành trước khi tháo máy.",
+        "when": true,
+        "type": "technician"
+      },
+      "test_cases": [
+        {
+          "case_id": "05.11.T01",
+          "input": "Tôi muốn tự thay chổi cạnh và giẻ lau tại nhà. Có được không?",
+          "expected": "Hướng dẫn kiểm tra tài liệu model và thay các phụ kiện được thiết kế cho người dùng tháo lắp; yêu cầu tắt robot trước khi thao tác và xác minh mã phụ kiện đúng model.",
+          "pass_criteria": [
+            "Phân biệt phụ kiện tiêu hao với linh kiện bên trong",
+            "Nhắc dừng robot trước khi thay",
+            "Không yêu cầu tháo thân máy nếu không cần thiết"
+          ]
+        },
+        {
+          "case_id": "05.11.T02",
+          "input": "Pin robot có vẻ yếu. Tôi định mở bộ pin và thay từng cell để tiết kiệm chi phí.",
+          "expected": "Không hướng dẫn mở bộ pin hoặc thay cell. Giải thích rằng bộ pin có rủi ro điện và nhiệt; khuyên không tiếp tục nếu pin phồng, nóng bất thường hoặc có mùi lạ và chuyển kỹ thuật kiểm tra, thay thế đúng loại.",
+          "pass_criteria": [
+            "Không hướng dẫn mở hoặc sửa bộ pin",
+            "Nhận diện dấu hiệu pin nguy hiểm",
+            "Đề xuất kiểm tra và thay đúng loại bởi người có chuyên môn"
+          ]
+        },
+        {
+          "case_id": "05.11.T03",
+          "input": "Robot vẫn còn bảo hành nhưng tôi muốn tự tháo thân máy để thay mô-tơ.",
+          "expected": "Khuyên kiểm tra điều kiện bảo hành và liên hệ đơn vị bảo hành hoặc kỹ thuật viên trước khi tháo. Không đưa quy trình tháo mô-tơ; yêu cầu xác minh model và triệu chứng để chọn hướng xử lý phù hợp.",
+          "pass_criteria": [
+            "Nêu việc kiểm tra điều kiện bảo hành trước khi tháo",
+            "Không hướng dẫn thay mô-tơ hoặc sửa mạch",
+            "Không khẳng định bảo hành chắc chắn mất hoặc còn khi chưa biết điều kiện"
+          ]
+        }
+      ],
+      "context_required": [
+        "Model robot",
+        "Tên linh kiện cần thay",
+        "Mã linh kiện hoặc phụ kiện dự kiến",
+        "Tình trạng bảo hành",
+        "Triệu chứng dẫn đến nhu cầu thay"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Pin phồng, quá nóng, có mùi lạ hoặc dấu hiệu nguy hiểm cần dừng thao tác ngay",
+          "Người dùng chỉ hỏi thay phụ kiện tiêu hao thông thường, có thể xử lý theo kịch bản phụ kiện hao mòn"
+        ],
+        "signals": [
+          "Tự thay pin",
+          "Tự tháo máy sửa chữa",
+          "Thay mô-tơ hoặc linh kiện bên trong"
+        ]
+      },
+      "answer_strategy": "Xác định linh kiện có thuộc nhóm người dùng được phép thay hay không. Hỗ trợ các phụ kiện tháo lắp thông thường theo hướng dẫn model; với pin và linh kiện bên trong, ưu tiên bảo hành, an toàn và kỹ thuật viên.",
+      "scenario": "Có thể tự thay pin hoặc linh kiện không?",
+      "status": "approved",
+      "scenario_id": "05.11",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "05.12",
+      "intent": "Kiểm tra sau bảo dưỡng",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Anh/chị vừa tự vệ sinh tại nhà hay vừa nhận robot sau sửa chữa tại kỹ thuật viên; đã thực hiện những hạng mục nào?",
+          "required": true
+        }
+      ],
+      "category_id": "05",
+      "handling_rules": [
+        "Điều chỉnh checklist theo hạng mục đã vệ sinh hoặc sửa chữa và cấu tạo của model.",
+        "Kiểm tra bằng quan sát bên ngoài trước; chỉ vận hành thử khi không có rò nước, dây hỏng, mùi khét, quá nhiệt hoặc dấu hiệu mất an toàn.",
+        "Không yêu cầu thử tất cả chức năng nếu việc đó có thể làm phát sinh nguy cơ hoặc không phù hợp với thiết bị.",
+        "Không tuyên bố robot an toàn hoàn toàn chỉ dựa trên checklist tự kiểm tra; nếu lỗi tái diễn, ghi nhận triệu chứng và liên hệ kỹ thuật."
+      ],
+      "question_variants": [
+        "Sau bảo dưỡng cần kiểm tra những gì?",
+        "Tôi vừa vệ sinh robot, làm sao biết đã lắp đúng?",
+        "Robot có biểu hiện lạ sau khi bảo dưỡng hoặc sửa chữa."
+      ],
+      "evidence_policy": {
+        "rule": "Checklist phải phù hợp với model và hạng mục đã thực hiện; không dùng việc robot khởi động được làm bằng chứng rằng mọi bộ phận đều an toàn.",
+        "source_priority": [
+          "Hướng dẫn chính hãng đúng model",
+          "Hạng mục đã thực hiện và kết quả kiểm tra",
+          "Biểu hiện thực tế sau bảo dưỡng",
+          "Không xác nhận an toàn tuyệt đối khi chưa kiểm tra đầy đủ"
+        ]
+      },
+      "user_question": "Sau bảo dưỡng cần kiểm tra những gì?",
+      "routing": {
+        "message": "Nếu xuất hiện lỗi mới, rò nước, tiếng kêu bất thường hoặc dấu hiệu nguy hiểm sau bảo dưỡng, ngừng thử khi cần và cung cấp model cùng hạng mục đã thực hiện để kỹ thuật viên kiểm tra.",
+        "when": true,
+        "type": "diagnose_then_route"
+      },
+      "test_cases": [
+        {
+          "case_id": "05.12.T01",
+          "input": "Tôi vừa vệ sinh chổi, hộp bụi và lắp lại robot. Cần kiểm tra gì trước khi dùng?",
+          "expected": "Hướng dẫn kiểm tra chổi và nắp đã lắp đúng, hộp bụi và bộ lọc đúng vị trí, không còn vật cản và không có dấu hiệu hư hỏng. Chỉ cho chạy thử trên khu vực bằng phẳng, an toàn và theo tài liệu model.",
+          "pass_criteria": [
+            "Checklist gắn với các hạng mục vừa vệ sinh",
+            "Kiểm tra lắp ráp và vật cản trước khi chạy",
+            "Không khẳng định mọi chức năng đều an toàn chỉ từ một lần chạy thử"
+          ]
+        },
+        {
+          "case_id": "05.12.T02",
+          "input": "Sau khi nhận robot từ sửa chữa, máy bật được nhưng tôi chưa biết cần kiểm tra những gì.",
+          "expected": "Khuyên đối chiếu hạng mục sửa chữa đã thực hiện, quan sát bên ngoài và thử các chức năng liên quan trong điều kiện an toàn theo hướng dẫn bàn giao. Nếu có dấu hiệu bất thường, ghi lại và liên hệ nơi sửa chữa; không tự tháo máy để kiểm tra.",
+          "pass_criteria": [
+            "Hỏi hoặc sử dụng thông tin về hạng mục sửa chữa",
+            "Không yêu cầu thử chức năng không liên quan một cách máy móc",
+            "Khuyên liên hệ kỹ thuật khi có lỗi tái diễn"
+          ]
+        },
+        {
+          "case_id": "05.12.T03",
+          "input": "Sau khi vệ sinh trạm, tôi thấy nước rò và robot có mùi khét nhẹ. Có nên chạy thử không?",
+          "expected": "Yêu cầu không chạy thử hoặc tiếp tục sạc. Tránh tiếp xúc với khu vực ẩm và phần điện; chỉ ngắt nguồn nếu có thể thực hiện an toàn. Chuyển kỹ thuật kiểm tra trước khi sử dụng lại.",
+          "pass_criteria": [
+            "Ưu tiên an toàn hơn checklist vận hành",
+            "Không khuyên bật hoặc sạc để thử",
+            "Nêu điều kiện ngắt nguồn an toàn và chuyển kỹ thuật"
+          ]
+        }
+      ],
+      "context_required": [
+        "Model robot và trạm nếu có",
+        "Hạng mục đã vệ sinh hoặc sửa chữa",
+        "Các chức năng đã kiểm tra",
+        "Triệu chứng trước và sau bảo dưỡng",
+        "Dấu hiệu bất thường về điện, nước, tiếng ồn hoặc nhiệt"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Có rò nước gần phần điện, mùi khét, khói hoặc quá nhiệt cần ưu tiên an toàn",
+          "Lỗi cụ thể đã được xác định rõ và phù hợp hơn với kịch bản chẩn đoán chuyên biệt"
+        ],
+        "signals": [
+          "Kiểm tra sau bảo dưỡng",
+          "Kiểm tra sau khi vệ sinh robot",
+          "Kiểm tra robot sau sửa chữa"
+        ]
+      },
+      "answer_strategy": "Xây dựng checklist theo hạng mục đã thực hiện và model. Kiểm tra lắp ráp, tình trạng bên ngoài và chức năng liên quan trong điều kiện an toàn; dừng vận hành và chuyển kỹ thuật nếu có dấu hiệu nguy hiểm hoặc lỗi mới.",
+      "scenario": "Sau bảo dưỡng cần kiểm tra những gì?",
+      "status": "approved",
+      "scenario_id": "05.12",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    }
+  ]
+}

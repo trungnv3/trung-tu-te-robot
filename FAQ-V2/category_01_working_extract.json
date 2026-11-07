@@ -1,0 +1,1334 @@
+﻿{
+  "schema_version": "1.0",
+  "project": "Trung Tu Te Robot FAQ",
+  "language": "vi-VN",
+  "category_id": "01",
+  "category_name": "Tư vấn lựa chọn robot",
+  "created_as": "new",
+  "scenario_count": 12,
+  "minimum_tests_per_scenario": 3,
+  "scenarios": [
+    {
+      "branch_id": "01.01",
+      "intent": "chon_robot_theo_ngan_sach",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Thiếu thông tin ảnh hưởng trực tiếp đến tư vấn",
+          "question": "Anh/chị dự kiến ngân sách bao nhiêu và diện tích nhà khoảng bao nhiêu mét vuông?",
+          "ask": "Anh/chị dự kiến ngân sách bao nhiêu và diện tích nhà khoảng bao nhiêu mét vuông?",
+          "if_answered": "Dựa trên thông tin đã cung cấp, Xác định ngân sách và nhu cầu trước, sau đó đề xuất phân khúc phù hợp; chỉ nêu model và giá khi có dữ liệu đã xác minh. Chỉ so sánh hoặc đề xuất model khi từng tiêu chí có dữ liệu đã xác minh; nếu chưa đủ căn cứ, nêu rõ giới hạn và hỏi tối đa một tiêu chí còn thiếu.",
+          "if_unknown": "Không tự suy đoán. Hướng dẫn người dùng cung cấp hoặc kiểm tra tiêu chí quan trọng nhất còn thiếu; không đề xuất model, giá hoặc tính năng cụ thể khi chưa có căn cứ."
+        }
+      ],
+      "category_id": "01",
+      "handling_rules": [
+        "Không tự đặt giá hoặc khẳng định model đang còn hàng.",
+        "Giải thích sự đánh đổi giữa tính năng và ngân sách."
+      ],
+      "question_variants": [
+        "Tầm tiền này nên mua robot nào?",
+        "Có ngân sách giới hạn thì nên ưu tiên gì?"
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Nói rõ thông tin chưa được xác minh và đề nghị kiểm tra trước khi kết luận.",
+        "allowed": [
+          "Thông số và tài liệu model đã xác minh",
+          "Nhu cầu do người dùng cung cấp"
+        ],
+        "forbidden": [
+          "Tự bịa thông số, giá hoặc tình trạng hàng",
+          "Suy diễn tính năng từ model khác"
+        ]
+      },
+      "user_question": "Ngân sách của tôi khoảng bao nhiêu thì chọn được robot phù hợp?",
+      "routing": {
+        "destination": "Tư vấn lựa chọn",
+        "handoff_message": "Mình cần xác minh thêm thông tin trước khi kết luận để tránh tư vấn sai.",
+        "handoff_conditions": [
+          "Người dùng yêu cầu xác nhận dữ liệu chưa có căn cứ",
+          "Cần kỹ thuật viên đánh giá thực tế"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Ngân sách của tôi khoảng bao nhiêu thì chọn được robot phù hợp?",
+          "pass_criteria": [
+            "Không bịa thông số hoặc giá",
+            "Nêu được thông tin còn thiếu nếu có"
+          ],
+          "expected": "Nhận diện đúng nhu cầu và chỉ tư vấn trong phạm vi dữ liệu có căn cứ.",
+          "source_test_id": "01.01.T01",
+          "test_id": "01.01.01.T01",
+          "expected_intent": "chon_robot_theo_ngan_sach",
+          "expected_behavior": "Nhận diện đúng nhu cầu và chỉ tư vấn trong phạm vi dữ liệu có căn cứ.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        },
+        {
+          "input": "Tôi chưa biết cần cung cấp thông tin gì để được tư vấn.",
+          "pass_criteria": [
+            "Chỉ có một câu hỏi làm rõ trong lượt",
+            "Câu hỏi liên quan trực tiếp đến lựa chọn"
+          ],
+          "expected": "Hỏi một câu làm rõ ưu tiên, không hỏi dồn nhiều câu.",
+          "source_test_id": "01.01.T02",
+          "test_id": "01.01.01.T02",
+          "expected_intent": "chon_robot_theo_ngan_sach",
+          "expected_behavior": "Hỏi một câu làm rõ ưu tiên, không hỏi dồn nhiều câu.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        },
+        {
+          "input": "Hãy khẳng định model cụ thể có tính năng này dù chưa có tài liệu xác minh.",
+          "pass_criteria": [
+            "Không bịa dữ liệu",
+            "Nêu rõ giới hạn xác minh"
+          ],
+          "expected": "Không xác nhận khi thiếu bằng chứng; nêu cần kiểm tra thông tin model.",
+          "source_test_id": "01.01.T03",
+          "test_id": "01.01.01.T03",
+          "expected_intent": "chon_robot_theo_ngan_sach",
+          "expected_behavior": "Không xác nhận khi thiếu bằng chứng; nêu cần kiểm tra thông tin model.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        }
+      ],
+      "context_required": [
+        "Ngân sách dự kiến",
+        "Diện tích và mặt sàn",
+        "Nhu cầu lau hút",
+        "Yêu cầu về trạm sạc"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "chon_robot_theo_ngan_sach",
+          "Tư vấn chọn robot theo ngân sách"
+        ],
+        "negative_signals": [
+          "Câu hỏi thuộc lỗi kỹ thuật cần chẩn đoán",
+          "Câu hỏi về chính sách chưa được xác minh"
+        ]
+      },
+      "answer_strategy": "Xác định ngân sách và nhu cầu trước, sau đó đề xuất phân khúc phù hợp; chỉ nêu model và giá khi có dữ liệu đã xác minh.",
+      "scenario": "Tư vấn chọn robot theo ngân sách",
+      "status": "approved",
+      "scenario_id": "01.01.01",
+      "review_status": "approved",
+      "review_reasons": [],
+      "must_not": [
+        "Tự bịa thông số, giá hoặc tình trạng hàng",
+        "Suy diễn tính năng từ model khác"
+      ]
+    },
+    {
+      "branch_id": "01.02",
+      "intent": "chon_theo_dien_tich",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Thiếu thông tin ảnh hưởng trực tiếp đến tư vấn",
+          "question": "Diện tích đó là toàn bộ nhà hay phần sàn robot cần làm sạch, và nhà có nhiều phòng hoặc nhiều tầng không?",
+          "ask": "Diện tích đó là toàn bộ nhà hay phần sàn robot cần làm sạch, và nhà có nhiều phòng hoặc nhiều tầng không?",
+          "if_answered": "Dựa trên thông tin đã cung cấp, Đối chiếu diện tích cần làm sạch với dữ liệu pin, khả năng làm sạch và bố trí nhà đã xác minh. Chỉ so sánh hoặc đề xuất model khi từng tiêu chí có dữ liệu đã xác minh; nếu chưa đủ căn cứ, nêu rõ giới hạn và hỏi tối đa một tiêu chí còn thiếu.",
+          "if_unknown": "Không tự suy đoán. Hướng dẫn người dùng cung cấp hoặc kiểm tra tiêu chí quan trọng nhất còn thiếu; không đề xuất model, giá hoặc tính năng cụ thể khi chưa có căn cứ."
+        }
+      ],
+      "category_id": "01",
+      "handling_rules": [
+        "Không suy ra diện tích tối đa chỉ từ dung lượng pin.",
+        "Nêu rõ điều kiện có thể ảnh hưởng đến kết quả thực tế."
+      ],
+      "question_variants": [
+        "Robot có làm sạch được cả căn hộ không?",
+        "Diện tích nhà ảnh hưởng thế nào đến lựa chọn robot?"
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Nói rõ thông tin chưa được xác minh và đề nghị kiểm tra trước khi kết luận.",
+        "allowed": [
+          "Thông số và tài liệu model đã xác minh",
+          "Nhu cầu do người dùng cung cấp"
+        ],
+        "forbidden": [
+          "Tự bịa thông số, giá hoặc tình trạng hàng",
+          "Suy diễn tính năng từ model khác"
+        ]
+      },
+      "user_question": "Nhà tôi rộng khoảng 100 m² thì nên chọn robot nào?",
+      "routing": {
+        "destination": "Tư vấn lựa chọn",
+        "handoff_message": "Mình cần xác minh thêm thông tin trước khi kết luận để tránh tư vấn sai.",
+        "handoff_conditions": [
+          "Người dùng yêu cầu xác nhận dữ liệu chưa có căn cứ",
+          "Cần kỹ thuật viên đánh giá thực tế"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Nhà tôi rộng khoảng 100 m² thì nên chọn robot nào?",
+          "pass_criteria": [
+            "Không bịa thông số hoặc giá",
+            "Nêu được thông tin còn thiếu nếu có"
+          ],
+          "expected": "Nhận diện đúng nhu cầu và chỉ tư vấn trong phạm vi dữ liệu có căn cứ.",
+          "source_test_id": "01.02.T01",
+          "test_id": "01.02.01.T01",
+          "expected_intent": "chon_theo_dien_tich",
+          "expected_behavior": "Nhận diện đúng nhu cầu và chỉ tư vấn trong phạm vi dữ liệu có căn cứ.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        },
+        {
+          "input": "Tôi chưa biết cần cung cấp thông tin gì để được tư vấn.",
+          "pass_criteria": [
+            "Chỉ có một câu hỏi làm rõ trong lượt",
+            "Câu hỏi liên quan trực tiếp đến lựa chọn"
+          ],
+          "expected": "Hỏi một câu làm rõ ưu tiên, không hỏi dồn nhiều câu.",
+          "source_test_id": "01.02.T02",
+          "test_id": "01.02.01.T02",
+          "expected_intent": "chon_theo_dien_tich",
+          "expected_behavior": "Hỏi một câu làm rõ ưu tiên, không hỏi dồn nhiều câu.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        },
+        {
+          "input": "Hãy khẳng định model cụ thể có tính năng này dù chưa có tài liệu xác minh.",
+          "pass_criteria": [
+            "Không bịa dữ liệu",
+            "Nêu rõ giới hạn xác minh"
+          ],
+          "expected": "Không xác nhận khi thiếu bằng chứng; nêu cần kiểm tra thông tin model.",
+          "source_test_id": "01.02.T03",
+          "test_id": "01.02.01.T03",
+          "expected_intent": "chon_theo_dien_tich",
+          "expected_behavior": "Không xác nhận khi thiếu bằng chứng; nêu cần kiểm tra thông tin model.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        }
+      ],
+      "context_required": [
+        "Diện tích cần làm sạch",
+        "Bố trí phòng",
+        "Thời gian làm sạch mong muốn",
+        "Pin và dung tích nếu có dữ liệu"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "chon_theo_dien_tich",
+          "Chọn robot theo diện tích nhà"
+        ],
+        "negative_signals": [
+          "Câu hỏi thuộc lỗi kỹ thuật cần chẩn đoán",
+          "Câu hỏi về chính sách chưa được xác minh"
+        ]
+      },
+      "answer_strategy": "Đối chiếu diện tích cần làm sạch với dữ liệu pin, khả năng làm sạch và bố trí nhà đã xác minh.",
+      "scenario": "Chọn robot theo diện tích nhà",
+      "status": "approved",
+      "scenario_id": "01.02.01",
+      "review_status": "approved",
+      "review_reasons": [],
+      "must_not": [
+        "Tự bịa thông số, giá hoặc tình trạng hàng",
+        "Suy diễn tính năng từ model khác"
+      ]
+    },
+    {
+      "branch_id": "01.03",
+      "intent": "chon_theo_mat_san",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Thiếu thông tin ảnh hưởng trực tiếp đến tư vấn",
+          "question": "Sàn gỗ nhà mình là loại chịu ẩm hay sàn gỗ tự nhiên, và anh/chị có cần robot lau ướt thường xuyên không?",
+          "ask": "Sàn gỗ nhà mình là loại chịu ẩm hay sàn gỗ tự nhiên, và anh/chị có cần robot lau ướt thường xuyên không?",
+          "if_answered": "Dựa trên thông tin đã cung cấp, Làm rõ vật liệu sàn và nhu cầu lau; chỉ đề xuất chế độ lau khi có hướng dẫn tương ứng của nhà sản xuất. Chỉ so sánh hoặc đề xuất model khi từng tiêu chí có dữ liệu đã xác minh; nếu chưa đủ căn cứ, nêu rõ giới hạn và hỏi tối đa một tiêu chí còn thiếu.",
+          "if_unknown": "Không tự suy đoán. Hướng dẫn người dùng cung cấp hoặc kiểm tra tiêu chí quan trọng nhất còn thiếu; không đề xuất model, giá hoặc tính năng cụ thể khi chưa có căn cứ."
+        }
+      ],
+      "category_id": "01",
+      "handling_rules": [
+        "Không khẳng định mọi loại sàn gỗ đều phù hợp lau ướt.",
+        "Khuyến nghị kiểm tra hướng dẫn bảo dưỡng của vật liệu sàn."
+      ],
+      "question_variants": [
+        "Robot lau sàn gỗ có được không?",
+        "Nhà có nhiều loại sàn nên chọn loại nào?"
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Nói rõ thông tin chưa được xác minh và đề nghị kiểm tra trước khi kết luận.",
+        "allowed": [
+          "Thông số và tài liệu model đã xác minh",
+          "Nhu cầu do người dùng cung cấp"
+        ],
+        "forbidden": [
+          "Tự bịa thông số, giá hoặc tình trạng hàng",
+          "Suy diễn tính năng từ model khác"
+        ]
+      },
+      "user_question": "Nhà có gạch men và sàn gỗ thì dùng robot nào phù hợp?",
+      "routing": {
+        "destination": "Tư vấn lựa chọn",
+        "handoff_message": "Mình cần xác minh thêm thông tin trước khi kết luận để tránh tư vấn sai.",
+        "handoff_conditions": [
+          "Người dùng yêu cầu xác nhận dữ liệu chưa có căn cứ",
+          "Cần kỹ thuật viên đánh giá thực tế"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Nhà có gạch men và sàn gỗ thì dùng robot nào phù hợp?",
+          "pass_criteria": [
+            "Không bịa thông số hoặc giá",
+            "Nêu được thông tin còn thiếu nếu có"
+          ],
+          "expected": "Nhận diện đúng nhu cầu và chỉ tư vấn trong phạm vi dữ liệu có căn cứ.",
+          "source_test_id": "01.03.T01",
+          "test_id": "01.03.01.T01",
+          "expected_intent": "chon_theo_mat_san",
+          "expected_behavior": "Nhận diện đúng nhu cầu và chỉ tư vấn trong phạm vi dữ liệu có căn cứ.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        },
+        {
+          "input": "Tôi chưa biết cần cung cấp thông tin gì để được tư vấn.",
+          "pass_criteria": [
+            "Chỉ có một câu hỏi làm rõ trong lượt",
+            "Câu hỏi liên quan trực tiếp đến lựa chọn"
+          ],
+          "expected": "Hỏi một câu làm rõ ưu tiên, không hỏi dồn nhiều câu.",
+          "source_test_id": "01.03.T02",
+          "test_id": "01.03.01.T02",
+          "expected_intent": "chon_theo_mat_san",
+          "expected_behavior": "Hỏi một câu làm rõ ưu tiên, không hỏi dồn nhiều câu.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        },
+        {
+          "input": "Hãy khẳng định model cụ thể có tính năng này dù chưa có tài liệu xác minh.",
+          "pass_criteria": [
+            "Không bịa dữ liệu",
+            "Nêu rõ giới hạn xác minh"
+          ],
+          "expected": "Không xác nhận khi thiếu bằng chứng; nêu cần kiểm tra thông tin model.",
+          "source_test_id": "01.03.T03",
+          "test_id": "01.03.01.T03",
+          "expected_intent": "chon_theo_mat_san",
+          "expected_behavior": "Không xác nhận khi thiếu bằng chứng; nêu cần kiểm tra thông tin model.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        }
+      ],
+      "context_required": [
+        "Loại sàn",
+        "Khu vực cần lau",
+        "Mức độ bẩn",
+        "Yêu cầu điều chỉnh lượng nước"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "chon_theo_mat_san",
+          "Chọn robot theo loại mặt sàn"
+        ],
+        "negative_signals": [
+          "Câu hỏi thuộc lỗi kỹ thuật cần chẩn đoán",
+          "Câu hỏi về chính sách chưa được xác minh"
+        ]
+      },
+      "answer_strategy": "Làm rõ vật liệu sàn và nhu cầu lau; chỉ đề xuất chế độ lau khi có hướng dẫn tương ứng của nhà sản xuất.",
+      "scenario": "Chọn robot theo loại mặt sàn",
+      "status": "approved",
+      "scenario_id": "01.03.01",
+      "review_status": "approved",
+      "review_reasons": [],
+      "must_not": [
+        "Tự bịa thông số, giá hoặc tình trạng hàng",
+        "Suy diễn tính năng từ model khác"
+      ]
+    },
+    {
+      "branch_id": "01.04",
+      "intent": "chon_robot_cho_long_toc_thu_cung",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Thiếu thông tin ảnh hưởng trực tiếp đến tư vấn",
+          "question": "Nhà mình chủ yếu gặp lông thú, tóc dài hay cả hai, và sàn có nhiều thảm không?",
+          "ask": "Nhà mình chủ yếu gặp lông thú, tóc dài hay cả hai, và sàn có nhiều thảm không?",
+          "if_answered": "Dựa trên thông tin đã cung cấp, Ưu tiên so sánh cấu tạo chổi, khả năng chống rối và cách bảo dưỡng theo thông tin đã xác minh. Chỉ so sánh hoặc đề xuất model khi từng tiêu chí có dữ liệu đã xác minh; nếu chưa đủ căn cứ, nêu rõ giới hạn và hỏi tối đa một tiêu chí còn thiếu.",
+          "if_unknown": "Không tự suy đoán. Hướng dẫn người dùng cung cấp hoặc kiểm tra tiêu chí quan trọng nhất còn thiếu; không đề xuất model, giá hoặc tính năng cụ thể khi chưa có căn cứ."
+        }
+      ],
+      "category_id": "01",
+      "handling_rules": [
+        "Không khẳng định chổi chống rối loại bỏ hoàn toàn việc vệ sinh.",
+        "Không hứa robot xử lý được mọi loại chất thải của thú cưng."
+      ],
+      "question_variants": [
+        "Robot nào hạn chế tóc quấn chổi?",
+        "Nhà nuôi mèo cần lưu ý gì khi chọn robot?"
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Nói rõ thông tin chưa được xác minh và đề nghị kiểm tra trước khi kết luận.",
+        "allowed": [
+          "Thông số và tài liệu model đã xác minh",
+          "Nhu cầu do người dùng cung cấp"
+        ],
+        "forbidden": [
+          "Tự bịa thông số, giá hoặc tình trạng hàng",
+          "Suy diễn tính năng từ model khác"
+        ]
+      },
+      "user_question": "Nhà có chó mèo và nhiều lông thì nên chọn robot nào?",
+      "routing": {
+        "destination": "Tư vấn lựa chọn",
+        "handoff_message": "Mình cần xác minh thêm thông tin trước khi kết luận để tránh tư vấn sai.",
+        "handoff_conditions": [
+          "Người dùng yêu cầu xác nhận dữ liệu chưa có căn cứ",
+          "Cần kỹ thuật viên đánh giá thực tế"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Nhà có chó mèo và nhiều lông thì nên chọn robot nào?",
+          "pass_criteria": [
+            "Không bịa thông số hoặc giá",
+            "Nêu được thông tin còn thiếu nếu có"
+          ],
+          "expected": "Nhận diện đúng nhu cầu và chỉ tư vấn trong phạm vi dữ liệu có căn cứ.",
+          "source_test_id": "01.04.T01",
+          "test_id": "01.04.01.T01",
+          "expected_intent": "chon_robot_cho_long_toc_thu_cung",
+          "expected_behavior": "Nhận diện đúng nhu cầu và chỉ tư vấn trong phạm vi dữ liệu có căn cứ.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        },
+        {
+          "input": "Tôi chưa biết cần cung cấp thông tin gì để được tư vấn.",
+          "pass_criteria": [
+            "Chỉ có một câu hỏi làm rõ trong lượt",
+            "Câu hỏi liên quan trực tiếp đến lựa chọn"
+          ],
+          "expected": "Hỏi một câu làm rõ ưu tiên, không hỏi dồn nhiều câu.",
+          "source_test_id": "01.04.T02",
+          "test_id": "01.04.01.T02",
+          "expected_intent": "chon_robot_cho_long_toc_thu_cung",
+          "expected_behavior": "Hỏi một câu làm rõ ưu tiên, không hỏi dồn nhiều câu.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        },
+        {
+          "input": "Hãy khẳng định model cụ thể có tính năng này dù chưa có tài liệu xác minh.",
+          "pass_criteria": [
+            "Không bịa dữ liệu",
+            "Nêu rõ giới hạn xác minh"
+          ],
+          "expected": "Không xác nhận khi thiếu bằng chứng; nêu cần kiểm tra thông tin model.",
+          "source_test_id": "01.04.T03",
+          "test_id": "01.04.01.T03",
+          "expected_intent": "chon_robot_cho_long_toc_thu_cung",
+          "expected_behavior": "Không xác nhận khi thiếu bằng chứng; nêu cần kiểm tra thông tin model.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        }
+      ],
+      "context_required": [
+        "Loại và lượng lông",
+        "Loại sàn",
+        "Tóc dài hay ngắn",
+        "Mức độ cần hút bụi"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "chon_robot_cho_long_toc_thu_cung",
+          "Chọn robot cho nhà có tóc hoặc thú cưng"
+        ],
+        "negative_signals": [
+          "Câu hỏi thuộc lỗi kỹ thuật cần chẩn đoán",
+          "Câu hỏi về chính sách chưa được xác minh"
+        ]
+      },
+      "answer_strategy": "Ưu tiên so sánh cấu tạo chổi, khả năng chống rối và cách bảo dưỡng theo thông tin đã xác minh.",
+      "scenario": "Chọn robot cho nhà có tóc hoặc thú cưng",
+      "status": "approved",
+      "scenario_id": "01.04.01",
+      "review_status": "approved",
+      "review_reasons": [],
+      "must_not": [
+        "Tự bịa thông số, giá hoặc tình trạng hàng",
+        "Suy diễn tính năng từ model khác"
+      ]
+    },
+    {
+      "branch_id": "01.05",
+      "intent": "chon_chuc_nang_lau",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Thiếu thông tin ảnh hưởng trực tiếp đến tư vấn",
+          "question": "Nhà mình chủ yếu có bụi và dấu chân hay thường có vết bẩn bám dính, dầu mỡ?",
+          "ask": "Nhà mình chủ yếu có bụi và dấu chân hay thường có vết bẩn bám dính, dầu mỡ?",
+          "if_answered": "Dựa trên thông tin đã cung cấp, Giải thích khác biệt giữa các cơ chế lau và tính năng trạm sạc theo nhu cầu thực tế. Chỉ so sánh hoặc đề xuất model khi từng tiêu chí có dữ liệu đã xác minh; nếu chưa đủ căn cứ, nêu rõ giới hạn và hỏi tối đa một tiêu chí còn thiếu.",
+          "if_unknown": "Không tự suy đoán. Hướng dẫn người dùng cung cấp hoặc kiểm tra tiêu chí quan trọng nhất còn thiếu; không đề xuất model, giá hoặc tính năng cụ thể khi chưa có căn cứ."
+        }
+      ],
+      "category_id": "01",
+      "handling_rules": [
+        "Không đồng nhất lực hút cao với hiệu quả lau tốt.",
+        "Không khẳng định loại giẻ hoặc con lăn nào luôn tốt nhất trong mọi nhà."
+      ],
+      "question_variants": [
+        "Giẻ lau xoay hay con lăn phù hợp hơn?",
+        "Nên chọn robot có giặt giẻ tự động không?"
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Nói rõ thông tin chưa được xác minh và đề nghị kiểm tra trước khi kết luận.",
+        "allowed": [
+          "Thông số và tài liệu model đã xác minh",
+          "Nhu cầu do người dùng cung cấp"
+        ],
+        "forbidden": [
+          "Tự bịa thông số, giá hoặc tình trạng hàng",
+          "Suy diễn tính năng từ model khác"
+        ]
+      },
+      "user_question": "Tôi muốn robot lau sạch vết bẩn hằng ngày, nên chú ý chức năng nào?",
+      "routing": {
+        "destination": "Tư vấn lựa chọn",
+        "handoff_message": "Mình cần xác minh thêm thông tin trước khi kết luận để tránh tư vấn sai.",
+        "handoff_conditions": [
+          "Người dùng yêu cầu xác nhận dữ liệu chưa có căn cứ",
+          "Cần kỹ thuật viên đánh giá thực tế"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Tôi muốn robot lau sạch vết bẩn hằng ngày, nên chú ý chức năng nào?",
+          "pass_criteria": [
+            "Không bịa thông số hoặc giá",
+            "Nêu được thông tin còn thiếu nếu có"
+          ],
+          "expected": "Nhận diện đúng nhu cầu và chỉ tư vấn trong phạm vi dữ liệu có căn cứ.",
+          "source_test_id": "01.05.T01",
+          "test_id": "01.05.01.T01",
+          "expected_intent": "chon_chuc_nang_lau",
+          "expected_behavior": "Nhận diện đúng nhu cầu và chỉ tư vấn trong phạm vi dữ liệu có căn cứ.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        },
+        {
+          "input": "Tôi chưa biết cần cung cấp thông tin gì để được tư vấn.",
+          "pass_criteria": [
+            "Chỉ có một câu hỏi làm rõ trong lượt",
+            "Câu hỏi liên quan trực tiếp đến lựa chọn"
+          ],
+          "expected": "Hỏi một câu làm rõ ưu tiên, không hỏi dồn nhiều câu.",
+          "source_test_id": "01.05.T02",
+          "test_id": "01.05.01.T02",
+          "expected_intent": "chon_chuc_nang_lau",
+          "expected_behavior": "Hỏi một câu làm rõ ưu tiên, không hỏi dồn nhiều câu.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        },
+        {
+          "input": "Hãy khẳng định model cụ thể có tính năng này dù chưa có tài liệu xác minh.",
+          "pass_criteria": [
+            "Không bịa dữ liệu",
+            "Nêu rõ giới hạn xác minh"
+          ],
+          "expected": "Không xác nhận khi thiếu bằng chứng; nêu cần kiểm tra thông tin model.",
+          "source_test_id": "01.05.T03",
+          "test_id": "01.05.01.T03",
+          "expected_intent": "chon_chuc_nang_lau",
+          "expected_behavior": "Không xác nhận khi thiếu bằng chứng; nêu cần kiểm tra thông tin model.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        }
+      ],
+      "context_required": [
+        "Loại vết bẩn thường gặp",
+        "Diện tích",
+        "Tần suất lau",
+        "Mức tự động hóa mong muốn"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "chon_chuc_nang_lau",
+          "Chọn robot theo nhu cầu lau nhà"
+        ],
+        "negative_signals": [
+          "Câu hỏi thuộc lỗi kỹ thuật cần chẩn đoán",
+          "Câu hỏi về chính sách chưa được xác minh"
+        ]
+      },
+      "answer_strategy": "Giải thích khác biệt giữa các cơ chế lau và tính năng trạm sạc theo nhu cầu thực tế.",
+      "scenario": "Chọn robot theo nhu cầu lau nhà",
+      "status": "approved",
+      "scenario_id": "01.05.01",
+      "review_status": "approved",
+      "review_reasons": [],
+      "must_not": [
+        "Tự bịa thông số, giá hoặc tình trạng hàng",
+        "Suy diễn tính năng từ model khác"
+      ]
+    },
+    {
+      "branch_id": "01.06",
+      "intent": "chon_tram_sac_tu_dong",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Thiếu thông tin ảnh hưởng trực tiếp đến tư vấn",
+          "question": "Anh/chị muốn tự động hóa những việc nào: giặt giẻ, sấy giẻ, đổ bụi hay bổ sung nước?",
+          "ask": "Anh/chị muốn tự động hóa những việc nào: giặt giẻ, sấy giẻ, đổ bụi hay bổ sung nước?",
+          "if_answered": "Dựa trên thông tin đã cung cấp, Tách từng chức năng trạm và đối chiếu nhu cầu, không gian, công việc bảo dưỡng và ngân sách. Chỉ so sánh hoặc đề xuất model khi từng tiêu chí có dữ liệu đã xác minh; nếu chưa đủ căn cứ, nêu rõ giới hạn và hỏi tối đa một tiêu chí còn thiếu.",
+          "if_unknown": "Không tự suy đoán. Hướng dẫn người dùng cung cấp hoặc kiểm tra tiêu chí quan trọng nhất còn thiếu; không đề xuất model, giá hoặc tính năng cụ thể khi chưa có căn cứ."
+        }
+      ],
+      "category_id": "01",
+      "handling_rules": [
+        "Không giả định mọi trạm đều có đủ các chức năng.",
+        "Không bỏ qua việc người dùng vẫn cần vệ sinh và bảo dưỡng trạm."
+      ],
+      "question_variants": [
+        "Trạm đa năng có đáng để đầu tư không?",
+        "Tôi muốn ít phải vệ sinh robot thì chọn loại nào?"
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Nói rõ thông tin chưa được xác minh và đề nghị kiểm tra trước khi kết luận.",
+        "allowed": [
+          "Thông số và tài liệu model đã xác minh",
+          "Nhu cầu do người dùng cung cấp"
+        ],
+        "forbidden": [
+          "Tự bịa thông số, giá hoặc tình trạng hàng",
+          "Suy diễn tính năng từ model khác"
+        ]
+      },
+      "user_question": "Có nên chọn robot với trạm tự giặt và sấy giẻ không?",
+      "routing": {
+        "destination": "Tư vấn lựa chọn",
+        "handoff_message": "Mình cần xác minh thêm thông tin trước khi kết luận để tránh tư vấn sai.",
+        "handoff_conditions": [
+          "Người dùng yêu cầu xác nhận dữ liệu chưa có căn cứ",
+          "Cần kỹ thuật viên đánh giá thực tế"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Có nên chọn robot với trạm tự giặt và sấy giẻ không?",
+          "pass_criteria": [
+            "Không bịa thông số hoặc giá",
+            "Nêu được thông tin còn thiếu nếu có"
+          ],
+          "expected": "Nhận diện đúng nhu cầu và chỉ tư vấn trong phạm vi dữ liệu có căn cứ.",
+          "source_test_id": "01.06.T01",
+          "test_id": "01.06.01.T01",
+          "expected_intent": "chon_tram_sac_tu_dong",
+          "expected_behavior": "Nhận diện đúng nhu cầu và chỉ tư vấn trong phạm vi dữ liệu có căn cứ.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        },
+        {
+          "input": "Tôi chưa biết cần cung cấp thông tin gì để được tư vấn.",
+          "pass_criteria": [
+            "Chỉ có một câu hỏi làm rõ trong lượt",
+            "Câu hỏi liên quan trực tiếp đến lựa chọn"
+          ],
+          "expected": "Hỏi một câu làm rõ ưu tiên, không hỏi dồn nhiều câu.",
+          "source_test_id": "01.06.T02",
+          "test_id": "01.06.01.T02",
+          "expected_intent": "chon_tram_sac_tu_dong",
+          "expected_behavior": "Hỏi một câu làm rõ ưu tiên, không hỏi dồn nhiều câu.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        },
+        {
+          "input": "Hãy khẳng định model cụ thể có tính năng này dù chưa có tài liệu xác minh.",
+          "pass_criteria": [
+            "Không bịa dữ liệu",
+            "Nêu rõ giới hạn xác minh"
+          ],
+          "expected": "Không xác nhận khi thiếu bằng chứng; nêu cần kiểm tra thông tin model.",
+          "source_test_id": "01.06.T03",
+          "test_id": "01.06.01.T03",
+          "expected_intent": "chon_tram_sac_tu_dong",
+          "expected_behavior": "Không xác nhận khi thiếu bằng chứng; nêu cần kiểm tra thông tin model.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        }
+      ],
+      "context_required": [
+        "Mức tự động hóa",
+        "Không gian đặt trạm",
+        "Khả năng vệ sinh trạm",
+        "Ngân sách"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "chon_tram_sac_tu_dong",
+          "Chọn robot theo tính năng trạm sạc"
+        ],
+        "negative_signals": [
+          "Câu hỏi thuộc lỗi kỹ thuật cần chẩn đoán",
+          "Câu hỏi về chính sách chưa được xác minh"
+        ]
+      },
+      "answer_strategy": "Tách từng chức năng trạm và đối chiếu nhu cầu, không gian, công việc bảo dưỡng và ngân sách.",
+      "scenario": "Chọn robot theo tính năng trạm sạc",
+      "status": "approved",
+      "scenario_id": "01.06.01",
+      "review_status": "approved",
+      "review_reasons": [],
+      "must_not": [
+        "Tự bịa thông số, giá hoặc tình trạng hàng",
+        "Suy diễn tính năng từ model khác"
+      ]
+    },
+    {
+      "branch_id": "01.07",
+      "intent": "chon_chong_roi",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Thiếu thông tin ảnh hưởng trực tiếp đến tư vấn",
+          "question": "Tóc dài thường xuất hiện ở sàn cứng hay cả trên thảm, và anh/chị có sẵn lòng vệ sinh chổi định kỳ không?",
+          "ask": "Tóc dài thường xuất hiện ở sàn cứng hay cả trên thảm, và anh/chị có sẵn lòng vệ sinh chổi định kỳ không?",
+          "if_answered": "Dựa trên thông tin đã cung cấp, So sánh thiết kế chổi và cơ chế chống rối dựa trên thông số hoặc tài liệu xác minh của từng model. Chỉ so sánh hoặc đề xuất model khi từng tiêu chí có dữ liệu đã xác minh; nếu chưa đủ căn cứ, nêu rõ giới hạn và hỏi tối đa một tiêu chí còn thiếu.",
+          "if_unknown": "Không tự suy đoán. Hướng dẫn người dùng cung cấp hoặc kiểm tra tiêu chí quan trọng nhất còn thiếu; không đề xuất model, giá hoặc tính năng cụ thể khi chưa có căn cứ."
+        }
+      ],
+      "category_id": "01",
+      "handling_rules": [
+        "Không hứa loại bỏ hoàn toàn tóc quấn.",
+        "Nêu rõ yêu cầu kiểm tra và vệ sinh chổi định kỳ."
+      ],
+      "question_variants": [
+        "Chổi cao su có chống rối tốt không?",
+        "Có cần chổi cắt tóc tự động không?"
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Nói rõ thông tin chưa được xác minh và đề nghị kiểm tra trước khi kết luận.",
+        "allowed": [
+          "Thông số và tài liệu model đã xác minh",
+          "Nhu cầu do người dùng cung cấp"
+        ],
+        "forbidden": [
+          "Tự bịa thông số, giá hoặc tình trạng hàng",
+          "Suy diễn tính năng từ model khác"
+        ]
+      },
+      "user_question": "Tôi có tóc dài, nên chọn loại chổi nào để ít bị quấn tóc?",
+      "routing": {
+        "destination": "Tư vấn lựa chọn",
+        "handoff_message": "Mình cần xác minh thêm thông tin trước khi kết luận để tránh tư vấn sai.",
+        "handoff_conditions": [
+          "Người dùng yêu cầu xác nhận dữ liệu chưa có căn cứ",
+          "Cần kỹ thuật viên đánh giá thực tế"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Tôi có tóc dài, nên chọn loại chổi nào để ít bị quấn tóc?",
+          "pass_criteria": [
+            "Không bịa thông số hoặc giá",
+            "Nêu được thông tin còn thiếu nếu có"
+          ],
+          "expected": "Nhận diện đúng nhu cầu và chỉ tư vấn trong phạm vi dữ liệu có căn cứ.",
+          "source_test_id": "01.07.T01",
+          "test_id": "01.07.01.T01",
+          "expected_intent": "chon_chong_roi",
+          "expected_behavior": "Nhận diện đúng nhu cầu và chỉ tư vấn trong phạm vi dữ liệu có căn cứ.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        },
+        {
+          "input": "Tôi chưa biết cần cung cấp thông tin gì để được tư vấn.",
+          "pass_criteria": [
+            "Chỉ có một câu hỏi làm rõ trong lượt",
+            "Câu hỏi liên quan trực tiếp đến lựa chọn"
+          ],
+          "expected": "Hỏi một câu làm rõ ưu tiên, không hỏi dồn nhiều câu.",
+          "source_test_id": "01.07.T02",
+          "test_id": "01.07.01.T02",
+          "expected_intent": "chon_chong_roi",
+          "expected_behavior": "Hỏi một câu làm rõ ưu tiên, không hỏi dồn nhiều câu.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        },
+        {
+          "input": "Hãy khẳng định model cụ thể có tính năng này dù chưa có tài liệu xác minh.",
+          "pass_criteria": [
+            "Không bịa dữ liệu",
+            "Nêu rõ giới hạn xác minh"
+          ],
+          "expected": "Không xác nhận khi thiếu bằng chứng; nêu cần kiểm tra thông tin model.",
+          "source_test_id": "01.07.T03",
+          "test_id": "01.07.01.T03",
+          "expected_intent": "chon_chong_roi",
+          "expected_behavior": "Không xác nhận khi thiếu bằng chứng; nêu cần kiểm tra thông tin model.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        }
+      ],
+      "context_required": [
+        "Tình trạng tóc",
+        "Loại sàn",
+        "Thảm và khe sàn",
+        "Khả năng thay chổi"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "chon_chong_roi",
+          "Chọn robot theo khả năng chống rối"
+        ],
+        "negative_signals": [
+          "Câu hỏi thuộc lỗi kỹ thuật cần chẩn đoán",
+          "Câu hỏi về chính sách chưa được xác minh"
+        ]
+      },
+      "answer_strategy": "So sánh thiết kế chổi và cơ chế chống rối dựa trên thông số hoặc tài liệu xác minh của từng model.",
+      "scenario": "Chọn robot theo khả năng chống rối",
+      "status": "approved",
+      "scenario_id": "01.07.01",
+      "review_status": "approved",
+      "review_reasons": [],
+      "must_not": [
+        "Tự bịa thông số, giá hoặc tình trạng hàng",
+        "Suy diễn tính năng từ model khác"
+      ]
+    },
+    {
+      "branch_id": "01.08",
+      "intent": "chon_theo_chieu_cao_gam",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Thiếu thông tin ảnh hưởng trực tiếp đến tư vấn",
+          "question": "Khoảng hở dưới sofa và chiều cao gờ cửa khoảng bao nhiêu milimét?",
+          "ask": "Khoảng hở dưới sofa và chiều cao gờ cửa khoảng bao nhiêu milimét?",
+          "if_answered": "Dựa trên thông tin đã cung cấp, So sánh kích thước robot và khả năng vượt chướng ngại đã công bố với số đo thực tế của nhà. Chỉ so sánh hoặc đề xuất model khi từng tiêu chí có dữ liệu đã xác minh; nếu chưa đủ căn cứ, nêu rõ giới hạn và hỏi tối đa một tiêu chí còn thiếu.",
+          "if_unknown": "Không tự suy đoán. Hướng dẫn người dùng cung cấp hoặc kiểm tra tiêu chí quan trọng nhất còn thiếu; không đề xuất model, giá hoặc tính năng cụ thể khi chưa có căn cứ."
+        }
+      ],
+      "category_id": "01",
+      "handling_rules": [
+        "Không suy đoán khả năng vượt gờ từ hình ảnh quảng cáo.",
+        "Nhắc người dùng đo tại điểm thấp nhất và xét hình dạng gờ."
+      ],
+      "question_variants": [
+        "Nhà có gờ cao thì chọn robot nào?",
+        "Robot có đi qua được chân cửa không?"
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Nói rõ thông tin chưa được xác minh và đề nghị kiểm tra trước khi kết luận.",
+        "allowed": [
+          "Thông số và tài liệu model đã xác minh",
+          "Nhu cầu do người dùng cung cấp"
+        ],
+        "forbidden": [
+          "Tự bịa thông số, giá hoặc tình trạng hàng",
+          "Suy diễn tính năng từ model khác"
+        ]
+      },
+      "user_question": "Robot có chui được dưới sofa và vượt qua gờ cửa nhà tôi không?",
+      "routing": {
+        "destination": "Tư vấn lựa chọn",
+        "handoff_message": "Mình cần xác minh thêm thông tin trước khi kết luận để tránh tư vấn sai.",
+        "handoff_conditions": [
+          "Người dùng yêu cầu xác nhận dữ liệu chưa có căn cứ",
+          "Cần kỹ thuật viên đánh giá thực tế"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Robot có chui được dưới sofa và vượt qua gờ cửa nhà tôi không?",
+          "pass_criteria": [
+            "Không bịa thông số hoặc giá",
+            "Nêu được thông tin còn thiếu nếu có"
+          ],
+          "expected": "Nhận diện đúng nhu cầu và chỉ tư vấn trong phạm vi dữ liệu có căn cứ.",
+          "source_test_id": "01.08.T01",
+          "test_id": "01.08.01.T01",
+          "expected_intent": "chon_theo_chieu_cao_gam",
+          "expected_behavior": "Nhận diện đúng nhu cầu và chỉ tư vấn trong phạm vi dữ liệu có căn cứ.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        },
+        {
+          "input": "Tôi chưa biết cần cung cấp thông tin gì để được tư vấn.",
+          "pass_criteria": [
+            "Chỉ có một câu hỏi làm rõ trong lượt",
+            "Câu hỏi liên quan trực tiếp đến lựa chọn"
+          ],
+          "expected": "Hỏi một câu làm rõ ưu tiên, không hỏi dồn nhiều câu.",
+          "source_test_id": "01.08.T02",
+          "test_id": "01.08.01.T02",
+          "expected_intent": "chon_theo_chieu_cao_gam",
+          "expected_behavior": "Hỏi một câu làm rõ ưu tiên, không hỏi dồn nhiều câu.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        },
+        {
+          "input": "Hãy khẳng định model cụ thể có tính năng này dù chưa có tài liệu xác minh.",
+          "pass_criteria": [
+            "Không bịa dữ liệu",
+            "Nêu rõ giới hạn xác minh"
+          ],
+          "expected": "Không xác nhận khi thiếu bằng chứng; nêu cần kiểm tra thông tin model.",
+          "source_test_id": "01.08.T03",
+          "test_id": "01.08.01.T03",
+          "expected_intent": "chon_theo_chieu_cao_gam",
+          "expected_behavior": "Không xác nhận khi thiếu bằng chứng; nêu cần kiểm tra thông tin model.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        }
+      ],
+      "context_required": [
+        "Khoảng hở thấp nhất dưới nội thất",
+        "Chiều cao gờ",
+        "Hình dạng gờ",
+        "Thông số model dự kiến"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "chon_theo_chieu_cao_gam",
+          "Chọn robot theo gầm nội thất và gờ sàn"
+        ],
+        "negative_signals": [
+          "Câu hỏi thuộc lỗi kỹ thuật cần chẩn đoán",
+          "Câu hỏi về chính sách chưa được xác minh"
+        ]
+      },
+      "answer_strategy": "So sánh kích thước robot và khả năng vượt chướng ngại đã công bố với số đo thực tế của nhà.",
+      "scenario": "Chọn robot theo gầm nội thất và gờ sàn",
+      "status": "approved",
+      "scenario_id": "01.08.01",
+      "review_status": "approved",
+      "review_reasons": [],
+      "must_not": [
+        "Tự bịa thông số, giá hoặc tình trạng hàng",
+        "Suy diễn tính năng từ model khác"
+      ]
+    },
+    {
+      "branch_id": "01.09",
+      "intent": "chon_dieu_huong_tranh_vat_can",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Thiếu thông tin ảnh hưởng trực tiếp đến tư vấn",
+          "question": "Trên sàn thường có dây điện, đồ chơi nhỏ hay vật cản lớn, và khu vực đó có đủ ánh sáng không?",
+          "ask": "Trên sàn thường có dây điện, đồ chơi nhỏ hay vật cản lớn, và khu vực đó có đủ ánh sáng không?",
+          "if_answered": "Dựa trên thông tin đã cung cấp, Giải thích giới hạn của hệ thống điều hướng và nhận diện vật cản; đối chiếu khả năng cụ thể khi có model. Chỉ so sánh hoặc đề xuất model khi từng tiêu chí có dữ liệu đã xác minh; nếu chưa đủ căn cứ, nêu rõ giới hạn và hỏi tối đa một tiêu chí còn thiếu.",
+          "if_unknown": "Không tự suy đoán. Hướng dẫn người dùng cung cấp hoặc kiểm tra tiêu chí quan trọng nhất còn thiếu; không đề xuất model, giá hoặc tính năng cụ thể khi chưa có căn cứ."
+        }
+      ],
+      "category_id": "01",
+      "handling_rules": [
+        "Không cam kết tránh được mọi vật nhỏ hoặc dây điện.",
+        "Đề nghị dọn vật dễ mắc kẹt và tạo vùng cấm khi phù hợp."
+      ],
+      "question_variants": [
+        "Robot nào tránh vật cản tốt?",
+        "Robot có nhận diện được dây sạc không?"
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Nói rõ thông tin chưa được xác minh và đề nghị kiểm tra trước khi kết luận.",
+        "allowed": [
+          "Thông số và tài liệu model đã xác minh",
+          "Nhu cầu do người dùng cung cấp"
+        ],
+        "forbidden": [
+          "Tự bịa thông số, giá hoặc tình trạng hàng",
+          "Suy diễn tính năng từ model khác"
+        ]
+      },
+      "user_question": "Nhà có nhiều đồ đạc và dây điện, nên ưu tiên công nghệ nào?",
+      "routing": {
+        "destination": "Tư vấn lựa chọn",
+        "handoff_message": "Mình cần xác minh thêm thông tin trước khi kết luận để tránh tư vấn sai.",
+        "handoff_conditions": [
+          "Người dùng yêu cầu xác nhận dữ liệu chưa có căn cứ",
+          "Cần kỹ thuật viên đánh giá thực tế"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Nhà có nhiều đồ đạc và dây điện, nên ưu tiên công nghệ nào?",
+          "pass_criteria": [
+            "Không bịa thông số hoặc giá",
+            "Nêu được thông tin còn thiếu nếu có"
+          ],
+          "expected": "Nhận diện đúng nhu cầu và chỉ tư vấn trong phạm vi dữ liệu có căn cứ.",
+          "source_test_id": "01.09.T01",
+          "test_id": "01.09.01.T01",
+          "expected_intent": "chon_dieu_huong_tranh_vat_can",
+          "expected_behavior": "Nhận diện đúng nhu cầu và chỉ tư vấn trong phạm vi dữ liệu có căn cứ.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        },
+        {
+          "input": "Tôi chưa biết cần cung cấp thông tin gì để được tư vấn.",
+          "pass_criteria": [
+            "Chỉ có một câu hỏi làm rõ trong lượt",
+            "Câu hỏi liên quan trực tiếp đến lựa chọn"
+          ],
+          "expected": "Hỏi một câu làm rõ ưu tiên, không hỏi dồn nhiều câu.",
+          "source_test_id": "01.09.T02",
+          "test_id": "01.09.01.T02",
+          "expected_intent": "chon_dieu_huong_tranh_vat_can",
+          "expected_behavior": "Hỏi một câu làm rõ ưu tiên, không hỏi dồn nhiều câu.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        },
+        {
+          "input": "Hãy khẳng định model cụ thể có tính năng này dù chưa có tài liệu xác minh.",
+          "pass_criteria": [
+            "Không bịa dữ liệu",
+            "Nêu rõ giới hạn xác minh"
+          ],
+          "expected": "Không xác nhận khi thiếu bằng chứng; nêu cần kiểm tra thông tin model.",
+          "source_test_id": "01.09.T03",
+          "test_id": "01.09.01.T03",
+          "expected_intent": "chon_dieu_huong_tranh_vat_can",
+          "expected_behavior": "Không xác nhận khi thiếu bằng chứng; nêu cần kiểm tra thông tin model.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        }
+      ],
+      "context_required": [
+        "Mật độ đồ đạc",
+        "Dây điện và vật nhỏ",
+        "Ánh sáng",
+        "Bố trí nhà"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "chon_dieu_huong_tranh_vat_can",
+          "Chọn robot theo khả năng điều hướng"
+        ],
+        "negative_signals": [
+          "Câu hỏi thuộc lỗi kỹ thuật cần chẩn đoán",
+          "Câu hỏi về chính sách chưa được xác minh"
+        ]
+      },
+      "answer_strategy": "Giải thích giới hạn của hệ thống điều hướng và nhận diện vật cản; đối chiếu khả năng cụ thể khi có model.",
+      "scenario": "Chọn robot theo khả năng điều hướng",
+      "status": "approved",
+      "scenario_id": "01.09.01",
+      "review_status": "approved",
+      "review_reasons": [],
+      "must_not": [
+        "Tự bịa thông số, giá hoặc tình trạng hàng",
+        "Suy diễn tính năng từ model khác"
+      ]
+    },
+    {
+      "branch_id": "01.10",
+      "intent": "chon_theo_thuong_hieu",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Thiếu thông tin ảnh hưởng trực tiếp đến tư vấn",
+          "question": "Anh/chị ưu tiên hiệu quả làm sạch, mức tự động hóa, chi phí bảo dưỡng hay khả năng hỗ trợ kỹ thuật?",
+          "ask": "Anh/chị ưu tiên hiệu quả làm sạch, mức tự động hóa, chi phí bảo dưỡng hay khả năng hỗ trợ kỹ thuật?",
+          "if_answered": "Dựa trên thông tin đã cung cấp, So sánh các model cụ thể theo nhu cầu và dữ liệu dịch vụ có căn cứ, tránh xếp hạng thương hiệu chung chung. Chỉ so sánh hoặc đề xuất model khi từng tiêu chí có dữ liệu đã xác minh; nếu chưa đủ căn cứ, nêu rõ giới hạn và hỏi tối đa một tiêu chí còn thiếu.",
+          "if_unknown": "Không tự suy đoán. Hướng dẫn người dùng cung cấp hoặc kiểm tra tiêu chí quan trọng nhất còn thiếu; không đề xuất model, giá hoặc tính năng cụ thể khi chưa có căn cứ."
+        }
+      ],
+      "category_id": "01",
+      "handling_rules": [
+        "Không khẳng định thương hiệu nào luôn tốt nhất.",
+        "Phân biệt dữ liệu đã xác minh với trải nghiệm hoặc nhận định cần kiểm chứng."
+      ],
+      "question_variants": [
+        "Dreame, Roborock hay Ecovacs phù hợp hơn?",
+        "Nên ưu tiên hãng nào nếu quan tâm sửa chữa?"
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Nói rõ thông tin chưa được xác minh và đề nghị kiểm tra trước khi kết luận.",
+        "allowed": [
+          "Thông số và tài liệu model đã xác minh",
+          "Nhu cầu do người dùng cung cấp"
+        ],
+        "forbidden": [
+          "Tự bịa thông số, giá hoặc tình trạng hàng",
+          "Suy diễn tính năng từ model khác"
+        ]
+      },
+      "user_question": "Nên chọn thương hiệu robot nào để dùng lâu dài và dễ bảo dưỡng?",
+      "routing": {
+        "destination": "Tư vấn lựa chọn",
+        "handoff_message": "Mình cần xác minh thêm thông tin trước khi kết luận để tránh tư vấn sai.",
+        "handoff_conditions": [
+          "Người dùng yêu cầu xác nhận dữ liệu chưa có căn cứ",
+          "Cần kỹ thuật viên đánh giá thực tế"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Nên chọn thương hiệu robot nào để dùng lâu dài và dễ bảo dưỡng?",
+          "pass_criteria": [
+            "Không bịa thông số hoặc giá",
+            "Nêu được thông tin còn thiếu nếu có"
+          ],
+          "expected": "Nhận diện đúng nhu cầu và chỉ tư vấn trong phạm vi dữ liệu có căn cứ.",
+          "source_test_id": "01.10.T01",
+          "test_id": "01.10.01.T01",
+          "expected_intent": "chon_theo_thuong_hieu",
+          "expected_behavior": "Nhận diện đúng nhu cầu và chỉ tư vấn trong phạm vi dữ liệu có căn cứ.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        },
+        {
+          "input": "Tôi chưa biết cần cung cấp thông tin gì để được tư vấn.",
+          "pass_criteria": [
+            "Chỉ có một câu hỏi làm rõ trong lượt",
+            "Câu hỏi liên quan trực tiếp đến lựa chọn"
+          ],
+          "expected": "Hỏi một câu làm rõ ưu tiên, không hỏi dồn nhiều câu.",
+          "source_test_id": "01.10.T02",
+          "test_id": "01.10.01.T02",
+          "expected_intent": "chon_theo_thuong_hieu",
+          "expected_behavior": "Hỏi một câu làm rõ ưu tiên, không hỏi dồn nhiều câu.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        },
+        {
+          "input": "Hãy khẳng định model cụ thể có tính năng này dù chưa có tài liệu xác minh.",
+          "pass_criteria": [
+            "Không bịa dữ liệu",
+            "Nêu rõ giới hạn xác minh"
+          ],
+          "expected": "Không xác nhận khi thiếu bằng chứng; nêu cần kiểm tra thông tin model.",
+          "source_test_id": "01.10.T03",
+          "test_id": "01.10.01.T03",
+          "expected_intent": "chon_theo_thuong_hieu",
+          "expected_behavior": "Không xác nhận khi thiếu bằng chứng; nêu cần kiểm tra thông tin model.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        }
+      ],
+      "context_required": [
+        "Ngân sách",
+        "Nhu cầu sử dụng",
+        "Dịch vụ hỗ trợ mong muốn",
+        "Model đang cân nhắc"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "chon_theo_thuong_hieu",
+          "Chọn thương hiệu theo nhu cầu"
+        ],
+        "negative_signals": [
+          "Câu hỏi thuộc lỗi kỹ thuật cần chẩn đoán",
+          "Câu hỏi về chính sách chưa được xác minh"
+        ]
+      },
+      "answer_strategy": "So sánh các model cụ thể theo nhu cầu và dữ liệu dịch vụ có căn cứ, tránh xếp hạng thương hiệu chung chung.",
+      "scenario": "Chọn thương hiệu theo nhu cầu",
+      "status": "approved",
+      "scenario_id": "01.10.01",
+      "review_status": "approved",
+      "review_reasons": [],
+      "must_not": [
+        "Tự bịa thông số, giá hoặc tình trạng hàng",
+        "Suy diễn tính năng từ model khác"
+      ]
+    },
+    {
+      "branch_id": "01.11",
+      "intent": "so_sanh_hai_model",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Thiếu thông tin ảnh hưởng trực tiếp đến tư vấn",
+          "question": "Anh/chị cho mình tên đầy đủ của hai model và 2–3 tiêu chí quan trọng nhất được không?",
+          "ask": "Anh/chị cho mình tên đầy đủ của hai model và 2–3 tiêu chí quan trọng nhất được không?",
+          "if_answered": "Dựa trên thông tin đã cung cấp, So sánh theo cùng tiêu chí, chỉ dùng dữ liệu có nguồn; nêu rõ mục nào chưa đủ thông tin. Chỉ so sánh hoặc đề xuất model khi từng tiêu chí có dữ liệu đã xác minh; nếu chưa đủ căn cứ, nêu rõ giới hạn và hỏi tối đa một tiêu chí còn thiếu.",
+          "if_unknown": "Không tự suy đoán. Hướng dẫn người dùng cung cấp hoặc kiểm tra tiêu chí quan trọng nhất còn thiếu; không đề xuất model, giá hoặc tính năng cụ thể khi chưa có căn cứ."
+        }
+      ],
+      "category_id": "01",
+      "handling_rules": [
+        "Không trộn thông số giữa các phiên bản gần tên nhau.",
+        "Không kết luận hơn kém khi thiếu dữ liệu thiết yếu."
+      ],
+      "question_variants": [
+        "So sánh giúp tôi hai robot này.",
+        "Model nào đáng chọn hơn cho nhà tôi?"
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Nói rõ thông tin chưa được xác minh và đề nghị kiểm tra trước khi kết luận.",
+        "allowed": [
+          "Thông số và tài liệu model đã xác minh",
+          "Nhu cầu do người dùng cung cấp"
+        ],
+        "forbidden": [
+          "Tự bịa thông số, giá hoặc tình trạng hàng",
+          "Suy diễn tính năng từ model khác"
+        ]
+      },
+      "user_question": "Tôi đang phân vân giữa hai model robot, nên chọn mẫu nào?",
+      "routing": {
+        "destination": "Tư vấn lựa chọn",
+        "handoff_message": "Mình cần xác minh thêm thông tin trước khi kết luận để tránh tư vấn sai.",
+        "handoff_conditions": [
+          "Người dùng yêu cầu xác nhận dữ liệu chưa có căn cứ",
+          "Cần kỹ thuật viên đánh giá thực tế"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Tôi đang phân vân giữa hai model robot, nên chọn mẫu nào?",
+          "pass_criteria": [
+            "Không bịa thông số hoặc giá",
+            "Nêu được thông tin còn thiếu nếu có"
+          ],
+          "expected": "Nhận diện đúng nhu cầu và chỉ tư vấn trong phạm vi dữ liệu có căn cứ.",
+          "source_test_id": "01.11.T01",
+          "test_id": "01.11.01.T01",
+          "expected_intent": "so_sanh_hai_model",
+          "expected_behavior": "Nhận diện đúng nhu cầu và chỉ tư vấn trong phạm vi dữ liệu có căn cứ.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        },
+        {
+          "input": "Tôi chưa biết cần cung cấp thông tin gì để được tư vấn.",
+          "pass_criteria": [
+            "Chỉ có một câu hỏi làm rõ trong lượt",
+            "Câu hỏi liên quan trực tiếp đến lựa chọn"
+          ],
+          "expected": "Hỏi một câu làm rõ ưu tiên, không hỏi dồn nhiều câu.",
+          "source_test_id": "01.11.T02",
+          "test_id": "01.11.01.T02",
+          "expected_intent": "so_sanh_hai_model",
+          "expected_behavior": "Hỏi một câu làm rõ ưu tiên, không hỏi dồn nhiều câu.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        },
+        {
+          "input": "Hãy khẳng định model cụ thể có tính năng này dù chưa có tài liệu xác minh.",
+          "pass_criteria": [
+            "Không bịa dữ liệu",
+            "Nêu rõ giới hạn xác minh"
+          ],
+          "expected": "Không xác nhận khi thiếu bằng chứng; nêu cần kiểm tra thông tin model.",
+          "source_test_id": "01.11.T03",
+          "test_id": "01.11.01.T03",
+          "expected_intent": "so_sanh_hai_model",
+          "expected_behavior": "Không xác nhận khi thiếu bằng chứng; nêu cần kiểm tra thông tin model.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        }
+      ],
+      "context_required": [
+        "Tên model chính xác",
+        "Giá và tình trạng hàng đã xác minh",
+        "Nhu cầu",
+        "Điều kiện nhà"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "so_sanh_hai_model",
+          "So sánh hai model đang cân nhắc"
+        ],
+        "negative_signals": [
+          "Câu hỏi thuộc lỗi kỹ thuật cần chẩn đoán",
+          "Câu hỏi về chính sách chưa được xác minh"
+        ]
+      },
+      "answer_strategy": "So sánh theo cùng tiêu chí, chỉ dùng dữ liệu có nguồn; nêu rõ mục nào chưa đủ thông tin.",
+      "scenario": "So sánh hai model đang cân nhắc",
+      "status": "approved",
+      "scenario_id": "01.11.01",
+      "review_status": "approved",
+      "review_reasons": [],
+      "must_not": [
+        "Tự bịa thông số, giá hoặc tình trạng hàng",
+        "Suy diễn tính năng từ model khác"
+      ]
+    },
+    {
+      "branch_id": "01.12",
+      "intent": "lam_ro_nhu_cau",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Thiếu thông tin ảnh hưởng trực tiếp đến tư vấn",
+          "question": "Để tư vấn sát hơn, anh/chị cho mình biết ngân sách dự kiến và diện tích sàn cần làm sạch nhé?",
+          "ask": "Để tư vấn sát hơn, anh/chị cho mình biết ngân sách dự kiến và diện tích sàn cần làm sạch nhé?",
+          "if_answered": "Dựa trên thông tin đã cung cấp, Thu thập thông tin theo từng lượt, ưu tiên câu hỏi có ảnh hưởng lớn đến lựa chọn rồi mới đề xuất. Chỉ so sánh hoặc đề xuất model khi từng tiêu chí có dữ liệu đã xác minh; nếu chưa đủ căn cứ, nêu rõ giới hạn và hỏi tối đa một tiêu chí còn thiếu.",
+          "if_unknown": "Không tự suy đoán. Hướng dẫn người dùng cung cấp hoặc kiểm tra tiêu chí quan trọng nhất còn thiếu; không đề xuất model, giá hoặc tính năng cụ thể khi chưa có căn cứ."
+        }
+      ],
+      "category_id": "01",
+      "handling_rules": [
+        "Mỗi lượt chỉ hỏi một câu làm rõ.",
+        "Không đưa danh sách model dài khi nhu cầu chưa rõ.",
+        "Không tự giả định ngân sách hoặc điều kiện nhà."
+      ],
+      "question_variants": [
+        "Tôi muốn mua robot nhưng chưa biết chọn loại nào.",
+        "Bạn gợi ý giúp tôi robot tốt nhé."
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Nói rõ thông tin chưa được xác minh và đề nghị kiểm tra trước khi kết luận.",
+        "allowed": [
+          "Thông số và tài liệu model đã xác minh",
+          "Nhu cầu do người dùng cung cấp"
+        ],
+        "forbidden": [
+          "Tự bịa thông số, giá hoặc tình trạng hàng",
+          "Suy diễn tính năng từ model khác"
+        ]
+      },
+      "user_question": "Tư vấn cho tôi một robot lau nhà phù hợp.",
+      "routing": {
+        "destination": "Tư vấn lựa chọn",
+        "handoff_message": "Mình cần xác minh thêm thông tin trước khi kết luận để tránh tư vấn sai.",
+        "handoff_conditions": [
+          "Người dùng yêu cầu xác nhận dữ liệu chưa có căn cứ",
+          "Cần kỹ thuật viên đánh giá thực tế"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Tư vấn cho tôi một robot lau nhà phù hợp.",
+          "pass_criteria": [
+            "Không bịa thông số hoặc giá",
+            "Nêu được thông tin còn thiếu nếu có"
+          ],
+          "expected": "Nhận diện đúng nhu cầu và chỉ tư vấn trong phạm vi dữ liệu có căn cứ.",
+          "source_test_id": "01.12.T01",
+          "test_id": "01.12.01.T01",
+          "expected_intent": "lam_ro_nhu_cau",
+          "expected_behavior": "Nhận diện đúng nhu cầu và chỉ tư vấn trong phạm vi dữ liệu có căn cứ.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        },
+        {
+          "input": "Tôi chưa biết cần cung cấp thông tin gì để được tư vấn.",
+          "pass_criteria": [
+            "Chỉ có một câu hỏi làm rõ trong lượt",
+            "Câu hỏi liên quan trực tiếp đến lựa chọn"
+          ],
+          "expected": "Hỏi một câu làm rõ ưu tiên, không hỏi dồn nhiều câu.",
+          "source_test_id": "01.12.T02",
+          "test_id": "01.12.01.T02",
+          "expected_intent": "lam_ro_nhu_cau",
+          "expected_behavior": "Hỏi một câu làm rõ ưu tiên, không hỏi dồn nhiều câu.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        },
+        {
+          "input": "Hãy khẳng định model cụ thể có tính năng này dù chưa có tài liệu xác minh.",
+          "pass_criteria": [
+            "Không bịa dữ liệu",
+            "Nêu rõ giới hạn xác minh"
+          ],
+          "expected": "Không xác nhận khi thiếu bằng chứng; nêu cần kiểm tra thông tin model.",
+          "source_test_id": "01.12.T03",
+          "test_id": "01.12.01.T03",
+          "expected_intent": "lam_ro_nhu_cau",
+          "expected_behavior": "Không xác nhận khi thiếu bằng chứng; nêu cần kiểm tra thông tin model.",
+          "must_not": "Không được: Tự bịa thông số, giá hoặc tình trạng hàng; Suy diễn tính năng từ model khác"
+        }
+      ],
+      "context_required": [
+        "Ngân sách",
+        "Diện tích",
+        "Loại sàn",
+        "Tóc hoặc thú cưng",
+        "Mức tự động hóa"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "lam_ro_nhu_cau",
+          "Làm rõ nhu cầu trước khi đề xuất robot"
+        ],
+        "negative_signals": [
+          "Câu hỏi thuộc lỗi kỹ thuật cần chẩn đoán",
+          "Câu hỏi về chính sách chưa được xác minh"
+        ]
+      },
+      "answer_strategy": "Thu thập thông tin theo từng lượt, ưu tiên câu hỏi có ảnh hưởng lớn đến lựa chọn rồi mới đề xuất.",
+      "scenario": "Làm rõ nhu cầu trước khi đề xuất robot",
+      "status": "approved",
+      "scenario_id": "01.12.01",
+      "review_status": "approved",
+      "review_reasons": [],
+      "must_not": [
+        "Tự bịa thông số, giá hoặc tình trạng hàng",
+        "Suy diễn tính năng từ model khác"
+      ]
+    }
+  ]
+}

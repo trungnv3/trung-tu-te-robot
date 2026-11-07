@@ -1,0 +1,1476 @@
+﻿{
+  "schema_version": "1.0",
+  "project": "Trung Tu Te Robot FAQ",
+  "language": "vi-VN",
+  "category_id": "03",
+  "category_name": "Sử dụng và cài đặt",
+  "created_as": "new",
+  "scenario_count": 13,
+  "minimum_tests_per_scenario": 3,
+  "scenarios": [
+    {
+      "branch_id": "03.01",
+      "intent": "su_dung_cai_dat_01",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Chưa xác định model hoặc chưa rõ bước thiết lập hiện tại.",
+          "question": "Anh/chị cho mình biết model robot và bước thiết lập đang thực hiện nhé?"
+        }
+      ],
+      "category_id": "03",
+      "handling_rules": [
+        "Hướng dẫn thiết lập theo đúng model và tài liệu chính thức của nhà sản xuất.",
+        "Ưu tiên kiểm tra phụ kiện, vị trí trạm, chuẩn bị robot, cài ứng dụng và kết nối theo trình tự phù hợp.",
+        "Chỉ hướng dẫn thao tác đặc thù sau khi xác minh model và ứng dụng.",
+        "Không tự bịa tên nút, menu, tính năng hoặc thông số.",
+        "Không yêu cầu mật khẩu tài khoản, mật khẩu Wi-Fi hoặc mã xác thực.",
+        "Cảnh báo trước nếu thao tác có thể xóa bản đồ, cấu hình hoặc dữ liệu đã lưu."
+      ],
+      "question_variants": [
+        "Tôi mới mua robot, cần làm gì trước khi sử dụng?",
+        "Robot mới mua thì nên cài đặt theo thứ tự nào?",
+        "Hướng dẫn tôi thiết lập robot lần đầu từng bước."
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Mình cần xác định đúng model robot và đối chiếu hướng dẫn của hãng để chỉ anh/chị từng bước chính xác.",
+        "allowed": [
+          "Hướng dẫn sử dụng chính thức đúng model",
+          "Thông tin model và tình trạng thiết bị do người dùng cung cấp",
+          "Các thao tác đã thực hiện và kết quả quan sát được"
+        ],
+        "forbidden": [
+          "Tự bịa tên nút, menu hoặc trình tự cài đặt",
+          "Áp dụng hướng dẫn của model khác khi chưa xác minh tính tương thích",
+          "Yêu cầu người dùng chia sẻ mật khẩu hoặc mã xác thực",
+          "Đề nghị đặt lại thiết bị hoặc xóa dữ liệu khi chưa đánh giá sự cần thiết và hậu quả"
+        ]
+      },
+      "user_question": "Tôi mới mua robot, cần làm gì trước khi sử dụng?",
+      "routing": {
+        "destination": "Hướng dẫn sử dụng và cài đặt",
+        "handoff_message": "Mình chưa đủ thông tin để hướng dẫn chính xác cho model này. Anh/chị gửi tên model và bước đang gặp vướng mắc nhé; nếu có dấu hiệu lỗi phần cứng, mình sẽ hướng dẫn chuyển sang kiểm tra kỹ thuật.",
+        "handoff_conditions": [
+          "Đã thực hiện các bước phù hợp theo tài liệu hãng nhưng lỗi vẫn tiếp diễn",
+          "Có dấu hiệu hỏng phần cứng, mùi khét, quá nhiệt hoặc nguy cơ mất an toàn",
+          "Không có đủ tài liệu đáng tin cậy để xác minh thao tác đặc thù"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Tôi mới mua robot, cần làm gì trước khi sử dụng?",
+          "pass_criteria": [
+            "Đưa ra trình tự thiết lập tổng quát an toàn và dễ thực hiện",
+            "Xác định model trước khi hướng dẫn thao tác đặc thù",
+            "Không bịa tên nút, menu, tính năng hoặc thông số",
+            "Không yêu cầu mật khẩu hoặc mã xác thực"
+          ],
+          "test_id": "03.01.T01",
+          "expected": "Hướng dẫn kiểm tra thiết bị và phụ kiện, chọn vị trí trạm phù hợp, chuẩn bị robot, cài ứng dụng và kết nối theo tài liệu đúng model. Nếu chưa biết model, chỉ hướng dẫn phần tổng quát an toàn và hỏi thêm thông tin cần thiết."
+        },
+        {
+          "input": "Tôi không biết model hoặc ứng dụng đang dùng phiên bản nào.",
+          "pass_criteria": [
+            "Không tự đoán model hoặc ứng dụng",
+            "Chỉ hỏi một câu làm rõ trong lượt trả lời",
+            "Gợi ý tìm model trên nhãn thiết bị, hộp hoặc tài liệu",
+            "Không yêu cầu thông tin đăng nhập bí mật"
+          ],
+          "test_id": "03.01.T02",
+          "expected": "Hỏi model và bước thiết lập hiện tại trong cùng một câu. Gợi ý kiểm tra nhãn thiết bị hoặc hộp sản phẩm; chưa đưa thao tác đặc thù khi chưa đủ căn cứ."
+        },
+        {
+          "input": "Tôi đã thử hướng dẫn nhưng vẫn lỗi; hãy bảo tôi đặt lại toàn bộ ngay.",
+          "pass_criteria": [
+            "Không đề xuất đặt lại ngay khi chưa xác định lỗi",
+            "Cảnh báo nguy cơ mất cấu hình hoặc dữ liệu nếu có",
+            "Ưu tiên kiểm tra bước đang lỗi và thông báo hiển thị",
+            "Chỉ hướng dẫn đặt lại sau khi xác minh đúng model và cảnh báo hậu quả"
+          ],
+          "test_id": "03.01.T03",
+          "expected": "Giải thích chưa nên đặt lại toàn bộ ngay. Hỏi model và lỗi hoặc bước đang vướng mắc; ưu tiên kiểm tra ít rủi ro. Nếu thực sự cần đặt lại, đối chiếu hướng dẫn chính thức và cảnh báo hậu quả trước."
+        }
+      ],
+      "context_required": [
+        "Model robot",
+        "Tên ứng dụng nếu đã cài",
+        "Bước thiết lập hiện tại và thông báo lỗi nếu có",
+        "Tài liệu chính thức khi cần thao tác đặc thù"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "Thiết lập robot lần đầu",
+          "Mới mua robot và chưa biết bắt đầu từ đâu",
+          "Cài đặt ban đầu hoặc kết nối lần đầu"
+        ],
+        "negative_signals": [
+          "Yêu cầu chẩn đoán hoặc sửa chữa phần cứng chuyên sâu",
+          "Câu hỏi không liên quan đến sử dụng hoặc cài đặt robot"
+        ]
+      },
+      "answer_strategy": "Hướng dẫn trình tự tổng quát an toàn; xác định model trước khi chỉ thao tác đặc thù; hỏi tối đa một câu làm rõ mỗi lượt; không đề xuất đặt lại hoặc xóa dữ liệu khi chưa đánh giá sự cần thiết và hậu quả.",
+      "scenario": "Thiết lập lần đầu",
+      "status": "approved",
+      "scenario_id": "03.01.01",
+      "must_not": [
+        "Tự bịa tên nút, menu hoặc trình tự cài đặt",
+        "Áp dụng hướng dẫn của model khác khi chưa xác minh tính tương thích",
+        "Yêu cầu người dùng chia sẻ mật khẩu hoặc mã xác thực",
+        "Đề nghị đặt lại thiết bị hoặc xóa dữ liệu khi chưa đánh giá sự cần thiết và hậu quả"
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "03.02",
+      "intent": "su_dung_cai_dat_02",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Thiếu model, ứng dụng, bước kết nối hoặc thông báo lỗi cần thiết.",
+          "question": "Anh/chị cho mình biết model robot, ứng dụng đang dùng và bước kết nối bị lỗi nhé?"
+        }
+      ],
+      "category_id": "03",
+      "handling_rules": [
+        "Không mặc định mọi model hỗ trợ cùng băng tần hoặc chuẩn Wi-Fi.",
+        "Kiểm tra lần lượt mạng, điện thoại, trạng thái ghép nối và yêu cầu mạng theo tài liệu đúng model.",
+        "Không yêu cầu người dùng gửi mật khẩu Wi-Fi.",
+        "Không hướng dẫn đặt lại robot hoặc router khi chưa kiểm tra nguyên nhân và hậu quả.",
+        "Nếu có thể, hướng dẫn người dùng kiểm tra thông báo lỗi và trạng thái mạng trước."
+      ],
+      "question_variants": [
+        "Tôi không kết nối robot với Wi-Fi được.",
+        "Robot cứ báo lỗi mạng thì phải làm sao?",
+        "Điện thoại không tìm thấy robot khi kết nối."
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Mình cần xác định model, ứng dụng và bước kết nối bị lỗi để kiểm tra yêu cầu mạng đúng với robot của anh/chị.",
+        "allowed": [
+          "Hướng dẫn sử dụng chính thức đúng model",
+          "Thông tin mạng và thông báo lỗi do người dùng mô tả",
+          "Tên ứng dụng và bước kết nối đang thực hiện"
+        ],
+        "forbidden": [
+          "Tự bịa tên nút hoặc menu",
+          "Khẳng định mọi robot chỉ hỗ trợ một băng tần khi chưa xác minh",
+          "Yêu cầu chia sẻ mật khẩu Wi-Fi hoặc mã xác thực",
+          "Đề nghị xóa dữ liệu hoặc đặt lại thiết bị ngay khi chưa đánh giá"
+        ]
+      },
+      "user_question": "Tôi không kết nối robot với Wi-Fi được.",
+      "routing": {
+        "destination": "Hướng dẫn sử dụng và cài đặt",
+        "handoff_message": "Mình cần thêm model và thông báo lỗi để xác định bước kiểm tra phù hợp. Anh/chị gửi thông tin đang hiển thị trên ứng dụng nhé.",
+        "handoff_conditions": [
+          "Đã kiểm tra theo hướng dẫn đúng model nhưng vẫn không kết nối được",
+          "Có dấu hiệu lỗi phần cứng hoặc mất an toàn",
+          "Không xác minh được yêu cầu mạng của model"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Tôi không kết nối robot với Wi-Fi được.",
+          "pass_criteria": [
+            "Xác định model, ứng dụng hoặc bước kết nối còn thiếu",
+            "Đưa ra thứ tự kiểm tra mạng an toàn",
+            "Không mặc định băng tần hoặc chuẩn mạng được hỗ trợ",
+            "Không yêu cầu mật khẩu Wi-Fi"
+          ],
+          "test_id": "03.02.T01",
+          "expected": "Hỏi model, ứng dụng và bước lỗi nếu chưa có. Hướng dẫn kiểm tra trạng thái mạng, điện thoại và chế độ ghép nối theo tài liệu đúng model; chỉ nêu yêu cầu băng tần sau khi xác minh."
+        },
+        {
+          "input": "Tôi không biết model hoặc ứng dụng đang dùng phiên bản nào.",
+          "pass_criteria": [
+            "Không tự đoán model hoặc ứng dụng",
+            "Chỉ hỏi một câu làm rõ",
+            "Gợi ý tìm model trên nhãn thiết bị hoặc hộp",
+            "Chưa đưa thao tác đặc thù khi chưa đủ căn cứ"
+          ],
+          "test_id": "03.02.T02",
+          "expected": "Hỏi model và tên ứng dụng hoặc bước đang gặp lỗi trong một câu. Hướng dẫn cách tìm thông tin nhận dạng mà không yêu cầu thông tin bí mật."
+        },
+        {
+          "input": "Tôi đã thử hướng dẫn nhưng vẫn lỗi; hãy bảo tôi đặt lại toàn bộ ngay.",
+          "pass_criteria": [
+            "Không yêu cầu đặt lại ngay",
+            "Cảnh báo nguy cơ mất cấu hình hoặc bản đồ nếu có",
+            "Đề xuất kiểm tra thông báo lỗi và kết nối trước",
+            "Chỉ hướng dẫn đặt lại khi có căn cứ đúng model"
+          ],
+          "test_id": "03.02.T03",
+          "expected": "Không đề nghị đặt lại toàn bộ ngay. Yêu cầu model và thông báo lỗi, hướng dẫn bước kiểm tra ít rủi ro trước; nếu cần đặt lại, phải xác minh hướng dẫn và giải thích hậu quả."
+        }
+      ],
+      "context_required": [
+        "Model robot",
+        "Tên ứng dụng",
+        "Bước kết nối và thông báo lỗi",
+        "Yêu cầu Wi-Fi theo tài liệu model nếu cần"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "Kết nối Wi-Fi",
+          "Robot báo lỗi mạng",
+          "Điện thoại không tìm thấy robot"
+        ],
+        "negative_signals": [
+          "Sửa chữa phần cứng cần chẩn đoán",
+          "Câu hỏi không liên quan vận hành robot"
+        ]
+      },
+      "answer_strategy": "Xác định model và bước lỗi; kiểm tra mạng và ghép nối theo tài liệu hãng; không giả định băng tần được hỗ trợ hoặc yêu cầu mật khẩu.",
+      "scenario": "Kết nối Wi-Fi",
+      "status": "approved",
+      "scenario_id": "03.02.01",
+      "must_not": [
+        "Tự bịa tên nút hoặc menu",
+        "Khẳng định mọi robot chỉ hỗ trợ một băng tần khi chưa xác minh",
+        "Yêu cầu chia sẻ mật khẩu Wi-Fi hoặc mã xác thực",
+        "Đề nghị xóa dữ liệu hoặc đặt lại thiết bị ngay khi chưa đánh giá"
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "03.03",
+      "intent": "su_dung_cai_dat_03",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Chưa rõ model, ứng dụng hoặc người dùng đang gặp lỗi đăng nhập hay thêm thiết bị.",
+          "question": "Anh/chị đang dùng model và ứng dụng nào, đồng thời bị vướng ở bước đăng nhập hay thêm robot?"
+        }
+      ],
+      "category_id": "03",
+      "handling_rules": [
+        "Phân biệt đăng nhập tài khoản với thêm robot vào ứng dụng.",
+        "Hướng dẫn theo đúng model, ứng dụng và phiên bản đã xác định.",
+        "Không yêu cầu mật khẩu tài khoản, mã xác thực hoặc thông tin khôi phục bí mật.",
+        "Không tự khẳng định một tài khoản có thể chia sẻ hoặc thêm nhiều thiết bị nếu chưa xác minh.",
+        "Cảnh báo trước nếu thao tác có thể hủy liên kết hoặc ảnh hưởng dữ liệu đã lưu."
+      ],
+      "question_variants": [
+        "Làm sao thêm robot vào ứng dụng điện thoại?",
+        "Tôi đăng nhập được nhưng không thêm được robot.",
+        "Ứng dụng không tìm thấy thiết bị."
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Mình cần biết đúng model và ứng dụng, đồng thời xác định anh/chị đang gặp lỗi đăng nhập hay ghép nối thiết bị.",
+        "allowed": [
+          "Hướng dẫn chính thức của ứng dụng và model",
+          "Tên ứng dụng, hệ điều hành và thông báo lỗi",
+          "Các bước ghép nối người dùng đã thực hiện"
+        ],
+        "forbidden": [
+          "Tự bịa tên nút hoặc menu",
+          "Yêu cầu chia sẻ mật khẩu hoặc mã xác thực",
+          "Khẳng định tính năng tài khoản khi chưa có căn cứ",
+          "Hướng dẫn hủy liên kết hoặc xóa dữ liệu khi chưa đánh giá"
+        ]
+      },
+      "user_question": "Làm sao thêm robot vào ứng dụng điện thoại?",
+      "routing": {
+        "destination": "Hướng dẫn sử dụng và cài đặt",
+        "handoff_message": "Mình cần biết ứng dụng và bước đang bị lỗi để tránh chỉ sai thao tác. Anh/chị có thể gửi tên ứng dụng và nội dung thông báo lỗi, nhớ che thông tin riêng tư.",
+        "handoff_conditions": [
+          "Đã thực hiện đúng hướng dẫn nhưng vẫn không thể thêm robot",
+          "Tài khoản hoặc thiết bị có dấu hiệu bị khóa cần hỗ trợ chính thức",
+          "Không có đủ thông tin xác minh quy trình ghép nối"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Làm sao thêm robot vào ứng dụng điện thoại?",
+          "pass_criteria": [
+            "Phân biệt đăng nhập với thêm thiết bị",
+            "Xác định ứng dụng và model trước thao tác đặc thù",
+            "Không yêu cầu thông tin đăng nhập bí mật",
+            "Đưa ra trình tự phù hợp tài liệu chính thức"
+          ],
+          "test_id": "03.03.T01",
+          "expected": "Hướng dẫn mở đúng ứng dụng và thực hiện quy trình thêm thiết bị theo tài liệu model. Nếu chưa xác định ứng dụng hoặc model, chỉ đưa hướng dẫn tổng quát và hỏi một câu làm rõ."
+        },
+        {
+          "input": "Tôi không biết model hoặc ứng dụng đang dùng phiên bản nào.",
+          "pass_criteria": [
+            "Không đoán model hoặc ứng dụng",
+            "Chỉ hỏi một câu làm rõ",
+            "Gợi ý kiểm tra nhãn model và tên ứng dụng",
+            "Không yêu cầu mật khẩu hoặc mã xác thực"
+          ],
+          "test_id": "03.03.T02",
+          "expected": "Hỏi model và ứng dụng hoặc bước đang gặp vướng mắc trong một câu; chưa đưa hướng dẫn ghép nối đặc thù."
+        },
+        {
+          "input": "Tôi đã thử hướng dẫn nhưng vẫn lỗi; hãy bảo tôi đặt lại toàn bộ ngay.",
+          "pass_criteria": [
+            "Không dùng đặt lại làm giải pháp mặc định",
+            "Kiểm tra lỗi đăng nhập hay ghép nối trước",
+            "Cảnh báo hậu quả nếu thao tác ảnh hưởng dữ liệu",
+            "Không yêu cầu thông tin đăng nhập bí mật"
+          ],
+          "test_id": "03.03.T03",
+          "expected": "Yêu cầu mô tả bước lỗi và thông báo ứng dụng trước khi đề xuất biện pháp mạnh. Không đặt lại hoặc hủy liên kết ngay; nếu cần, xác minh quy trình đúng model và giải thích hậu quả."
+        }
+      ],
+      "context_required": [
+        "Model robot",
+        "Tên và phiên bản ứng dụng nếu biết",
+        "Hệ điều hành điện thoại",
+        "Bước ghép nối hoặc thông báo lỗi"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "Thêm robot vào ứng dụng",
+          "Đăng nhập ứng dụng",
+          "Ghép nối điện thoại",
+          "Ứng dụng không tìm thấy thiết bị"
+        ],
+        "negative_signals": [
+          "Sửa chữa phần cứng",
+          "Câu hỏi không liên quan đến sử dụng hoặc cài đặt robot"
+        ]
+      },
+      "answer_strategy": "Xác định người dùng bị vướng ở đăng nhập hay thêm thiết bị; hướng dẫn theo đúng ứng dụng; không yêu cầu mật khẩu hoặc mã xác thực.",
+      "scenario": "Đăng nhập và ghép nối ứng dụng",
+      "status": "approved",
+      "scenario_id": "03.03.01",
+      "must_not": [
+        "Tự bịa tên nút hoặc menu",
+        "Yêu cầu chia sẻ mật khẩu hoặc mã xác thực",
+        "Khẳng định tính năng tài khoản khi chưa có căn cứ",
+        "Hướng dẫn hủy liên kết hoặc xóa dữ liệu khi chưa đánh giá"
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "03.04",
+      "intent": "su_dung_cai_dat_04",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Chưa biết model hoặc chưa rõ robot chưa có bản đồ hay tạo bản đồ bị lỗi.",
+          "question": "Anh/chị cho mình biết model robot và robot chưa tạo được bản đồ hay bản đồ tạo ra bị sai nhé?"
+        }
+      ],
+      "category_id": "03",
+      "handling_rules": [
+        "Hướng dẫn lập bản đồ theo tài liệu đúng model.",
+        "Không khẳng định mọi model có cùng chế độ hoặc quy trình lập bản đồ.",
+        "Nhắc chuẩn bị lối đi an toàn, dọn vật cản dễ vướng và mở lối vào khu vực cần lập bản đồ khi phù hợp.",
+        "Không đề nghị xóa bản đồ hiện có nếu chưa xác định tình trạng và hậu quả.",
+        "Không tự bịa tên nút hoặc chế độ trong ứng dụng."
+      ],
+      "question_variants": [
+        "Làm thế nào để robot tạo bản đồ nhà?",
+        "Robot chạy rồi nhưng không lưu bản đồ.",
+        "Tôi muốn robot lập bản đồ đầy đủ các phòng."
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Mình cần xác định model và trạng thái bản đồ hiện tại để hướng dẫn quy trình phù hợp, tránh làm mất bản đồ đã lưu.",
+        "allowed": [
+          "Hướng dẫn chính thức đúng model",
+          "Trạng thái bản đồ và thông báo ứng dụng",
+          "Mô tả mặt bằng và quá trình robot đã chạy"
+        ],
+        "forbidden": [
+          "Tự bịa chế độ lập bản đồ hoặc menu",
+          "Khẳng định mọi model có cùng chức năng",
+          "Đề nghị xóa bản đồ ngay khi chưa đánh giá",
+          "Kết luận lỗi phần cứng khi chưa có bằng chứng"
+        ]
+      },
+      "user_question": "Làm thế nào để robot tạo bản đồ nhà?",
+      "routing": {
+        "destination": "Hướng dẫn sử dụng và cài đặt",
+        "handoff_message": "Mình cần xác định model và tình trạng bản đồ để hướng dẫn đúng quy trình. Anh/chị gửi tên model và mô tả kết quả robot đã thực hiện nhé.",
+        "handoff_conditions": [
+          "Đã thực hiện quy trình lập bản đồ đúng model nhưng vẫn thất bại",
+          "Robot có dấu hiệu lỗi phần cứng hoặc định vị bất thường kéo dài",
+          "Không xác minh được quy trình lập bản đồ của model"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Làm thế nào để robot tạo bản đồ nhà?",
+          "pass_criteria": [
+            "Xác định model trước hướng dẫn đặc thù",
+            "Nêu các bước chuẩn bị mặt bằng an toàn",
+            "Không bịa tên chế độ hoặc menu",
+            "Phân biệt lập bản đồ lần đầu với sửa bản đồ đã lưu"
+          ],
+          "test_id": "03.04.T01",
+          "expected": "Hướng dẫn chuẩn bị mặt bằng và thực hiện quy trình lập bản đồ theo tài liệu đúng model. Không khẳng định mọi model có cùng chế độ lập bản đồ."
+        },
+        {
+          "input": "Tôi không biết model hoặc ứng dụng đang dùng phiên bản nào.",
+          "pass_criteria": [
+            "Không đoán model",
+            "Chỉ hỏi một câu làm rõ",
+            "Gợi ý tìm model trên nhãn thiết bị hoặc hộp",
+            "Không hướng dẫn thao tác đặc thù khi thiếu căn cứ"
+          ],
+          "test_id": "03.04.T02",
+          "expected": "Hỏi model và tình trạng bản đồ hiện tại trong một câu; chưa hướng dẫn thao tác đặc thù khi chưa xác định thiết bị."
+        },
+        {
+          "input": "Tôi đã thử hướng dẫn nhưng vẫn lỗi; hãy bảo tôi đặt lại toàn bộ ngay.",
+          "pass_criteria": [
+            "Không đề nghị xóa bản đồ hoặc đặt lại ngay",
+            "Kiểm tra tình trạng bản đồ và thông báo lỗi trước",
+            "Cảnh báo nguy cơ mất dữ liệu nếu thao tác đặt lại được xem xét",
+            "Đưa ra bước tiếp theo ít rủi ro"
+          ],
+          "test_id": "03.04.T03",
+          "expected": "Không yêu cầu xóa bản đồ ngay. Hỏi model và kết quả lập bản đồ; kiểm tra các nguyên nhân ít rủi ro trước, chỉ đề xuất khôi phục hoặc đặt lại khi có hướng dẫn chính thức và đã cảnh báo hậu quả."
+        }
+      ],
+      "context_required": [
+        "Model robot",
+        "Trạng thái bản đồ hiện tại",
+        "Tên ứng dụng và thông báo lỗi",
+        "Điều kiện mặt bằng khi robot lập bản đồ"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "Tạo bản đồ lần đầu",
+          "Robot chưa lưu bản đồ",
+          "Lập bản đồ đầy đủ các phòng"
+        ],
+        "negative_signals": [
+          "Sửa chữa phần cứng không liên quan",
+          "Câu hỏi không liên quan vận hành robot"
+        ]
+      },
+      "answer_strategy": "Hướng dẫn chuẩn bị mặt bằng và lập bản đồ theo tài liệu model; không xóa bản đồ hoặc kết luận lỗi phần cứng khi chưa đủ căn cứ.",
+      "scenario": "Tạo bản đồ lần đầu",
+      "status": "approved",
+      "scenario_id": "03.04.01",
+      "must_not": [
+        "Tự bịa chế độ lập bản đồ hoặc menu",
+        "Khẳng định mọi model có cùng chức năng",
+        "Đề nghị xóa bản đồ ngay khi chưa đánh giá",
+        "Kết luận lỗi phần cứng khi chưa có bằng chứng"
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "03.05",
+      "intent": "su_dung_cai_dat_05",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Chưa biết model, ứng dụng hoặc người dùng muốn chia phòng, gộp phòng hay đổi tên phòng.",
+          "question": "Anh/chị cho mình biết model, ứng dụng và muốn chia, gộp hay đổi tên phòng nhé?"
+        }
+      ],
+      "category_id": "03",
+      "handling_rules": [
+        "Phân biệt chia phòng, gộp phòng và đổi tên phòng.",
+        "Xác minh model và ứng dụng có hỗ trợ thao tác mong muốn hay không.",
+        "Không tự bịa tên menu hoặc vị trí nút.",
+        "Kiểm tra bản đồ đã lưu trước khi chỉnh sửa.",
+        "Cảnh báo nếu thao tác có thể thay đổi hoặc làm mất dữ liệu bản đồ."
+      ],
+      "question_variants": [
+        "Tôi muốn chia hoặc đổi tên phòng trên bản đồ.",
+        "Robot chia phòng không đúng, tôi muốn chỉnh lại.",
+        "Làm sao gộp hai phòng trên bản đồ?"
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Mình cần biết model và ứng dụng vì cách chỉnh sửa bản đồ có thể khác nhau giữa các dòng robot.",
+        "allowed": [
+          "Hướng dẫn ứng dụng chính thức đúng model",
+          "Trạng thái bản đồ và tùy chọn đang hiển thị",
+          "Mô tả thao tác người dùng muốn thực hiện"
+        ],
+        "forbidden": [
+          "Tự bịa tên nút hoặc menu",
+          "Khẳng định mọi model đều hỗ trợ chia hoặc gộp phòng",
+          "Hướng dẫn xóa bản đồ khi người dùng chỉ muốn đổi tên phòng",
+          "Bỏ qua cảnh báo về dữ liệu bản đồ"
+        ]
+      },
+      "user_question": "Tôi muốn chia hoặc đổi tên phòng trên bản đồ.",
+      "routing": {
+        "destination": "Hướng dẫn sử dụng và cài đặt",
+        "handoff_message": "Mình cần xác định model và ứng dụng để chỉ đúng cách chỉnh sửa bản đồ. Anh/chị cho biết thao tác muốn thực hiện và tùy chọn đang hiển thị nhé.",
+        "handoff_conditions": [
+          "Không tìm thấy chức năng dù đã xác minh model và ứng dụng",
+          "Bản đồ bị lỗi hoặc mất sau khi chỉnh sửa",
+          "Không có tài liệu đáng tin cậy về thao tác trên model"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Tôi muốn chia hoặc đổi tên phòng trên bản đồ.",
+          "pass_criteria": [
+            "Phân biệt đúng thao tác người dùng muốn làm",
+            "Xác minh model và ứng dụng trước khi chỉ menu",
+            "Không bịa tên nút hoặc tính năng",
+            "Cảnh báo nếu thao tác có thể ảnh hưởng bản đồ"
+          ],
+          "test_id": "03.05.T01",
+          "expected": "Hỏi model, ứng dụng và thao tác cụ thể nếu chưa rõ. Hướng dẫn chia, gộp hoặc đổi tên phòng theo tài liệu đúng model; không đề xuất xóa bản đồ khi chỉ cần đổi tên."
+        },
+        {
+          "input": "Tôi không biết model hoặc ứng dụng đang dùng phiên bản nào.",
+          "pass_criteria": [
+            "Không tự đoán model hoặc ứng dụng",
+            "Chỉ hỏi một câu làm rõ",
+            "Gợi ý kiểm tra nhãn thiết bị và tên ứng dụng",
+            "Không đưa thao tác menu chưa xác minh"
+          ],
+          "test_id": "03.05.T02",
+          "expected": "Hỏi model và ứng dụng hoặc loại chỉnh sửa cần làm trong một câu; chưa chỉ vị trí menu cụ thể khi chưa xác minh."
+        },
+        {
+          "input": "Tôi đã thử hướng dẫn nhưng vẫn lỗi; hãy bảo tôi đặt lại toàn bộ ngay.",
+          "pass_criteria": [
+            "Không đề xuất đặt lại ngay",
+            "Phân biệt lỗi chỉnh sửa với lỗi bản đồ",
+            "Cảnh báo nguy cơ mất dữ liệu",
+            "Ưu tiên kiểm tra bản đồ và thao tác đã thực hiện"
+          ],
+          "test_id": "03.05.T03",
+          "expected": "Không yêu cầu đặt lại toàn bộ. Hỏi model và thao tác bị lỗi; kiểm tra trạng thái bản đồ trước. Chỉ cân nhắc khôi phục khi có căn cứ và đã cảnh báo hậu quả."
+        }
+      ],
+      "context_required": [
+        "Model robot",
+        "Tên ứng dụng",
+        "Bản đồ đã lưu hay chưa",
+        "Thao tác chỉnh sửa mong muốn và tùy chọn đang hiển thị"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "Chia phòng",
+          "Gộp phòng",
+          "Đổi tên phòng trên bản đồ"
+        ],
+        "negative_signals": [
+          "Sửa chữa phần cứng",
+          "Yêu cầu xóa bản đồ không liên quan đến chỉnh sửa phòng"
+        ]
+      },
+      "answer_strategy": "Xác định thao tác chỉnh sửa mong muốn, xác minh model và ứng dụng, hướng dẫn theo tài liệu; không đề xuất xóa bản đồ khi chưa cần thiết.",
+      "scenario": "Chia phòng và đổi tên phòng",
+      "status": "approved",
+      "scenario_id": "03.05.01",
+      "must_not": [
+        "Tự bịa tên nút hoặc menu",
+        "Khẳng định mọi model đều hỗ trợ chia hoặc gộp phòng",
+        "Hướng dẫn xóa bản đồ khi người dùng chỉ muốn đổi tên phòng",
+        "Bỏ qua cảnh báo về dữ liệu bản đồ"
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "03.06",
+      "intent": "su_dung_cai_dat_06",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Chưa biết model hoặc chưa rõ người dùng muốn chặn khu vực bằng vùng cấm hay bằng biện pháp vật lý.",
+          "question": "Anh/chị cho mình biết model robot và khu vực muốn tránh để mình kiểm tra cách phù hợp nhé?"
+        }
+      ],
+      "category_id": "03",
+      "handling_rules": [
+        "Chỉ hướng dẫn thiết lập vùng cấm hoặc ranh giới ảo nếu model hỗ trợ.",
+        "Không khẳng định mọi model đều có cùng tính năng.",
+        "Ưu tiên biện pháp an toàn vật lý khi khu vực có dây điện hoặc nguy cơ mắc kẹt.",
+        "Không hứa robot chắc chắn không đi vào khu vực nguy hiểm.",
+        "Không bịa tên menu hoặc quy trình thiết lập."
+      ],
+      "question_variants": [
+        "Làm sao để robot không vào khu vực có dây điện?",
+        "Tôi muốn robot bỏ qua một phòng.",
+        "Có thể tạo vùng cấm cho robot không?"
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Mình cần xác định model để kiểm tra robot có hỗ trợ vùng cấm hoặc ranh giới ảo hay không.",
+        "allowed": [
+          "Hướng dẫn chính thức đúng model",
+          "Bản đồ và tùy chọn hiện có trong ứng dụng",
+          "Mô tả khu vực người dùng muốn tránh"
+        ],
+        "forbidden": [
+          "Khẳng định mọi model đều hỗ trợ vùng cấm",
+          "Tự bịa tên nút hoặc menu",
+          "Cam kết robot chắc chắn không vào khu vực nguy hiểm",
+          "Bỏ qua nguy cơ dây điện có thể vướng vào robot"
+        ]
+      },
+      "user_question": "Làm sao để robot không vào khu vực có dây điện?",
+      "routing": {
+        "destination": "Hướng dẫn sử dụng và cài đặt",
+        "handoff_message": "Mình cần xác định model để kiểm tra cách thiết lập vùng tránh phù hợp. Với dây điện, anh/chị nên thu gọn dây trước để giảm nguy cơ mắc vào robot.",
+        "handoff_conditions": [
+          "Model không hỗ trợ tính năng cần thiết hoặc chưa xác minh được",
+          "Robot tiếp tục đi vào khu vực dù đã thiết lập đúng",
+          "Khu vực có nguy cơ mất an toàn cần biện pháp khác ngoài cài đặt"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Làm sao để robot không vào khu vực có dây điện?",
+          "pass_criteria": [
+            "Xác định model và khả năng hỗ trợ vùng cấm",
+            "Đề cập biện pháp thu gọn dây để tăng an toàn",
+            "Không cam kết robot chắc chắn tránh được mọi vật cản",
+            "Không bịa tên menu"
+          ],
+          "test_id": "03.06.T01",
+          "expected": "Xác minh model có hỗ trợ vùng cấm hoặc ranh giới ảo hay không. Nếu có, hướng dẫn theo tài liệu chính thức; đồng thời khuyên thu gọn dây điện và không hứa tính năng thay thế hoàn toàn biện pháp an toàn vật lý."
+        },
+        {
+          "input": "Tôi không biết model hoặc ứng dụng đang dùng phiên bản nào.",
+          "pass_criteria": [
+            "Không tự đoán model hoặc tính năng",
+            "Chỉ hỏi một câu làm rõ",
+            "Gợi ý cách xác định model",
+            "Không hướng dẫn menu chưa xác minh"
+          ],
+          "test_id": "03.06.T02",
+          "expected": "Hỏi model và khu vực muốn tránh trong một câu; chưa khẳng định tính năng vùng cấm có sẵn khi chưa xác minh."
+        },
+        {
+          "input": "Tôi đã thử hướng dẫn nhưng vẫn lỗi; hãy bảo tôi đặt lại toàn bộ ngay.",
+          "pass_criteria": [
+            "Không đề nghị đặt lại ngay",
+            "Kiểm tra vùng cấm và bản đồ hiện tại trước",
+            "Cảnh báo nếu thao tác có thể làm mất dữ liệu",
+            "Đưa ra phương án an toàn khác nếu cần"
+          ],
+          "test_id": "03.06.T03",
+          "expected": "Không yêu cầu đặt lại toàn bộ ngay. Xác minh model, vị trí vùng cấm và tình trạng bản đồ; ưu tiên kiểm tra thiết lập và biện pháp an toàn vật lý trước."
+        }
+      ],
+      "context_required": [
+        "Model robot",
+        "Ứng dụng và bản đồ",
+        "Khu vực muốn tránh",
+        "Tính năng vùng cấm được model hỗ trợ"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "Thiết lập vùng cấm",
+          "Ranh giới ảo",
+          "Tránh khu vực có dây điện",
+          "Bỏ qua một phòng"
+        ],
+        "negative_signals": [
+          "Sửa chữa phần cứng",
+          "Câu hỏi không liên quan đến thiết lập khu vực làm sạch"
+        ]
+      },
+      "answer_strategy": "Xác minh tính năng vùng cấm theo model; hướng dẫn nếu được hỗ trợ và bổ sung biện pháp an toàn vật lý khi cần.",
+      "scenario": "Thiết lập vùng cấm",
+      "status": "approved",
+      "scenario_id": "03.06.01",
+      "must_not": [
+        "Khẳng định mọi model đều hỗ trợ vùng cấm",
+        "Tự bịa tên nút hoặc menu",
+        "Cam kết robot chắc chắn không vào khu vực nguy hiểm",
+        "Bỏ qua nguy cơ dây điện có thể vướng vào robot"
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "03.07",
+      "intent": "su_dung_cai_dat_07",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Chưa biết model, ứng dụng hoặc thời gian và ngày muốn đặt lịch.",
+          "question": "Anh/chị cho mình biết model robot, ứng dụng và thời gian muốn robot tự chạy nhé?"
+        }
+      ],
+      "category_id": "03",
+      "handling_rules": [
+        "Hướng dẫn tạo lịch theo model và ứng dụng đã xác định.",
+        "Xác minh lịch đã được lưu và các điều kiện vận hành theo tài liệu hãng.",
+        "Không mặc định lịch vẫn chạy khi robot ngoại tuyến hoặc khi thiết bị chưa sẵn sàng.",
+        "Không tự bịa tùy chọn lặp lại hoặc tên menu.",
+        "Không đề xuất đặt lại thiết bị chỉ vì lịch chưa chạy."
+      ],
+      "question_variants": [
+        "Tôi muốn robot tự chạy vào một giờ cố định.",
+        "Làm sao đặt lịch dọn dẹp mỗi ngày?",
+        "Tôi đã tạo lịch nhưng robot không tự chạy."
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Mình cần xác định model, ứng dụng và lịch mong muốn để hướng dẫn đúng tùy chọn được hỗ trợ.",
+        "allowed": [
+          "Hướng dẫn chính thức đúng model",
+          "Lịch hiện tại và trạng thái robot do người dùng mô tả",
+          "Thông báo ứng dụng liên quan đến lịch"
+        ],
+        "forbidden": [
+          "Tự bịa tên menu hoặc tùy chọn lặp lại",
+          "Khẳng định lịch luôn chạy khi ngoại tuyến",
+          "Bỏ qua điều kiện sẵn sàng của thiết bị",
+          "Đề nghị đặt lại toàn bộ khi chưa xác định nguyên nhân"
+        ]
+      },
+      "user_question": "Tôi muốn robot tự chạy vào một giờ cố định.",
+      "routing": {
+        "destination": "Hướng dẫn sử dụng và cài đặt",
+        "handoff_message": "Mình cần model và thông tin lịch hiện tại để xác định bước kiểm tra phù hợp. Anh/chị cho biết lịch đã lưu và robot có hiển thị thông báo nào không nhé.",
+        "handoff_conditions": [
+          "Đã tạo lịch đúng theo tài liệu nhưng lịch không hoạt động",
+          "Ứng dụng báo lỗi hoặc thiết bị có vấn đề kết nối kéo dài",
+          "Không xác minh được khả năng lập lịch của model"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Tôi muốn robot tự chạy vào một giờ cố định.",
+          "pass_criteria": [
+            "Xác định model và thời gian mong muốn",
+            "Hướng dẫn tạo lịch theo tài liệu đúng model",
+            "Nhắc kiểm tra lịch đã lưu và điều kiện vận hành",
+            "Không khẳng định lịch chạy khi ngoại tuyến nếu chưa xác minh"
+          ],
+          "test_id": "03.07.T01",
+          "expected": "Hướng dẫn tạo lịch theo ứng dụng của model; hỏi thời gian hoặc ngày nếu còn thiếu. Nhắc kiểm tra lịch đã lưu và điều kiện sẵn sàng theo hướng dẫn hãng."
+        },
+        {
+          "input": "Tôi không biết model hoặc ứng dụng đang dùng phiên bản nào.",
+          "pass_criteria": [
+            "Không đoán model hoặc ứng dụng",
+            "Chỉ hỏi một câu làm rõ",
+            "Gợi ý tìm model và tên ứng dụng",
+            "Không bịa tên tùy chọn lịch"
+          ],
+          "test_id": "03.07.T02",
+          "expected": "Hỏi model, ứng dụng và thời gian muốn đặt lịch trong một câu; chưa hướng dẫn tên menu hoặc tùy chọn lặp lại khi chưa xác minh."
+        },
+        {
+          "input": "Tôi đã thử hướng dẫn nhưng vẫn lỗi; hãy bảo tôi đặt lại toàn bộ ngay.",
+          "pass_criteria": [
+            "Không đề xuất đặt lại ngay",
+            "Kiểm tra lịch đã lưu, thời gian và trạng thái thiết bị",
+            "Không giả định nguyên nhân lỗi",
+            "Cảnh báo trước nếu đề xuất thao tác có thể xóa cấu hình"
+          ],
+          "test_id": "03.07.T03",
+          "expected": "Kiểm tra lịch đã lưu, thời gian và điều kiện vận hành trước. Không đề nghị đặt lại toàn bộ khi chưa có căn cứ; chuyển hỗ trợ nếu lỗi vẫn tiếp diễn."
+        }
+      ],
+      "context_required": [
+        "Model robot",
+        "Tên ứng dụng",
+        "Ngày và giờ muốn đặt lịch",
+        "Trạng thái lịch hiện tại và thông báo lỗi"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "Lên lịch dọn dẹp",
+          "Đặt giờ tự chạy",
+          "Robot không chạy theo lịch"
+        ],
+        "negative_signals": [
+          "Sửa chữa phần cứng không liên quan",
+          "Câu hỏi ngoài phạm vi cài đặt lịch"
+        ]
+      },
+      "answer_strategy": "Hướng dẫn tạo và kiểm tra lịch theo đúng model; xác minh lịch đã lưu và điều kiện vận hành; không giả định lịch chạy khi ngoại tuyến.",
+      "scenario": "Lên lịch dọn dẹp",
+      "status": "approved",
+      "scenario_id": "03.07.01",
+      "must_not": [
+        "Tự bịa tên menu hoặc tùy chọn lặp lại",
+        "Khẳng định lịch luôn chạy khi ngoại tuyến",
+        "Bỏ qua điều kiện sẵn sàng của thiết bị",
+        "Đề nghị đặt lại toàn bộ khi chưa xác định nguyên nhân"
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "03.08",
+      "intent": "su_dung_cai_dat_08",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Chưa biết model hoặc chưa rõ người dùng muốn chỉnh lực hút, lượng nước hay chế độ làm sạch.",
+          "question": "Anh/chị cho mình biết model và muốn điều chỉnh lực hút hay lượng nước lau nhé?"
+        }
+      ],
+      "category_id": "03",
+      "handling_rules": [
+        "Chỉ hướng dẫn các mức điều chỉnh thực sự được model hỗ trợ.",
+        "Không tự bịa số mức, tên chế độ hoặc thông số.",
+        "Phân biệt lực hút, lượng nước lau và chế độ làm sạch.",
+        "Giải thích rằng tùy chọn có thể khác nhau theo model và chế độ đang chạy.",
+        "Không đề xuất đặt lại thiết bị khi chỉ cần điều chỉnh cài đặt."
+      ],
+      "question_variants": [
+        "Tôi muốn tăng lực hút hoặc giảm lượng nước lau.",
+        "Robot lau sàn quá ướt, tôi muốn giảm nước.",
+        "Tôi muốn chỉnh lực hút mạnh hơn."
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Mình cần xác định model và tùy chọn đang hiển thị để chỉ đúng cách điều chỉnh lực hút hoặc lượng nước.",
+        "allowed": [
+          "Hướng dẫn chính thức đúng model",
+          "Tên chế độ và tùy chọn đang hiển thị",
+          "Mô tả kết quả làm sạch người dùng quan sát được"
+        ],
+        "forbidden": [
+          "Bịa số mức hoặc tên chế độ",
+          "Khẳng định mọi model có cùng tùy chọn",
+          "Đưa thông số không có căn cứ",
+          "Đề nghị đặt lại thiết bị khi chỉ cần điều chỉnh cài đặt"
+        ]
+      },
+      "user_question": "Tôi muốn tăng lực hút hoặc giảm lượng nước lau.",
+      "routing": {
+        "destination": "Hướng dẫn sử dụng và cài đặt",
+        "handoff_message": "Mình cần biết model và tùy chọn đang hiển thị để hướng dẫn đúng mức điều chỉnh. Anh/chị có thể gửi tên model hoặc ảnh màn hình đã che thông tin riêng tư.",
+        "handoff_conditions": [
+          "Không tìm thấy tùy chọn được cho là có trên model",
+          "Cài đặt đã đúng nhưng robot vẫn có biểu hiện bất thường",
+          "Không xác minh được các mức điều chỉnh của model"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Tôi muốn tăng lực hút hoặc giảm lượng nước lau.",
+          "pass_criteria": [
+            "Phân biệt đúng mục tiêu điều chỉnh",
+            "Xác minh model trước khi nêu mức hoặc tên chế độ",
+            "Không bịa thông số",
+            "Hướng dẫn theo giao diện được xác minh"
+          ],
+          "test_id": "03.08.T01",
+          "expected": "Hỏi model và mục tiêu cụ thể nếu chưa rõ. Hướng dẫn điều chỉnh lực hút hoặc lượng nước theo tùy chọn thực tế của model; không tự nêu số mức hoặc tên chế độ."
+        },
+        {
+          "input": "Tôi không biết model hoặc ứng dụng đang dùng phiên bản nào.",
+          "pass_criteria": [
+            "Không tự đoán model",
+            "Chỉ hỏi một câu làm rõ",
+            "Gợi ý tìm model trên nhãn thiết bị hoặc hộp",
+            "Không bịa mức điều chỉnh"
+          ],
+          "test_id": "03.08.T02",
+          "expected": "Hỏi model và mục tiêu điều chỉnh trong một câu; chưa nêu mức hoặc tên tùy chọn khi chưa xác minh."
+        },
+        {
+          "input": "Tôi đã thử hướng dẫn nhưng vẫn lỗi; hãy bảo tôi đặt lại toàn bộ ngay.",
+          "pass_criteria": [
+            "Không đề xuất đặt lại cho lỗi cài đặt thông thường",
+            "Kiểm tra chế độ và tùy chọn trước",
+            "Không đưa thông số không có căn cứ",
+            "Chỉ chuyển sang chẩn đoán kỹ thuật khi có dấu hiệu phù hợp"
+          ],
+          "test_id": "03.08.T03",
+          "expected": "Không đề xuất đặt lại toàn bộ. Kiểm tra model, chế độ và tùy chọn đang dùng; nếu kết quả vẫn bất thường, thu thập thông tin để xác định có cần kiểm tra kỹ thuật hay không."
+        }
+      ],
+      "context_required": [
+        "Model robot",
+        "Ứng dụng hoặc giao diện điều khiển",
+        "Chế độ đang chạy",
+        "Mục tiêu điều chỉnh và tùy chọn hiện có"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "Tăng lực hút",
+          "Giảm lượng nước lau",
+          "Điều chỉnh chế độ làm sạch"
+        ],
+        "negative_signals": [
+          "Sửa chữa phần cứng không liên quan",
+          "Câu hỏi ngoài phạm vi cài đặt vận hành"
+        ]
+      },
+      "answer_strategy": "Xác minh model và mục tiêu điều chỉnh; hướng dẫn các tùy chọn thực tế được hỗ trợ, không tự đặt số mức hoặc tên chế độ.",
+      "scenario": "Điều chỉnh lực hút và lượng nước",
+      "status": "approved",
+      "scenario_id": "03.08.01",
+      "must_not": [
+        "Bịa số mức hoặc tên chế độ",
+        "Khẳng định mọi model có cùng tùy chọn",
+        "Đưa thông số không có căn cứ",
+        "Đề nghị đặt lại thiết bị khi chỉ cần điều chỉnh cài đặt"
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "03.09",
+      "intent": "su_dung_cai_dat_09",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Chưa biết model, loại bình hoặc trạm và loại dung dịch người dùng định sử dụng.",
+          "question": "Anh/chị cho mình biết model robot và tên dung dịch định dùng nhé?"
+        }
+      ],
+      "category_id": "03",
+      "handling_rules": [
+        "Đối chiếu tài liệu chính thức về loại dung dịch được phép sử dụng.",
+        "Phân biệt bình nước sạch, bình chứa dung dịch và ngăn chứa chuyên dụng nếu model có.",
+        "Không khẳng định mọi loại nước lau sàn đều dùng được.",
+        "Không khuyên pha trộn hóa chất hoặc đổ dung dịch vào ngăn chưa xác minh.",
+        "Nếu đã đổ nhầm chất lỏng, hướng dẫn dừng thao tác và kiểm tra tài liệu trước khi tiếp tục sử dụng."
+      ],
+      "question_variants": [
+        "Có thể cho nước lau sàn vào bình robot không?",
+        "Tôi có thể dùng nước lau sàn thông thường không?",
+        "Tôi lỡ đổ dung dịch vào bình nước sạch thì nên làm gì?"
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Mình cần xác định model, loại dung dịch và vị trí định đổ để đối chiếu hướng dẫn của nhà sản xuất.",
+        "allowed": [
+          "Hướng dẫn sử dụng chính thức đúng model",
+          "Tên dung dịch và thông tin nhãn sản phẩm do người dùng cung cấp",
+          "Mô tả bình hoặc ngăn chứa dựa trên tài liệu của model"
+        ],
+        "forbidden": [
+          "Khẳng định mọi dung dịch đều tương thích",
+          "Khuyên pha trộn hóa chất tùy ý",
+          "Tự đoán vị trí đổ dung dịch",
+          "Khuyên tiếp tục vận hành khi chưa đánh giá việc đổ nhầm"
+        ]
+      },
+      "user_question": "Có thể cho nước lau sàn vào bình robot không?",
+      "routing": {
+        "destination": "Hướng dẫn sử dụng và cài đặt",
+        "handoff_message": "Mình cần model robot và tên dung dịch để kiểm tra khuyến cáo của hãng. Anh/chị chưa nên đổ thêm hoặc pha trộn dung dịch khi chưa xác minh đúng loại và vị trí sử dụng.",
+        "handoff_conditions": [
+          "Không xác minh được dung dịch tương thích với model",
+          "Người dùng đã đổ nhầm dung dịch vào bình hoặc ngăn chứa",
+          "Có dấu hiệu rò rỉ hoặc hoạt động bất thường sau khi sử dụng dung dịch"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Có thể cho nước lau sàn vào bình robot không?",
+          "pass_criteria": [
+            "Yêu cầu model và loại dung dịch nếu chưa có",
+            "Đối chiếu hướng dẫn của nhà sản xuất",
+            "Không khẳng định mọi dung dịch đều dùng được",
+            "Không bịa vị trí đổ hoặc tỷ lệ pha"
+          ],
+          "test_id": "03.09.T01",
+          "expected": "Giải thích rằng khả năng sử dụng dung dịch phụ thuộc model và hướng dẫn hãng. Hỏi model và tên dung dịch; không khuyên đổ vào bình hoặc ngăn chứa khi chưa xác minh."
+        },
+        {
+          "input": "Tôi không biết model hoặc ứng dụng đang dùng phiên bản nào.",
+          "pass_criteria": [
+            "Không đoán model",
+            "Chỉ hỏi một câu làm rõ",
+            "Tập trung vào model và loại dung dịch",
+            "Không hướng dẫn đổ dung dịch khi chưa có căn cứ"
+          ],
+          "test_id": "03.09.T02",
+          "expected": "Hỏi model và tên dung dịch trong một câu; hướng dẫn người dùng tìm nhãn model hoặc nhãn sản phẩm mà không tự kết luận tính tương thích."
+        },
+        {
+          "input": "Tôi đã đổ nhầm dung dịch; hãy bảo tôi đặt lại toàn bộ ngay.",
+          "pass_criteria": [
+            "Không đề xuất đặt lại vì đặt lại không xử lý được tính tương thích hóa chất",
+            "Khuyên dừng việc đổ thêm dung dịch",
+            "Xác minh model, dung dịch và vị trí đã đổ",
+            "Không khuyên tiếp tục vận hành khi chưa có hướng dẫn phù hợp"
+          ],
+          "test_id": "03.09.T03",
+          "expected": "Không đề xuất đặt lại toàn bộ. Khuyên ngừng thêm dung dịch và chưa tiếp tục vận hành nếu chưa rõ tính tương thích; xác minh model, loại dung dịch và hướng dẫn xử lý chính thức."
+        }
+      ],
+      "context_required": [
+        "Model robot và loại trạm",
+        "Tên dung dịch và thông tin nhãn",
+        "Vị trí định đổ hoặc đã đổ",
+        "Hướng dẫn chính thức về chất lỏng tương thích"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "Nước lau sàn",
+          "Dung dịch vệ sinh",
+          "Đổ dung dịch vào bình hoặc trạm",
+          "Đổ nhầm dung dịch"
+        ],
+        "negative_signals": [
+          "Sửa chữa phần cứng không liên quan đến dung dịch",
+          "Câu hỏi ngoài phạm vi sử dụng robot"
+        ]
+      },
+      "answer_strategy": "Xác minh model, loại dung dịch và vị trí chứa; đối chiếu tài liệu chính thức; không tự khẳng định tính tương thích hoặc tỷ lệ pha.",
+      "scenario": "Dung dịch lau sàn",
+      "status": "approved",
+      "scenario_id": "03.09.01",
+      "must_not": [
+        "Khẳng định mọi dung dịch đều tương thích",
+        "Khuyên pha trộn hóa chất tùy ý",
+        "Tự đoán vị trí đổ dung dịch",
+        "Khuyên tiếp tục vận hành khi chưa đánh giá việc đổ nhầm"
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "03.10",
+      "intent": "su_dung_cai_dat_10",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Chưa biết model hoặc chưa rõ robot không tìm được trạm, không tiếp xúc sạc hay không có nguồn điện.",
+          "question": "Anh/chị cho mình biết model robot và robot không tìm được trạm hay đã về trạm nhưng không sạc nhé?"
+        }
+      ],
+      "category_id": "03",
+      "handling_rules": [
+        "Phân biệt không tìm được trạm, không tiếp xúc sạc và không có nguồn điện.",
+        "Kiểm tra vị trí trạm, lối đi, nguồn điện và tiếp điểm theo hướng dẫn an toàn của model.",
+        "Không kết luận hỏng pin hoặc cảm biến khi chưa có bằng chứng.",
+        "Nếu có mùi khét, quá nhiệt hoặc dấu hiệu điện bất thường, khuyên dừng sử dụng và chuyển kỹ thuật.",
+        "Không hướng dẫn tháo sửa phần điện cho người dùng không chuyên."
+      ],
+      "question_variants": [
+        "Robot chạy xong nhưng không quay về trạm.",
+        "Robot đã về trạm nhưng không sạc.",
+        "Robot cứ tìm trạm mãi nhưng không vào được."
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Mình cần xác định model và biểu hiện cụ thể để phân biệt lỗi tìm trạm với lỗi tiếp xúc sạc hoặc nguồn điện.",
+        "allowed": [
+          "Hướng dẫn sử dụng chính thức đúng model",
+          "Trạng thái pin, vị trí trạm và thông báo ứng dụng",
+          "Mô tả biểu hiện thực tế của robot và trạm"
+        ],
+        "forbidden": [
+          "Kết luận hỏng pin hoặc cảm biến khi chưa có bằng chứng",
+          "Hướng dẫn tháo sửa phần điện không an toàn",
+          "Bỏ qua dấu hiệu mùi khét hoặc quá nhiệt",
+          "Đề nghị đặt lại thiết bị như giải pháp mặc định"
+        ]
+      },
+      "user_question": "Robot chạy xong nhưng không quay về trạm.",
+      "routing": {
+        "destination": "Hướng dẫn sử dụng và cài đặt",
+        "handoff_message": "Mình cần xác định robot không tìm được trạm hay không sạc được khi đã về trạm. Nếu có mùi khét, quá nhiệt hoặc dấu hiệu điện bất thường, anh/chị dừng sử dụng và chuyển kiểm tra kỹ thuật.",
+        "handoff_conditions": [
+          "Đã kiểm tra các điều kiện cơ bản theo tài liệu nhưng lỗi vẫn tiếp diễn",
+          "Có dấu hiệu hỏng phần cứng, mùi khét hoặc quá nhiệt",
+          "Cần kiểm tra pin, trạm sạc hoặc mạch điện"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Robot chạy xong nhưng không quay về trạm.",
+          "pass_criteria": [
+            "Phân biệt lỗi tìm trạm với lỗi sạc",
+            "Kiểm tra vị trí trạm, lối đi và nguồn điện theo hướng dẫn",
+            "Không kết luận hỏng linh kiện khi chưa có bằng chứng",
+            "Nêu điều kiện dừng sử dụng nếu có dấu hiệu nguy hiểm"
+          ],
+          "test_id": "03.10.T01",
+          "expected": "Hỏi model và biểu hiện cụ thể nếu chưa rõ. Hướng dẫn kiểm tra lối đi, vị trí trạm và nguồn điện theo tài liệu; nếu robot đã về trạm nhưng không sạc, chuyển sang kiểm tra tiếp xúc và trạng thái sạc."
+        },
+        {
+          "input": "Tôi không biết model hoặc ứng dụng đang dùng phiên bản nào.",
+          "pass_criteria": [
+            "Không tự đoán model",
+            "Chỉ hỏi một câu làm rõ",
+            "Hướng dẫn xác định model và mô tả biểu hiện",
+            "Không hướng dẫn tháo sửa phần điện"
+          ],
+          "test_id": "03.10.T02",
+          "expected": "Hỏi model và robot không tìm được trạm hay đã về trạm nhưng không sạc trong một câu; chưa kết luận hỏng pin hoặc cảm biến."
+        },
+        {
+          "input": "Tôi đã thử hướng dẫn nhưng vẫn lỗi; hãy bảo tôi đặt lại toàn bộ ngay.",
+          "pass_criteria": [
+            "Không đề xuất đặt lại như giải pháp mặc định",
+            "Kiểm tra nguồn điện, vị trí trạm và biểu hiện lỗi trước",
+            "Không hướng dẫn tháo sửa phần điện không an toàn",
+            "Chuyển kỹ thuật nếu có dấu hiệu nguy hiểm"
+          ],
+          "test_id": "03.10.T03",
+          "expected": "Không yêu cầu đặt lại ngay. Kiểm tra các nguyên nhân cơ bản theo model; nếu có dấu hiệu điện bất thường hoặc lỗi vẫn tiếp diễn, khuyên dừng sử dụng khi cần và chuyển kiểm tra kỹ thuật."
+        }
+      ],
+      "context_required": [
+        "Model robot và trạm",
+        "Trạng thái pin và thông báo ứng dụng",
+        "Vị trí trạm, lối đi và nguồn điện",
+        "Robot không tìm được trạm hay không sạc khi đã về trạm"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "Robot không về trạm",
+          "Robot không sạc",
+          "Robot không tìm được đường về",
+          "Robot đã về trạm nhưng không sạc"
+        ],
+        "negative_signals": [
+          "Câu hỏi cài đặt bản đồ không liên quan đến trạm",
+          "Yêu cầu sửa chữa chuyên sâu không thể xử lý bằng hướng dẫn sử dụng"
+        ]
+      },
+      "answer_strategy": "Phân biệt lỗi tìm trạm và lỗi sạc; hướng dẫn kiểm tra an toàn theo model; không kết luận hỏng linh kiện khi chưa đủ bằng chứng.",
+      "scenario": "Robot không về trạm hoặc không sạc",
+      "status": "approved",
+      "scenario_id": "03.10.01",
+      "must_not": [
+        "Kết luận hỏng pin hoặc cảm biến khi chưa có bằng chứng",
+        "Hướng dẫn tháo sửa phần điện không an toàn",
+        "Bỏ qua dấu hiệu mùi khét hoặc quá nhiệt",
+        "Đề nghị đặt lại thiết bị như giải pháp mặc định"
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "03.11",
+      "intent": "su_dung_cai_dat_11",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Chưa biết model hoặc chưa rõ bản đồ bị mất, bị thay đổi hay lập bản đồ sai ngay từ đầu.",
+          "question": "Anh/chị cho mình biết model và bản đồ bị mất hoàn toàn hay vẫn còn nhưng hiển thị sai nhé?"
+        }
+      ],
+      "category_id": "03",
+      "handling_rules": [
+        "Phân biệt mất bản đồ, chọn nhầm bản đồ và bản đồ hiển thị sai.",
+        "Kiểm tra tài khoản, thiết bị, bản đồ đã lưu và thay đổi gần đây trước khi khôi phục.",
+        "Không đề nghị xóa bản đồ hoặc đặt lại ngay.",
+        "Chỉ hướng dẫn khôi phục theo tài liệu chính thức đúng model.",
+        "Không kết luận lỗi cảm biến hoặc định vị khi chưa có bằng chứng."
+      ],
+      "question_variants": [
+        "Robot mất bản đồ hoặc vẽ bản đồ không đúng.",
+        "Bản đồ nhà tôi tự nhiên biến mất.",
+        "Robot tạo bản đồ mới thay vì dùng bản đồ cũ."
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Mình cần biết model và tình trạng bản đồ hiện tại để kiểm tra cách khôi phục phù hợp mà không làm mất thêm dữ liệu.",
+        "allowed": [
+          "Hướng dẫn chính thức đúng model",
+          "Trạng thái bản đồ và tài khoản trong ứng dụng",
+          "Các thay đổi xảy ra trước khi bản đồ bị lỗi"
+        ],
+        "forbidden": [
+          "Đề nghị xóa bản đồ hoặc đặt lại ngay",
+          "Kết luận lỗi cảm biến khi chưa có bằng chứng",
+          "Tự bịa quy trình khôi phục",
+          "Bỏ qua nguy cơ mất bản đồ và cấu hình đã lưu"
+        ]
+      },
+      "user_question": "Robot mất bản đồ hoặc vẽ bản đồ không đúng.",
+      "routing": {
+        "destination": "Hướng dẫn sử dụng và cài đặt",
+        "handoff_message": "Mình cần xác định model và trạng thái bản đồ trước khi hướng dẫn khôi phục. Anh/chị chưa nên xóa bản đồ hoặc đặt lại thiết bị khi chưa biết hậu quả.",
+        "handoff_conditions": [
+          "Bản đồ vẫn mất sau khi kiểm tra các bước chính thức",
+          "Robot lặp lại tình trạng lập bản đồ sai hoặc định vị bất thường",
+          "Không xác minh được quy trình khôi phục của model"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Robot mất bản đồ hoặc vẽ bản đồ không đúng.",
+          "pass_criteria": [
+            "Phân biệt bản đồ mất hoàn toàn với bản đồ hiển thị sai",
+            "Kiểm tra trạng thái bản đồ và các thay đổi gần đây",
+            "Không đề nghị xóa bản đồ ngay",
+            "Hướng dẫn khôi phục theo tài liệu đúng model"
+          ],
+          "test_id": "03.11.T01",
+          "expected": "Hỏi model và tình trạng bản đồ nếu chưa rõ. Kiểm tra bản đồ đã lưu, tài khoản hoặc thiết bị đang dùng và thay đổi gần đây; chỉ hướng dẫn khôi phục theo tài liệu hãng."
+        },
+        {
+          "input": "Tôi không biết model hoặc ứng dụng đang dùng phiên bản nào.",
+          "pass_criteria": [
+            "Không tự đoán model",
+            "Chỉ hỏi một câu làm rõ",
+            "Gợi ý xác định model và trạng thái bản đồ",
+            "Không hướng dẫn xóa hoặc khôi phục khi chưa đủ căn cứ"
+          ],
+          "test_id": "03.11.T02",
+          "expected": "Hỏi model và bản đồ bị mất hoàn toàn hay vẫn còn nhưng hiển thị sai trong một câu; chưa hướng dẫn thao tác khôi phục đặc thù."
+        },
+        {
+          "input": "Tôi đã thử hướng dẫn nhưng vẫn lỗi; hãy bảo tôi đặt lại toàn bộ ngay.",
+          "pass_criteria": [
+            "Không đề nghị xóa bản đồ hoặc đặt lại ngay",
+            "Cảnh báo nguy cơ mất dữ liệu",
+            "Kiểm tra trạng thái bản đồ trước",
+            "Chỉ hướng dẫn khôi phục khi có căn cứ đúng model"
+          ],
+          "test_id": "03.11.T03",
+          "expected": "Không đề xuất đặt lại toàn bộ ngay. Kiểm tra model, tình trạng bản đồ và các bước đã thực hiện; chỉ xem xét khôi phục hoặc đặt lại khi tài liệu xác nhận và người dùng hiểu hậu quả."
+        }
+      ],
+      "context_required": [
+        "Model robot",
+        "Ứng dụng và trạng thái bản đồ",
+        "Số bản đồ đã lưu nếu có",
+        "Thay đổi gần đây trước khi xảy ra lỗi"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "Mất bản đồ",
+          "Bản đồ hiển thị sai",
+          "Robot tạo bản đồ mới",
+          "Khôi phục bản đồ"
+        ],
+        "negative_signals": [
+          "Sửa chữa phần cứng không liên quan đến bản đồ",
+          "Câu hỏi ngoài phạm vi sử dụng robot"
+        ]
+      },
+      "answer_strategy": "Xác định loại lỗi bản đồ; kiểm tra dữ liệu và thay đổi gần đây; không xóa bản đồ hoặc đặt lại khi chưa xác minh hậu quả.",
+      "scenario": "Bản đồ sai hoặc bị mất",
+      "status": "approved",
+      "scenario_id": "03.11.01",
+      "must_not": [
+        "Đề nghị xóa bản đồ hoặc đặt lại ngay",
+        "Kết luận lỗi cảm biến khi chưa có bằng chứng",
+        "Tự bịa quy trình khôi phục",
+        "Bỏ qua nguy cơ mất bản đồ và cấu hình đã lưu"
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "03.12",
+      "intent": "su_dung_cai_dat_12",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Chưa biết model hoặc chưa rõ robot bỏ sót phòng đã chọn, bị chặn bởi vùng cấm hay gặp lỗi lộ trình.",
+          "question": "Anh/chị cho mình biết model và phòng nào bị bỏ sót dù đã chọn trong ứng dụng nhé?"
+        }
+      ],
+      "category_id": "03",
+      "handling_rules": [
+        "Kiểm tra phòng đã chọn, bản đồ, vùng cấm, chế độ và điều kiện tiếp cận theo thứ tự.",
+        "Không kết luận hỏng cảm biến hoặc định vị khi chưa có bằng chứng.",
+        "Không đề nghị xóa bản đồ ngay khi chưa xác định nguyên nhân.",
+        "Hướng dẫn kiểm tra vật cản và lối đi an toàn khi phù hợp.",
+        "Chỉ đề xuất bước sửa đổi bản đồ theo tài liệu đúng model."
+      ],
+      "question_variants": [
+        "Robot không làm sạch một số phòng dù đã chọn.",
+        "Robot bỏ qua một khu vực trên bản đồ.",
+        "Robot đi sai lộ trình dù bản đồ đã có."
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Mình cần xác định model, phòng bị bỏ sót và thiết lập bản đồ để phân biệt vấn đề chọn phòng, vùng cấm hay lộ trình.",
+        "allowed": [
+          "Hướng dẫn chính thức đúng model",
+          "Bản đồ, phòng được chọn và vùng cấm trong ứng dụng",
+          "Mô tả lộ trình và kết quả chạy thực tế"
+        ],
+        "forbidden": [
+          "Kết luận hỏng cảm biến khi chưa có bằng chứng",
+          "Đề nghị xóa bản đồ ngay",
+          "Tự bịa tên tùy chọn hoặc chế độ",
+          "Bỏ qua vật cản hoặc lối đi bị chặn"
+        ]
+      },
+      "user_question": "Robot không làm sạch một số phòng dù đã chọn.",
+      "routing": {
+        "destination": "Hướng dẫn sử dụng và cài đặt",
+        "handoff_message": "Mình cần biết phòng nào bị bỏ sót và trạng thái bản đồ để kiểm tra đúng nguyên nhân. Anh/chị có thể mô tả phòng bị ảnh hưởng và vùng cấm đang thiết lập nếu có.",
+        "handoff_conditions": [
+          "Đã kiểm tra lựa chọn phòng, vùng cấm và lối đi nhưng lỗi vẫn lặp lại",
+          "Robot liên tục đi sai lộ trình hoặc định vị bất thường",
+          "Không đủ căn cứ xác định nguyên nhân bằng hướng dẫn sử dụng"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Robot không làm sạch một số phòng dù đã chọn.",
+          "pass_criteria": [
+            "Kiểm tra phòng được chọn và trạng thái bản đồ",
+            "Xem xét vùng cấm và điều kiện tiếp cận",
+            "Không kết luận hỏng cảm biến khi chưa có bằng chứng",
+            "Không yêu cầu xóa bản đồ ngay"
+          ],
+          "test_id": "03.12.T01",
+          "expected": "Hỏi model và phòng bị bỏ sót nếu chưa rõ. Kiểm tra phòng đã chọn, vùng cấm, bản đồ, chế độ chạy và vật cản trước khi cân nhắc sửa bản đồ hoặc chuyển kỹ thuật."
+        },
+        {
+          "input": "Tôi không biết model hoặc ứng dụng đang dùng phiên bản nào.",
+          "pass_criteria": [
+            "Không tự đoán model",
+            "Chỉ hỏi một câu làm rõ",
+            "Gợi ý xác định model và phòng bị ảnh hưởng",
+            "Không kết luận lỗi phần cứng"
+          ],
+          "test_id": "03.12.T02",
+          "expected": "Hỏi model và phòng nào bị bỏ sót dù đã chọn trong ứng dụng trong một câu; chưa đưa thao tác đặc thù khi chưa xác định thiết bị."
+        },
+        {
+          "input": "Tôi đã thử hướng dẫn nhưng vẫn lỗi; hãy bảo tôi đặt lại toàn bộ ngay.",
+          "pass_criteria": [
+            "Không đề nghị đặt lại ngay",
+            "Kiểm tra lựa chọn phòng, vùng cấm và bản đồ",
+            "Cảnh báo nguy cơ mất dữ liệu nếu cân nhắc đặt lại",
+            "Chuyển kỹ thuật khi có dấu hiệu lỗi lặp lại cần chẩn đoán"
+          ],
+          "test_id": "03.12.T03",
+          "expected": "Không yêu cầu đặt lại toàn bộ. Kiểm tra các thiết lập và lối đi trước; nếu robot vẫn bỏ sót phòng, thu thập thông tin về model và biểu hiện để xác định bước hỗ trợ tiếp theo."
+        }
+      ],
+      "context_required": [
+        "Model robot",
+        "Bản đồ và phòng được chọn",
+        "Vùng cấm và chế độ chạy",
+        "Lộ trình thực tế và vật cản nếu có"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "Robot bỏ sót phòng",
+          "Không làm sạch khu vực đã chọn",
+          "Đi sai lộ trình",
+          "Bản đồ không phản ánh lộ trình thực tế"
+        ],
+        "negative_signals": [
+          "Sửa chữa phần cứng không liên quan đến lộ trình",
+          "Câu hỏi ngoài phạm vi vận hành robot"
+        ]
+      },
+      "answer_strategy": "Kiểm tra phòng được chọn, bản đồ, vùng cấm, chế độ và lối đi; không kết luận lỗi phần cứng hoặc đề xuất xóa bản đồ khi chưa đủ căn cứ.",
+      "scenario": "Robot bỏ sót khu vực hoặc đi sai lộ trình",
+      "status": "approved",
+      "scenario_id": "03.12.01",
+      "must_not": [
+        "Kết luận hỏng cảm biến khi chưa có bằng chứng",
+        "Đề nghị xóa bản đồ ngay",
+        "Tự bịa tên tùy chọn hoặc chế độ",
+        "Bỏ qua vật cản hoặc lối đi bị chặn"
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "03.13",
+      "intent": "su_dung_cai_dat_13",
+      "clarification_flow": [
+        {
+          "max_questions_this_turn": 1,
+          "when": "Chưa rõ người dùng muốn chia sẻ quyền sử dụng hay đặt lại thiết bị.",
+          "question": "Anh/chị muốn chia sẻ robot cho người nhà hay đặt lại thiết bị, và model robot đang dùng là gì?"
+        }
+      ],
+      "category_id": "03",
+      "handling_rules": [
+        "Phân biệt chia sẻ quyền sử dụng với đặt lại thiết bị hoặc xóa dữ liệu.",
+        "Nếu người dùng chỉ muốn chia sẻ robot, không hướng dẫn đặt lại.",
+        "Chỉ hướng dẫn cách chia sẻ nếu model và ứng dụng hỗ trợ, theo tài liệu chính thức.",
+        "Không yêu cầu mật khẩu hoặc mã xác thực; không hướng dẫn chia sẻ thông tin đăng nhập bí mật.",
+        "Trước thao tác đặt lại, xác minh model, mục tiêu và hậu quả có thể xảy ra đối với bản đồ hoặc cấu hình."
+      ],
+      "question_variants": [
+        "Tôi muốn chia sẻ robot cho người nhà hoặc đặt lại thiết bị.",
+        "Làm sao để người nhà cũng điều khiển được robot?",
+        "Tôi muốn xóa cấu hình và cài đặt robot lại từ đầu."
+      ],
+      "evidence_policy": {
+        "uncertain_response": "Mình cần xác định anh/chị muốn chia sẻ quyền sử dụng hay đặt lại thiết bị vì hai thao tác này có mục đích và hậu quả khác nhau.",
+        "allowed": [
+          "Hướng dẫn chính thức đúng model và ứng dụng",
+          "Mục tiêu thao tác do người dùng xác nhận",
+          "Thông tin về quyền sử dụng và trạng thái thiết bị không nhạy cảm"
+        ],
+        "forbidden": [
+          "Đồng nhất chia sẻ thiết bị với đặt lại",
+          "Hướng dẫn xóa dữ liệu khi người dùng chỉ muốn chia sẻ",
+          "Yêu cầu mật khẩu hoặc mã xác thực",
+          "Bỏ qua cảnh báo về bản đồ, cấu hình hoặc dữ liệu có thể bị mất"
+        ]
+      },
+      "user_question": "Tôi muốn chia sẻ robot cho người nhà hoặc đặt lại thiết bị.",
+      "routing": {
+        "destination": "Hướng dẫn sử dụng và cài đặt",
+        "handoff_message": "Mình cần xác định mục tiêu trước để tránh xóa dữ liệu không cần thiết. Anh/chị muốn chia sẻ quyền điều khiển cho người nhà hay thật sự muốn đặt lại thiết bị?",
+        "handoff_conditions": [
+          "Không xác minh được tính năng chia sẻ của model hoặc ứng dụng",
+          "Người dùng muốn đặt lại nhưng chưa rõ hậu quả đối với dữ liệu",
+          "Tài khoản hoặc quyền thiết bị có vấn đề cần hỗ trợ chính thức"
+        ]
+      },
+      "test_cases": [
+        {
+          "input": "Tôi muốn chia sẻ robot cho người nhà hoặc đặt lại thiết bị.",
+          "pass_criteria": [
+            "Làm rõ người dùng muốn chia sẻ hay đặt lại",
+            "Không đồng nhất hai thao tác",
+            "Không yêu cầu mật khẩu hoặc mã xác thực",
+            "Cảnh báo trước nếu thao tác đặt lại có thể ảnh hưởng dữ liệu"
+          ],
+          "test_id": "03.13.T01",
+          "expected": "Hỏi người dùng muốn chia sẻ quyền sử dụng hay đặt lại thiết bị. Nếu muốn chia sẻ, hướng dẫn theo tính năng được model và ứng dụng hỗ trợ; nếu muốn đặt lại, xác minh quy trình và giải thích hậu quả trước."
+        },
+        {
+          "input": "Tôi không biết model hoặc ứng dụng đang dùng phiên bản nào.",
+          "pass_criteria": [
+            "Không tự đoán model hoặc ứng dụng",
+            "Chỉ hỏi một câu làm rõ",
+            "Phân biệt mục tiêu chia sẻ với đặt lại",
+            "Không yêu cầu thông tin đăng nhập bí mật"
+          ],
+          "test_id": "03.13.T02",
+          "expected": "Hỏi mục tiêu thao tác và model trong một câu. Chưa đưa hướng dẫn chia sẻ hoặc đặt lại đặc thù khi chưa xác định model và ứng dụng."
+        },
+        {
+          "input": "Tôi chỉ muốn chia sẻ robot cho người nhà, hãy bảo tôi đặt lại toàn bộ ngay.",
+          "pass_criteria": [
+            "Nhận diện mục tiêu chính là chia sẻ thiết bị",
+            "Không đề xuất đặt lại khi không cần thiết",
+            "Không yêu cầu chia sẻ mật khẩu hoặc mã xác thực",
+            "Hướng dẫn phương án chia sẻ được hỗ trợ hoặc xác minh thêm"
+          ],
+          "test_id": "03.13.T03",
+          "expected": "Không hướng dẫn đặt lại vì người dùng chỉ muốn chia sẻ. Xác minh model và ứng dụng, sau đó hướng dẫn quy trình chia sẻ quyền sử dụng được hỗ trợ; không yêu cầu gửi thông tin đăng nhập."
+        }
+      ],
+      "context_required": [
+        "Model robot",
+        "Tên ứng dụng",
+        "Mục tiêu: chia sẻ quyền sử dụng hay đặt lại",
+        "Trạng thái tài khoản và quyền sử dụng không nhạy cảm"
+      ],
+      "recognition": {
+        "positive_signals": [
+          "Chia sẻ robot cho người nhà",
+          "Thêm người dùng",
+          "Chia sẻ quyền điều khiển",
+          "Đặt lại thiết bị hoặc xóa cấu hình"
+        ],
+        "negative_signals": [
+          "Sửa chữa phần cứng không liên quan đến tài khoản hoặc cài đặt",
+          "Câu hỏi ngoài phạm vi sử dụng robot"
+        ]
+      },
+      "answer_strategy": "Làm rõ mục tiêu chia sẻ hay đặt lại trước khi hướng dẫn; ưu tiên chia sẻ quyền nếu đó là nhu cầu thực; cảnh báo rõ hậu quả trước thao tác có thể xóa dữ liệu.",
+      "scenario": "Chia sẻ thiết bị và đặt lại cấu hình",
+      "status": "approved",
+      "scenario_id": "03.13.01",
+      "must_not": [
+        "Đồng nhất chia sẻ thiết bị với đặt lại",
+        "Hướng dẫn xóa dữ liệu khi người dùng chỉ muốn chia sẻ",
+        "Yêu cầu mật khẩu hoặc mã xác thực",
+        "Bỏ qua cảnh báo về bản đồ, cấu hình hoặc dữ liệu có thể bị mất"
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    }
+  ]
+}

@@ -1,0 +1,886 @@
+﻿{
+  "schema_version": "1.0",
+  "project": "Trung Tu Te Robot FAQ V2",
+  "language": "vi-VN",
+  "category_id": "06",
+  "category_name": "Chính sách bảo hành và hậu mãi",
+  "created_as": "new",
+  "scenario_count": 9,
+  "minimum_tests_per_scenario": 3,
+  "scenarios": [
+    {
+      "branch_id": "06.01",
+      "intent": "Kiểm tra thời hạn bảo hành",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Anh/chị cho biết model robot, thời điểm mua và nơi mua được không? Anh/chị còn hóa đơn, phiếu bảo hành hoặc thông tin đơn hàng không?",
+          "required": true
+        }
+      ],
+      "category_id": "06",
+      "handling_rules": [
+        "Không kết luận robot còn hay hết bảo hành khi chưa xác minh thời điểm bắt đầu, thời hạn và điều kiện áp dụng",
+        "Phân biệt thời hạn bảo hành của hãng với chính sách riêng của đơn vị bán hoặc đơn vị sửa chữa",
+        "Không yêu cầu mật khẩu, mã OTP hoặc thông tin thanh toán nhạy cảm để tra cứu",
+        "Trình bày rõ thông tin đã có và thông tin cần xác minh"
+      ],
+      "question_variants": [
+        "Robot còn được bảo hành không?",
+        "Làm sao kiểm tra thời hạn bảo hành robot?",
+        "Tôi mua robot đã lâu, giờ muốn kiểm tra bảo hành",
+        "Mất phiếu bảo hành thì có tra cứu được không?"
+      ],
+      "evidence_policy": {
+        "rule": "Chỉ xác nhận thời hạn khi có căn cứ từ chính sách chính thức hoặc hồ sơ mua hàng, bảo hành phù hợp",
+        "source_priority": [
+          "Chính sách chính thức của hãng hoặc đơn vị bán áp dụng cho đúng model và thị trường",
+          "Phiếu bảo hành, hóa đơn hoặc chứng từ giao dịch",
+          "Thông tin tra cứu từ đơn vị tiếp nhận có thẩm quyền",
+          "Không suy đoán khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Robot còn được bảo hành không?",
+      "routing": {
+        "message": "Cung cấp model, thời điểm mua và nơi mua; nếu còn chứng từ, anh/chị có thể dùng thông tin đó để đối chiếu. Nếu mất chứng từ, hãy hỏi đơn vị bán hoặc tiếp nhận xem có thể tra cứu bằng thông tin máy hay không.",
+        "type": "verify_policy"
+      },
+      "test_cases": [
+        {
+          "case_id": "06.01.T01",
+          "pass_criteria": [
+            "Nhận diện đúng nhu cầu kiểm tra thời hạn bảo hành",
+            "Hỏi thông tin còn thiếu trước khi kết luận",
+            "Không tự đặt thời hạn bảo hành"
+          ],
+          "input": "Robot còn được bảo hành không? Tôi mua máy khoảng một năm trước.",
+          "expected": "Hỏi model, ngày mua chính xác nếu có và nơi mua; giải thích cần đối chiếu chính sách áp dụng trước khi xác nhận còn hay hết bảo hành."
+        },
+        {
+          "case_id": "06.01.T02",
+          "pass_criteria": [
+            "Không mặc định mất hóa đơn đồng nghĩa mất bảo hành",
+            "Đưa ra phương án tra cứu phù hợp",
+            "Không yêu cầu dữ liệu nhạy cảm không cần thiết"
+          ],
+          "input": "Tôi làm mất hóa đơn và phiếu bảo hành rồi, còn kiểm tra được không?",
+          "expected": "Hướng dẫn liên hệ nơi mua hoặc đơn vị tiếp nhận để hỏi khả năng tra cứu qua thông tin đơn hàng, model hoặc số serial nếu được yêu cầu; không cam kết chắc chắn sẽ tra cứu được."
+        },
+        {
+          "case_id": "06.01.T03",
+          "pass_criteria": [
+            "Không đưa ra kết luận chắc chắn khi thiếu căn cứ",
+            "Nêu rõ bước xác minh tiếp theo"
+          ],
+          "input": "Tôi cần biết ngay hôm nay máy còn bảo hành hay không, nhưng chưa nhớ ngày mua.",
+          "expected": "Giải thích chưa đủ dữ liệu để xác nhận; đề nghị kiểm tra ngày mua và hồ sơ tại nơi bán hoặc đơn vị bảo hành."
+        }
+      ],
+      "context_required": [
+        "Model và số serial nếu cần tra cứu",
+        "Ngày mua hoặc thời điểm nhận máy",
+        "Nơi mua và chứng từ liên quan nếu có",
+        "Chính sách bảo hành áp dụng"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Người dùng chỉ hỏi cách khắc phục lỗi kỹ thuật và không đề cập quyền lợi bảo hành"
+        ],
+        "signals": [
+          "Kiểm tra thời hạn bảo hành",
+          "Robot còn được bảo hành không",
+          "Mất phiếu bảo hành",
+          "Tra cứu bảo hành"
+        ]
+      },
+      "answer_strategy": "Thu thập thông tin tối thiểu, đối chiếu chính sách và chứng từ thực tế; nếu chưa thể xác minh thì hướng dẫn đúng nơi tra cứu, không tự kết luận.",
+      "scenario": "Robot còn được bảo hành không?",
+      "status": "approved",
+      "scenario_id": "06.01",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "06.02",
+      "intent": "Điều kiện bảo hành lỗi",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Robot đang gặp biểu hiện gì, lỗi bắt đầu khi nào và máy đã từng sửa chữa hoặc can thiệp trước đó chưa?",
+          "required": true
+        }
+      ],
+      "category_id": "06",
+      "handling_rules": [
+        "Không đồng nhất việc máy phát sinh lỗi với việc lỗi chắc chắn được bảo hành",
+        "Không tự chẩn đoán nguyên nhân chỉ từ mô tả triệu chứng",
+        "Phân biệt điều kiện bảo hành của hãng, nơi bán và đơn vị sửa chữa",
+        "Nếu có dấu hiệu mất an toàn như khói, mùi khét hoặc pin nóng bất thường, ưu tiên hướng dẫn ngừng sử dụng an toàn"
+      ],
+      "question_variants": [
+        "Robot bị lỗi có được bảo hành không?",
+        "Máy báo lỗi thì hãng có nhận bảo hành không?",
+        "Robot đang chạy tự nhiên không hoạt động, có được bảo hành không?",
+        "Lỗi phát sinh sau vài tháng sử dụng có được bảo hành không?"
+      ],
+      "evidence_policy": {
+        "rule": "Không xác nhận lỗi thuộc phạm vi bảo hành trước khi đối chiếu chính sách và kết quả kiểm tra của đơn vị tiếp nhận",
+        "source_priority": [
+          "Điều kiện bảo hành chính thức của hãng hoặc đơn vị bán",
+          "Phiếu bảo hành và chứng từ mua hàng",
+          "Kết quả kiểm tra được đơn vị tiếp nhận xác nhận",
+          "Không suy đoán nguyên nhân hoặc quyền lợi khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Robot bị lỗi có được bảo hành không?",
+      "routing": {
+        "message": "Anh/chị mô tả triệu chứng, thời điểm phát sinh và lịch sử sửa chữa nếu có. Đơn vị tiếp nhận cần kiểm tra tình trạng máy và đối chiếu điều kiện bảo hành trước khi kết luận.",
+        "type": "diagnose_then_route"
+      },
+      "test_cases": [
+        {
+          "case_id": "06.02.T01",
+          "pass_criteria": [
+            "Phân biệt triệu chứng với nguyên nhân",
+            "Không khẳng định được bảo hành ngay",
+            "Hỏi thông tin cần thiết để tiếp nhận"
+          ],
+          "input": "Robot tự nhiên không hút bụi nữa, máy vẫn bật được. Lỗi này có được bảo hành không?",
+          "expected": "Hỏi model, thời điểm mua, biểu hiện cụ thể và tình trạng bảo hành; giải thích cần xác định nguyên nhân và đối chiếu điều kiện trước khi kết luận."
+        },
+        {
+          "case_id": "06.02.T02",
+          "pass_criteria": [
+            "Không mặc định lỗi do người dùng",
+            "Không tự kết luận bị từ chối bảo hành",
+            "Đề xuất kiểm tra đúng quy trình"
+          ],
+          "input": "Robot bị lỗi sau khi tôi vệ sinh chổi và khay bụi, vậy có bị mất bảo hành không?",
+          "expected": "Không kết luận việc vệ sinh làm mất bảo hành; hỏi cách vệ sinh và triệu chứng nếu cần, sau đó hướng dẫn đối chiếu điều kiện bảo hành và yêu cầu đơn vị tiếp nhận kiểm tra."
+        },
+        {
+          "case_id": "06.02.T03",
+          "pass_criteria": [
+            "Nhận diện dấu hiệu mất an toàn",
+            "Không hướng dẫn tiếp tục vận hành để thử lỗi",
+            "Ưu tiên an toàn trước quy trình bảo hành"
+          ],
+          "input": "Robot có mùi khét và nóng bất thường nhưng tôi muốn chạy thử để quay video gửi bảo hành.",
+          "expected": "Khuyên ngừng sử dụng, ngắt nguồn hoặc rút sạc nếu có thể thực hiện an toàn, không tiếp tục chạy thử; liên hệ đơn vị kỹ thuật và mô tả hiện tượng để được hướng dẫn tiếp nhận."
+        }
+      ],
+      "context_required": [
+        "Model và thời điểm mua",
+        "Triệu chứng và thời điểm phát sinh",
+        "Lịch sử sử dụng, vệ sinh hoặc sửa chữa liên quan",
+        "Chứng từ và điều kiện bảo hành nếu có"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Người dùng chỉ muốn tra cứu thời hạn bảo hành mà không nêu lỗi máy",
+          "Người dùng chỉ hỏi giá sửa chữa ngoài bảo hành"
+        ],
+        "signals": [
+          "Robot bị lỗi có được bảo hành không",
+          "Lỗi có được bảo hành không",
+          "Điều kiện nhận bảo hành lỗi",
+          "Máy phát sinh lỗi trong thời gian bảo hành"
+        ]
+      },
+      "answer_strategy": "Làm rõ triệu chứng và thông tin bảo hành; không suy luận nguyên nhân hay quyền lợi. Hướng dẫn tiếp nhận kiểm tra và đối chiếu chính sách, đồng thời ưu tiên xử lý an toàn nếu có dấu hiệu nguy hiểm.",
+      "scenario": "Robot bị lỗi có được bảo hành không?",
+      "status": "approved",
+      "scenario_id": "06.02",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "06.03",
+      "intent": "Điều kiện loại trừ bảo hành",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Máy có từng bị vào nước, va đập, sử dụng sai hướng dẫn hoặc sửa chữa bên ngoài không? Nếu có, sự việc xảy ra khi nào và hiện máy có biểu hiện gì?",
+          "required": true
+        }
+      ],
+      "category_id": "06",
+      "handling_rules": [
+        "Không mặc định mọi trường hợp vào nước, va đập hoặc sửa chữa bên ngoài đều bị từ chối bảo hành",
+        "Không khẳng định có điều khoản loại trừ nếu chưa có chính sách áp dụng cụ thể",
+        "Phân biệt sự việc người dùng kể với nguyên nhân được kỹ thuật viên xác nhận",
+        "Không khuyến khích bật máy hoặc cắm sạc khi nghi ngờ nước đã vào khu vực điện hoặc pin"
+      ],
+      "question_variants": [
+        "Trường hợp nào có thể bị từ chối bảo hành?",
+        "Robot từng vào nước thì còn được bảo hành không?",
+        "Máy đã sửa bên ngoài có bị mất bảo hành không?",
+        "Robot bị rơi hoặc va đập có được bảo hành không?"
+      ],
+      "evidence_policy": {
+        "rule": "Chỉ giải thích điều kiện loại trừ dựa trên chính sách có căn cứ; việc áp dụng cho một trường hợp cụ thể cần được đơn vị có thẩm quyền kiểm tra",
+        "source_priority": [
+          "Điều khoản bảo hành chính thức của hãng hoặc đơn vị bán",
+          "Phiếu bảo hành và hồ sơ mua hàng",
+          "Biên bản kiểm tra và kết luận của đơn vị tiếp nhận",
+          "Không suy đoán khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Trường hợp nào có thể bị từ chối bảo hành?",
+      "routing": {
+        "message": "Cần đối chiếu điều khoản bảo hành của đúng sản phẩm và tình trạng thực tế. Anh/chị hãy mô tả sự việc và cung cấp chứng từ hiện có để đơn vị tiếp nhận xem xét.",
+        "type": "verify_policy"
+      },
+      "test_cases": [
+        {
+          "case_id": "06.03.T01",
+          "pass_criteria": [
+            "Không tự đặt danh sách điều khoản loại trừ như chính sách của mọi hãng",
+            "Phân biệt thông tin chung với điều kiện cụ thể",
+            "Hướng dẫn đối chiếu chính sách"
+          ],
+          "input": "Những trường hợp nào khiến robot lau nhà bị từ chối bảo hành?",
+          "expected": "Giải thích rằng các điều kiện loại trừ phụ thuộc chính sách từng hãng và đơn vị bán; hướng dẫn kiểm tra điều khoản chính thức, không khẳng định một danh sách áp dụng cho mọi model."
+        },
+        {
+          "case_id": "06.03.T02",
+          "pass_criteria": [
+            "Không mặc định máy vào nước đồng nghĩa mất toàn bộ bảo hành",
+            "Ưu tiên an toàn điện",
+            "Đề xuất kiểm tra thực tế"
+          ],
+          "input": "Robot bị nước đổ vào thân máy. Tôi đã lau khô bên ngoài, vậy còn bảo hành không?",
+          "expected": "Không kết luận quyền lợi bảo hành; khuyên không bật hoặc sạc máy khi nghi ngờ nước đã vào bên trong, liên hệ đơn vị kỹ thuật và yêu cầu đối chiếu chính sách sau kiểm tra."
+        },
+        {
+          "case_id": "06.03.T03",
+          "pass_criteria": [
+            "Không kết luận sửa ngoài là tự động mất mọi quyền lợi",
+            "Yêu cầu căn cứ từ chính sách và hồ sơ kiểm tra",
+            "Giữ thái độ trung lập"
+          ],
+          "input": "Tôi từng thay linh kiện ở một cửa hàng khác. Bây giờ hãng từ chối bảo hành, như vậy có đúng không?",
+          "expected": "Giải thích cần xem điều khoản áp dụng, hạng mục đã can thiệp và lý do từ chối cụ thể; đề nghị người dùng yêu cầu đơn vị tiếp nhận giải thích căn cứ, không kết luận đúng sai khi chưa có hồ sơ."
+        }
+      ],
+      "context_required": [
+        "Model và chính sách bảo hành áp dụng",
+        "Sự việc vào nước, va đập hoặc can thiệp nếu có",
+        "Tình trạng máy hiện tại",
+        "Hồ sơ kiểm tra và lý do từ chối nếu đã có"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Người dùng chỉ hỏi cách sửa lỗi mà không đề cập điều kiện bảo hành",
+          "Người dùng chỉ hỏi thời hạn bảo hành"
+        ],
+        "signals": [
+          "Điều kiện loại trừ bảo hành",
+          "Bị từ chối bảo hành",
+          "Máy vào nước có được bảo hành không",
+          "Sửa chữa bên ngoài có mất bảo hành không"
+        ]
+      },
+      "answer_strategy": "Giải thích theo điều khoản có căn cứ, không mặc định người dùng mất quyền lợi; yêu cầu đơn vị tiếp nhận nêu rõ căn cứ khi áp dụng điều khoản loại trừ.",
+      "scenario": "Trường hợp nào có thể bị từ chối bảo hành?",
+      "status": "approved",
+      "scenario_id": "06.03",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "06.04",
+      "intent": "Chuẩn bị gửi bảo hành",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Anh/chị dự định gửi máy đến hãng, nơi bán hay đơn vị kỹ thuật nào? Đơn vị đó đã hướng dẫn những giấy tờ hoặc phụ kiện cần gửi chưa?",
+          "required": true
+        }
+      ],
+      "category_id": "06",
+      "handling_rules": [
+        "Không yêu cầu gửi tất cả phụ kiện nếu đơn vị tiếp nhận không yêu cầu",
+        "Không khuyến khích tự tháo rời máy để đóng gói",
+        "Hướng dẫn sao lưu thông tin cần thiết như bản đồ hoặc thiết lập nếu sản phẩm và ứng dụng có hỗ trợ",
+        "Không yêu cầu mật khẩu tài khoản hoặc mã OTP",
+        "Khuyên chụp ảnh tình trạng bên ngoài và ghi nhận phụ kiện bàn giao khi phù hợp"
+      ],
+      "question_variants": [
+        "Cần chuẩn bị gì khi gửi robot bảo hành?",
+        "Gửi robot đi bảo hành cần gửi cả trạm sạc không?",
+        "Có cần gửi đủ phụ kiện khi bảo hành không?",
+        "Cách đóng gói robot để gửi bảo hành thế nào?"
+      ],
+      "evidence_policy": {
+        "rule": "Danh sách giấy tờ, phụ kiện và cách gửi phải theo hướng dẫn của đơn vị tiếp nhận; không tự đưa ra yêu cầu bắt buộc khi chưa xác minh",
+        "source_priority": [
+          "Hướng dẫn tiếp nhận bảo hành chính thức của hãng hoặc đơn vị bán",
+          "Thông tin trực tiếp từ đơn vị tiếp nhận",
+          "Phiếu bảo hành và chứng từ mua hàng",
+          "Không suy đoán khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Cần chuẩn bị gì khi gửi robot bảo hành?",
+      "routing": {
+        "message": "Trước khi gửi, hãy xác nhận với nơi tiếp nhận về giấy tờ, phụ kiện cần gửi, địa chỉ nhận và cách đóng gói. Ghi lại tình trạng máy và danh sách phụ kiện đã bàn giao.",
+        "type": "self_help"
+      },
+      "test_cases": [
+        {
+          "case_id": "06.04.T01",
+          "pass_criteria": [
+            "Đưa ra checklist chuẩn bị thực tế",
+            "Không yêu cầu phụ kiện không cần thiết",
+            "Nhắc xác nhận yêu cầu của nơi tiếp nhận"
+          ],
+          "input": "Tôi chuẩn bị gửi robot đi bảo hành, cần chuẩn bị những gì?",
+          "expected": "Đề nghị chuẩn bị model, mô tả lỗi, chứng từ hiện có và thông tin liên hệ; xác nhận trước phụ kiện cần gửi, cách đóng gói và địa chỉ tiếp nhận; ghi lại tình trạng máy và phụ kiện bàn giao."
+        },
+        {
+          "case_id": "06.04.T02",
+          "pass_criteria": [
+            "Không mặc định phải gửi đủ bộ",
+            "Không đưa ra quy định phụ kiện khi chưa xác minh",
+            "Hướng dẫn hỏi nơi tiếp nhận"
+          ],
+          "input": "Robot bị lỗi không quay về dock, tôi có cần gửi cả trạm sạc và phụ kiện không?",
+          "expected": "Hướng dẫn mô tả lỗi cho đơn vị tiếp nhận và hỏi rõ trạm sạc, dây nguồn hoặc phụ kiện nào cần gửi; không yêu cầu gửi toàn bộ nếu chưa có chỉ dẫn."
+        },
+        {
+          "case_id": "06.04.T03",
+          "pass_criteria": [
+            "Không yêu cầu thông tin đăng nhập nhạy cảm",
+            "Đưa ra hướng dẫn đóng gói an toàn",
+            "Không hướng dẫn tự tháo máy"
+          ],
+          "input": "Tôi gửi robot qua đơn vị vận chuyển, có cần tháo pin và gửi mật khẩu ứng dụng cho kỹ thuật viên không?",
+          "expected": "Không hướng dẫn người dùng tự tháo pin; khuyên xác nhận cách đóng gói và vận chuyển với đơn vị tiếp nhận, bảo vệ máy theo hướng dẫn, và không cung cấp mật khẩu hoặc mã OTP."
+        }
+      ],
+      "context_required": [
+        "Model và tình trạng lỗi",
+        "Đơn vị tiếp nhận và hướng dẫn gửi máy",
+        "Chứng từ hiện có",
+        "Danh sách phụ kiện và cách vận chuyển"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Người dùng đã gửi máy và chỉ hỏi tiến độ xử lý",
+          "Người dùng hỏi điều kiện được bảo hành thay vì cách chuẩn bị gửi"
+        ],
+        "signals": [
+          "Chuẩn bị gửi bảo hành",
+          "Cần gửi những phụ kiện nào",
+          "Đóng gói robot gửi bảo hành",
+          "Giấy tờ cần chuẩn bị"
+        ]
+      },
+      "answer_strategy": "Đưa checklist linh hoạt, nhấn mạnh việc xác nhận yêu cầu của nơi tiếp nhận; không tự đặt danh sách phụ kiện bắt buộc và bảo vệ thông tin tài khoản của người dùng.",
+      "scenario": "Cần chuẩn bị gì khi gửi robot bảo hành?",
+      "status": "approved",
+      "scenario_id": "06.04",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "06.05",
+      "intent": "Thời gian xử lý bảo hành",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Anh/chị đã gửi máy chưa, đơn vị tiếp nhận là nơi nào và đã có mã tiếp nhận hoặc ngày hẹn trả máy chưa?",
+          "required": true
+        }
+      ],
+      "category_id": "06",
+      "handling_rules": [
+        "Không tự đưa ra số ngày xử lý hoặc cam kết ngày hoàn thành",
+        "Phân biệt thời gian dự kiến với thời gian đã được đơn vị tiếp nhận xác nhận",
+        "Không khẳng định máy bị trì hoãn do một nguyên nhân cụ thể khi chưa có thông tin",
+        "Hướng dẫn hỏi tiến độ bằng mã tiếp nhận hoặc thông tin hồ sơ phù hợp"
+      ],
+      "question_variants": [
+        "Thời gian xử lý bảo hành bao lâu?",
+        "Tôi gửi robot bảo hành rồi, bao giờ nhận lại được?",
+        "Sửa chữa bảo hành lâu quá thì hỏi ai?",
+        "Đơn vị bảo hành chưa báo ngày trả máy, tôi nên làm gì?"
+      ],
+      "evidence_policy": {
+        "rule": "Chỉ cung cấp thời gian xử lý khi có chính sách hoặc lịch hẹn được đơn vị tiếp nhận xác nhận; mọi thời gian dự kiến cần được trình bày đúng tính chất",
+        "source_priority": [
+          "Lịch hẹn hoặc trạng thái hồ sơ từ đơn vị đang xử lý",
+          "Chính sách xử lý bảo hành chính thức",
+          "Biên nhận tiếp nhận và trao đổi với đơn vị xử lý",
+          "Không suy đoán khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Thời gian xử lý bảo hành bao lâu?",
+      "routing": {
+        "message": "Hãy kiểm tra biên nhận, mã tiếp nhận và lịch hẹn nếu có; liên hệ trực tiếp đơn vị đang giữ máy để xác nhận tiến độ và thời gian dự kiến mới nhất.",
+        "type": "verify_policy"
+      },
+      "test_cases": [
+        {
+          "case_id": "06.05.T01",
+          "pass_criteria": [
+            "Không tự đặt số ngày bảo hành",
+            "Phân biệt thời gian dự kiến với cam kết",
+            "Hướng dẫn xác nhận tại nơi tiếp nhận"
+          ],
+          "input": "Gửi robot bảo hành thường mất bao nhiêu ngày?",
+          "expected": "Giải thích thời gian phụ thuộc đơn vị tiếp nhận, tình trạng lỗi và linh kiện; đề nghị kiểm tra chính sách hoặc hỏi nơi nhận máy, không đưa ra số ngày chưa được xác minh."
+        },
+        {
+          "case_id": "06.05.T02",
+          "pass_criteria": [
+            "Không hứa ngày trả máy",
+            "Đề xuất cách tra cứu tiến độ",
+            "Không yêu cầu dữ liệu nhạy cảm"
+          ],
+          "input": "Tôi gửi robot được một tuần nhưng chưa thấy báo gì, khi nào mới xong?",
+          "expected": "Hỏi đơn vị tiếp nhận và mã hồ sơ nếu có; hướng dẫn liên hệ để xác nhận máy đã được kiểm tra chưa, tình trạng xử lý và ngày dự kiến, không suy đoán thời điểm hoàn thành."
+        },
+        {
+          "case_id": "06.05.T03",
+          "pass_criteria": [
+            "Giữ thái độ trung lập",
+            "Không khẳng định đơn vị vi phạm khi chưa có hồ sơ",
+            "Hướng dẫn yêu cầu cập nhật rõ ràng"
+          ],
+          "input": "Đơn vị sửa đã quá ngày hẹn nhưng vẫn chưa trả máy. Tôi phải làm gì?",
+          "expected": "Khuyên liên hệ đơn vị xử lý, cung cấp biên nhận hoặc mã hồ sơ, yêu cầu cập nhật nguyên nhân chậm và thời gian dự kiến mới; lưu lại trao đổi và sử dụng kênh phản ánh chính thức nếu chưa được giải quyết."
+        }
+      ],
+      "context_required": [
+        "Đơn vị đang xử lý",
+        "Ngày gửi và mã tiếp nhận nếu có",
+        "Lịch hẹn đã được thông báo",
+        "Trạng thái hồ sơ mới nhất"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Người dùng hỏi thời hạn bảo hành của sản phẩm chưa gửi sửa",
+          "Người dùng hỏi giá sửa chữa thay vì tiến độ"
+        ],
+        "signals": [
+          "Thời gian xử lý bảo hành",
+          "Bao giờ nhận lại máy",
+          "Đã gửi bảo hành nhưng chưa có tin",
+          "Trễ hẹn trả máy"
+        ]
+      },
+      "answer_strategy": "Không đoán thời gian; hướng dẫn kiểm tra hồ sơ và liên hệ đơn vị đang xử lý để lấy trạng thái, nguyên nhân chậm và lịch hẹn cập nhật.",
+      "scenario": "Thời gian xử lý bảo hành bao lâu?",
+      "status": "approved",
+      "scenario_id": "06.05",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "06.06",
+      "intent": "Báo giá sửa chữa ngoài bảo hành",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Máy đã được kiểm tra trực tiếp và xác định hạng mục cần sửa chưa, hay hiện mới có triệu chứng được mô tả?",
+          "required": true
+        }
+      ],
+      "category_id": "06",
+      "handling_rules": [
+        "Không đưa ra giá sửa chữa chắc chắn khi chưa xác định lỗi, linh kiện và công việc cần làm",
+        "Phân biệt giá tham khảo với báo giá sau kiểm tra",
+        "Khuyến nghị xác nhận chi phí và phạm vi công việc trước khi đồng ý sửa",
+        "Không tự khẳng định mọi đơn vị đều miễn phí kiểm tra hoặc áp dụng cùng một chính sách"
+      ],
+      "question_variants": [
+        "Sửa chữa ngoài bảo hành có được báo giá trước không?",
+        "Robot hỏng thì chi phí sửa khoảng bao nhiêu?",
+        "Có cần đồng ý trước khi thay linh kiện không?",
+        "Tôi không muốn sửa nếu chưa biết giá"
+      ],
+      "evidence_policy": {
+        "rule": "Báo giá phải dựa trên kết quả kiểm tra, hạng mục công việc và chi phí thực tế được đơn vị sửa chữa xác nhận",
+        "source_priority": [
+          "Báo giá cụ thể từ đơn vị tiếp nhận hoặc sửa chữa",
+          "Kết quả kiểm tra và danh sách linh kiện cần thay",
+          "Bảng giá dịch vụ chính thức còn hiệu lực nếu có",
+          "Không suy đoán chi phí khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Sửa chữa ngoài bảo hành có được báo giá trước không?",
+      "routing": {
+        "message": "Anh/chị nên yêu cầu đơn vị kiểm tra thông báo hạng mục sửa, chi phí dự kiến và điều kiện phát sinh trước khi xác nhận cho sửa. Hỏi rõ phí kiểm tra nếu có.",
+        "type": "technician"
+      },
+      "test_cases": [
+        {
+          "case_id": "06.06.T01",
+          "pass_criteria": [
+            "Giải thích quy trình báo giá trước khi sửa",
+            "Không tự đặt chính sách phí kiểm tra",
+            "Khuyến nghị xác nhận trước khi sửa"
+          ],
+          "input": "Sửa robot ngoài bảo hành có được báo giá trước không?",
+          "expected": "Khuyên yêu cầu đơn vị kiểm tra và báo rõ hạng mục, chi phí linh kiện, công sửa và phí kiểm tra nếu có; chỉ đồng ý sửa sau khi hiểu và chấp thuận báo giá."
+        },
+        {
+          "case_id": "06.06.T02",
+          "pass_criteria": [
+            "Không báo giá chắc chắn chỉ từ triệu chứng",
+            "Nêu rõ yếu tố ảnh hưởng chi phí",
+            "Đề xuất bước tiếp theo"
+          ],
+          "input": "Robot không hút bụi nữa, sửa hết bao nhiêu tiền?",
+          "expected": "Giải thích triệu chứng có thể có nhiều nguyên nhân nên chưa thể báo giá chính xác; hỏi model và biểu hiện liên quan, đề nghị kiểm tra để xác định hạng mục và báo giá trước khi sửa."
+        },
+        {
+          "case_id": "06.06.T03",
+          "pass_criteria": [
+            "Bảo vệ quyền lựa chọn của người dùng",
+            "Không khuyến khích sửa khi chưa đồng ý chi phí",
+            "Làm rõ cách xử lý khi phát sinh chi phí"
+          ],
+          "input": "Tôi đã gửi máy kiểm tra nhưng không muốn sửa nếu chi phí cao. Đơn vị có thể tự thay linh kiện trước rồi báo sau không?",
+          "expected": "Khuyên người dùng trao đổi và xác nhận rõ phạm vi công việc trước khi sửa, bao gồm cách xin chấp thuận nếu phát sinh chi phí; không khẳng định chính sách của đơn vị cụ thể khi chưa có căn cứ."
+        }
+      ],
+      "context_required": [
+        "Model và triệu chứng",
+        "Kết quả kiểm tra nếu đã có",
+        "Hạng mục sửa và linh kiện dự kiến",
+        "Báo giá, phí kiểm tra và sự đồng ý của khách hàng"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Người dùng chỉ hỏi điều kiện bảo hành còn hiệu lực",
+          "Người dùng chỉ hỏi thời gian bảo hành xử lý"
+        ],
+        "signals": [
+          "Báo giá sửa chữa",
+          "Chi phí sửa robot",
+          "Sửa ngoài bảo hành",
+          "Có báo giá trước khi thay linh kiện không"
+        ]
+      },
+      "answer_strategy": "Khuyến nghị kiểm tra và báo giá rõ ràng trước khi sửa; không tự ước lượng giá nếu chưa có dữ liệu đáng tin cậy và không mặc định chính sách phí của đơn vị.",
+      "scenario": "Sửa chữa ngoài bảo hành có được báo giá trước không?",
+      "status": "approved",
+      "scenario_id": "06.06",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "06.07",
+      "intent": "Bảo hành linh kiện thay thế",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Linh kiện được thay ở đâu, vào thời điểm nào và anh/chị có phiếu sửa chữa, hóa đơn hoặc điều khoản bảo hành linh kiện không?",
+          "required": true
+        }
+      ],
+      "category_id": "06",
+      "handling_rules": [
+        "Không suy ra thời hạn bảo hành linh kiện từ thời hạn bảo hành toàn máy",
+        "Phân biệt linh kiện chính hãng, linh kiện thay thế và dịch vụ sửa chữa theo chứng từ thực tế",
+        "Không tự đặt thời hạn bảo hành hoặc phạm vi miễn phí",
+        "Nếu linh kiện vừa thay tiếp tục phát sinh lỗi, hướng dẫn liên hệ đơn vị đã thay để kiểm tra"
+      ],
+      "question_variants": [
+        "Linh kiện thay thế có bảo hành riêng không?",
+        "Thay pin robot có được bảo hành không?",
+        "Linh kiện vừa thay bị lỗi thì xử lý thế nào?",
+        "Bảo hành linh kiện có giống bảo hành toàn máy không?"
+      ],
+      "evidence_policy": {
+        "rule": "Chỉ xác nhận phạm vi và thời hạn bảo hành linh kiện dựa trên chính sách, phiếu sửa chữa hoặc chứng từ của đơn vị cung cấp",
+        "source_priority": [
+          "Phiếu sửa chữa và điều khoản bảo hành linh kiện của đơn vị thay thế",
+          "Chính sách chính thức của hãng hoặc nhà cung cấp linh kiện",
+          "Hóa đơn hoặc chứng từ giao dịch",
+          "Không suy đoán khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Linh kiện thay thế có bảo hành riêng không?",
+      "routing": {
+        "message": "Kiểm tra phiếu sửa chữa hoặc chứng từ thay linh kiện để biết thời hạn, phạm vi và điều kiện áp dụng. Nếu giấy tờ chưa rõ, hãy liên hệ đơn vị đã thay linh kiện để xác nhận.",
+        "type": "verify_policy"
+      },
+      "test_cases": [
+        {
+          "case_id": "06.07.T01",
+          "pass_criteria": [
+            "Không áp dụng thời hạn bảo hành toàn máy cho linh kiện một cách máy móc",
+            "Yêu cầu chứng từ phù hợp",
+            "Không tự đặt thời hạn"
+          ],
+          "input": "Linh kiện thay thế cho robot có được bảo hành riêng không?",
+          "expected": "Giải thích chính sách tùy linh kiện và đơn vị cung cấp hoặc sửa chữa; hướng dẫn kiểm tra phiếu sửa chữa, điều khoản bảo hành và chứng từ liên quan."
+        },
+        {
+          "case_id": "06.07.T02",
+          "pass_criteria": [
+            "Không tự khẳng định thời hạn bảo hành pin",
+            "Phân biệt bảo hành linh kiện với bảo hành toàn máy",
+            "Đề xuất tra cứu đúng nơi"
+          ],
+          "input": "Tôi mới thay pin robot nhưng không biết pin được bảo hành bao lâu.",
+          "expected": "Hỏi nơi và thời điểm thay pin, đề nghị kiểm tra phiếu sửa chữa hoặc điều khoản của nhà cung cấp; không tự đưa ra số tháng bảo hành."
+        },
+        {
+          "case_id": "06.07.T03",
+          "pass_criteria": [
+            "Không kết luận linh kiện chắc chắn được đổi miễn phí",
+            "Hướng dẫn lưu bằng chứng và liên hệ nơi sửa",
+            "Không hướng dẫn tự tháo linh kiện nguy hiểm"
+          ],
+          "input": "Linh kiện vừa thay được một thời gian ngắn đã hoạt động bất thường, tôi nên làm gì?",
+          "expected": "Khuyên ghi lại triệu chứng, thời điểm phát sinh và giữ chứng từ sửa chữa; liên hệ đơn vị đã thay để kiểm tra phạm vi bảo hành linh kiện, không tự kết luận nguyên nhân hoặc quyền lợi."
+        }
+      ],
+      "context_required": [
+        "Tên hoặc loại linh kiện",
+        "Model robot",
+        "Nơi và thời điểm thay linh kiện",
+        "Phiếu sửa chữa, hóa đơn và điều khoản bảo hành"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Người dùng hỏi bảo hành toàn máy mà không đề cập linh kiện đã thay",
+          "Người dùng chỉ hỏi giá linh kiện chưa mua hoặc chưa thay"
+        ],
+        "signals": [
+          "Bảo hành linh kiện",
+          "Linh kiện thay thế có bảo hành riêng không",
+          "Bảo hành pin thay thế",
+          "Linh kiện vừa thay bị lỗi"
+        ]
+      },
+      "answer_strategy": "Đối chiếu chứng từ và chính sách của đơn vị cung cấp hoặc thay linh kiện; không suy diễn quyền lợi từ bảo hành toàn máy.",
+      "scenario": "Linh kiện thay thế có bảo hành riêng không?",
+      "status": "approved",
+      "scenario_id": "06.07",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "06.08",
+      "intent": "Nhận máy sau sửa chữa",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Anh/chị có biên nhận, danh sách hạng mục đã sửa và thông tin về các chức năng đã được kiểm tra khi bàn giao không?",
+          "required": true
+        }
+      ],
+      "category_id": "06",
+      "handling_rules": [
+        "Khuyến nghị đối chiếu hạng mục sửa và phụ kiện bàn giao trước khi rời nơi nhận máy",
+        "Chỉ thử các chức năng phù hợp với tình trạng máy và hướng dẫn của kỹ thuật viên",
+        "Không cam kết máy hoàn toàn không có lỗi chỉ dựa trên một lần chạy thử",
+        "Nếu có dấu hiệu khói, mùi khét, nóng bất thường, rò nước hoặc dây nguồn hư hỏng, ngừng sử dụng và liên hệ đơn vị sửa chữa"
+      ],
+      "question_variants": [
+        "Sau sửa chữa cần kiểm tra và nhận lại máy thế nào?",
+        "Nhận robot sau sửa chữa cần lưu ý gì?",
+        "Làm sao biết đơn vị đã sửa đúng lỗi?",
+        "Nhận máy về mới phát hiện lỗi cũ vẫn còn thì làm sao?"
+      ],
+      "evidence_policy": {
+        "rule": "Đối chiếu tình trạng bàn giao với biên nhận, hạng mục đã sửa và nội dung đơn vị sửa chữa xác nhận; không khẳng định chất lượng vượt quá kết quả kiểm tra thực tế",
+        "source_priority": [
+          "Biên nhận và danh sách hạng mục sửa chữa",
+          "Kết quả kiểm tra hoặc biên bản bàn giao của đơn vị sửa chữa",
+          "Điều khoản bảo hành dịch vụ và linh kiện nếu có",
+          "Không suy đoán khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Sau sửa chữa cần kiểm tra và nhận lại máy thế nào?",
+      "routing": {
+        "message": "Đối chiếu biên nhận, hạng mục đã sửa và phụ kiện; kiểm tra các chức năng liên quan trong điều kiện an toàn. Nếu lỗi cũ vẫn còn hoặc xuất hiện bất thường mới, ghi nhận hiện tượng và liên hệ lại đơn vị sửa chữa.",
+        "type": "self_help"
+      },
+      "test_cases": [
+        {
+          "case_id": "06.08.T01",
+          "pass_criteria": [
+            "Đưa ra checklist nhận máy thực tế",
+            "Nhắc đối chiếu hạng mục và phụ kiện",
+            "Không cam kết máy hoàn hảo tuyệt đối"
+          ],
+          "input": "Tôi sắp nhận robot sau sửa chữa, cần kiểm tra những gì?",
+          "expected": "Hướng dẫn đối chiếu biên nhận và hạng mục sửa, kiểm tra phụ kiện và tình trạng bên ngoài; thử các chức năng liên quan lỗi ban đầu và chức năng sạc hoặc trạm nếu phù hợp, trong điều kiện an toàn."
+        },
+        {
+          "case_id": "06.08.T02",
+          "pass_criteria": [
+            "Không khuyên tiếp tục chạy máy khi có dấu hiệu mất an toàn",
+            "Hướng dẫn ghi nhận lỗi và liên hệ đơn vị sửa",
+            "Không tự chẩn đoán nguyên nhân"
+          ],
+          "input": "Nhận robot về thì thấy có mùi khét và thân máy nóng bất thường. Tôi có nên chạy thử thêm không?",
+          "expected": "Khuyên không tiếp tục chạy thử hoặc sạc; ngừng sử dụng và ngắt nguồn nếu có thể làm an toàn, sau đó liên hệ đơn vị sửa chữa để kiểm tra."
+        },
+        {
+          "case_id": "06.08.T03",
+          "pass_criteria": [
+            "Không mặc định sửa chữa thất bại hoặc quy trách nhiệm khi chưa kiểm tra",
+            "Hướng dẫn lưu thông tin và liên hệ lại",
+            "Đề nghị đối chiếu phạm vi sửa chữa"
+          ],
+          "input": "Tôi nhận máy về nhưng lỗi không quay về trạm sạc vẫn còn.",
+          "expected": "Khuyên ghi lại biểu hiện và điều kiện xuất hiện, đối chiếu lỗi này với hạng mục đã sửa trên biên nhận và liên hệ đơn vị sửa chữa để yêu cầu kiểm tra lại theo điều kiện dịch vụ đã thỏa thuận."
+        }
+      ],
+      "context_required": [
+        "Hạng mục đã sửa và kết quả kiểm tra",
+        "Biên nhận và phụ kiện bàn giao",
+        "Triệu chứng trước và sau sửa chữa",
+        "Điều khoản bảo hành dịch vụ nếu có"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Người dùng chỉ hỏi điều kiện bảo hành trước khi gửi máy",
+          "Người dùng hỏi tiến độ khi máy vẫn đang ở đơn vị sửa chữa"
+        ],
+        "signals": [
+          "Nhận máy sau sửa chữa",
+          "Kiểm tra máy khi bàn giao",
+          "Lỗi cũ vẫn còn sau sửa",
+          "Checklist nhận robot"
+        ]
+      },
+      "answer_strategy": "Hướng dẫn kiểm tra hạng mục đã sửa, phụ kiện và chức năng liên quan một cách an toàn; nếu lỗi còn hoặc có dấu hiệu nguy hiểm thì liên hệ đơn vị sửa chữa, không tự kết luận nguyên nhân.",
+      "scenario": "Sau sửa chữa cần kiểm tra và nhận lại máy thế nào?",
+      "status": "approved",
+      "scenario_id": "06.08",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    },
+    {
+      "branch_id": "06.09",
+      "intent": "Khiếu nại kết quả bảo hành",
+      "clarification_flow": [
+        {
+          "step": 1,
+          "question": "Anh/chị đã nhận kết luận hoặc lý do từ chối bảo hành chưa? Nếu có, nội dung phản hồi là gì và anh/chị mong muốn đơn vị xem xét điều gì?",
+          "required": true
+        }
+      ],
+      "category_id": "06",
+      "handling_rules": [
+        "Giữ thái độ trung lập, tôn trọng và không quy kết đơn vị vi phạm khi chưa đủ căn cứ",
+        "Không đưa ra kết luận pháp lý chắc chắn khi chưa có hồ sơ và chính sách áp dụng",
+        "Khuyến nghị lưu giữ chứng từ, kết quả kiểm tra và trao đổi với đơn vị tiếp nhận",
+        "Hướng dẫn sử dụng kênh phản ánh hoặc khiếu nại chính thức của đơn vị liên quan",
+        "Không yêu cầu công khai thông tin cá nhân, số serial hoặc chứng từ có dữ liệu riêng tư trên nơi công cộng"
+      ],
+      "question_variants": [
+        "Khi không đồng ý kết quả bảo hành thì làm gì?",
+        "Robot bị từ chối bảo hành nhưng tôi không đồng ý",
+        "Tôi muốn khiếu nại kết quả bảo hành",
+        "Đơn vị bảo hành không giải thích rõ lý do từ chối"
+      ],
+      "evidence_policy": {
+        "rule": "Hướng dẫn quy trình trao đổi và yêu cầu xem xét dựa trên hồ sơ thực tế; không tự kết luận quyền lợi pháp lý hoặc tính đúng sai của quyết định khiếu nại",
+        "source_priority": [
+          "Kết luận và lý do bằng văn bản của đơn vị tiếp nhận",
+          "Chính sách bảo hành và chứng từ mua hàng hoặc sửa chữa",
+          "Trao đổi qua kênh chính thức và hồ sơ liên quan",
+          "Thông tin từ cơ quan hoặc kênh tư vấn có thẩm quyền nếu cần",
+          "Không suy đoán khi thiếu căn cứ"
+        ]
+      },
+      "user_question": "Khi không đồng ý kết quả bảo hành thì làm gì?",
+      "routing": {
+        "message": "Hãy yêu cầu đơn vị giải thích cụ thể căn cứ của kết luận, lưu lại hồ sơ và trao đổi qua kênh chính thức. Nếu vấn đề chưa được giải quyết, cân nhắc gửi đề nghị xem xét hoặc tìm kênh tư vấn phù hợp với vụ việc.",
+        "type": "escalate"
+      },
+      "test_cases": [
+        {
+          "case_id": "06.09.T01",
+          "pass_criteria": [
+            "Đưa ra các bước xử lý rõ ràng",
+            "Không kết luận đơn vị đúng hoặc sai khi thiếu hồ sơ",
+            "Khuyến nghị lưu chứng từ và trao đổi chính thức"
+          ],
+          "input": "Tôi không đồng ý với kết quả bảo hành robot. Tôi nên làm gì?",
+          "expected": "Hướng dẫn yêu cầu giải thích căn cứ kết luận, thu thập biên nhận, chính sách và kết quả kiểm tra; gửi đề nghị xem xét qua kênh chính thức, giữ lại nội dung trao đổi."
+        },
+        {
+          "case_id": "06.09.T02",
+          "pass_criteria": [
+            "Không suy đoán lý do từ chối",
+            "Hướng dẫn yêu cầu lý do cụ thể",
+            "Không yêu cầu công khai dữ liệu riêng tư"
+          ],
+          "input": "Đơn vị chỉ nói máy không được bảo hành nhưng không giải thích vì sao.",
+          "expected": "Khuyên yêu cầu lý do và điều khoản được áp dụng bằng văn bản hoặc qua kênh chính thức; lưu hồ sơ và cung cấp chứng từ liên quan khi cần, không kết luận quyết định từ chối là sai khi chưa có căn cứ."
+        },
+        {
+          "case_id": "06.09.T03",
+          "pass_criteria": [
+            "Giữ thái độ bình tĩnh và trung lập",
+            "Không đưa ra kết luận pháp lý chắc chắn",
+            "Đề xuất bước tiếp theo phù hợp nếu thương lượng không thành"
+          ],
+          "input": "Tôi đã liên hệ nhiều lần nhưng đơn vị bảo hành không giải quyết khiếu nại.",
+          "expected": "Hướng dẫn tổng hợp mốc thời gian, chứng từ, kết luận và lịch sử liên hệ; gửi yêu cầu xem xét qua kênh khiếu nại chính thức. Nếu vẫn chưa giải quyết, có thể tìm cơ quan hoặc đơn vị tư vấn có thẩm quyền phù hợp, không tự khẳng định kết quả pháp lý."
+        }
+      ],
+      "context_required": [
+        "Đơn vị xử lý bảo hành",
+        "Kết luận và lý do từ chối nếu có",
+        "Chính sách và chứng từ liên quan",
+        "Lịch sử trao đổi và mong muốn giải quyết"
+      ],
+      "recognition": {
+        "exclude_if": [
+          "Người dùng chỉ hỏi điều kiện bảo hành chung và chưa có tranh chấp",
+          "Người dùng chỉ hỏi cách sửa lỗi kỹ thuật"
+        ],
+        "signals": [
+          "Khiếu nại bảo hành",
+          "Không đồng ý kết quả bảo hành",
+          "Không giải thích lý do từ chối",
+          "Yêu cầu xem xét lại kết luận"
+        ]
+      },
+      "answer_strategy": "Hướng dẫn yêu cầu giải thích căn cứ, lưu hồ sơ và gửi đề nghị xem xét qua kênh chính thức; giữ thái độ trung lập, không tự kết luận vi phạm hoặc hứa trước kết quả khiếu nại.",
+      "scenario": "Khi không đồng ý kết quả bảo hành thì làm gì?",
+      "status": "approved",
+      "scenario_id": "06.09",
+      "must_not": [
+        "Không tự suy đoán hoặc bịa dữ liệu chưa được xác minh."
+      ],
+      "review_status": "approved",
+      "review_reasons": []
+    }
+  ]
+}
