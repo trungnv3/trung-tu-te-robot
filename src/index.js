@@ -1,3 +1,5 @@
+import { handleFaqV2Message } from "./faq-v2.js";
+
 function base64url(input) {
   return btoa(input)
     .replace(/\+/g, "-")
@@ -188,6 +190,142 @@ function createSlug(brand, model) {
     .replace(/đ/g, "d")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+const PRODUCT_TYPES = {
+  ROBOT: "robot-lau-nha",
+  FLOOR_WASHER: "may-lau-san"
+};
+
+const ROBOT_SPEC_FIELDS = [
+  "suction_power",
+  "obstacle_recognition",
+  "mopping_technology",
+  "mop_extension",
+  "side_brush_extension",
+  "automatic_mop_washing",
+  "mop_drying",
+  "wash_tray_self_cleaning",
+  "automatic_dust_emptying",
+  "automatic_detergent_dispensing",
+  "carpet_mop_lift",
+  "dust_bag_capacity",
+  "clean_dirty_water_capacity",
+  "battery_capacity",
+  "cleaning_area",
+  "robot_dimensions",
+  "dock_dimensions",
+  "reference_price"
+];
+
+const FLOOR_WASHER_SPEC_FIELDS = [
+  "color",
+  "origin",
+  "rated_power",
+  "suction_power",
+  "motor_type",
+  "cleaning_modes",
+  "battery_capacity",
+  "charging_time",
+  "runtime_modes",
+  "hot_water_temperature",
+  "steam_temperature",
+  "self_clean_temperature",
+  "drying_temperature",
+  "clean_water_capacity",
+  "dirty_water_capacity",
+  "dirty_water_capacity_flat",
+  "self_cleaning_technology",
+  "drying_modes",
+  "flat_recline",
+  "flat_height",
+  "swivel_angle",
+  "drive_assist",
+  "anti_tangle",
+  "dirt_detection",
+  "detergent_dispensing",
+  "app_control",
+  "display_type",
+  "voice_alerts",
+  "noise_level",
+  "product_dimensions",
+  "package_dimensions",
+  "product_weight",
+  "package_weight",
+  "included_accessories",
+  "reference_price"
+];
+
+function isSupportedProductType(value) {
+  return (
+    value === PRODUCT_TYPES.ROBOT ||
+    value === PRODUCT_TYPES.FLOOR_WASHER
+  );
+}
+
+function normalizeProductType(value) {
+  return value === PRODUCT_TYPES.FLOOR_WASHER
+    ? PRODUCT_TYPES.FLOOR_WASHER
+    : PRODUCT_TYPES.ROBOT;
+}
+
+function getSpecsTable(productType) {
+  return normalizeProductType(productType) === PRODUCT_TYPES.FLOOR_WASHER
+    ? "floor_washer_specs"
+    : "robot_specs";
+}
+
+function getSpecFields(productType) {
+  return normalizeProductType(productType) === PRODUCT_TYPES.FLOOR_WASHER
+    ? FLOOR_WASHER_SPEC_FIELDS
+    : ROBOT_SPEC_FIELDS;
+}
+
+function getNullableSpecValue(field, value) {
+  if (field === "reference_price") {
+    const price = Number(value);
+
+    return Number.isFinite(price) && price > 0
+      ? price
+      : null;
+  }
+
+  const text = String(value ?? "").trim();
+
+  return text || null;
+}
+
+function prepareSpecsUpsert(database, productType, robotId, specs) {
+  const table = getSpecsTable(productType);
+  const fields = getSpecFields(productType);
+  const columns = ["robot_id", ...fields];
+  const placeholders = columns.map(() => "?").join(", ");
+  const assignments = fields
+    .map((field) => `${field} = excluded.${field}`)
+    .join(", ");
+
+  return database
+    .prepare(
+      `
+      INSERT INTO ${table}
+      (${columns.join(", ")})
+      VALUES (${placeholders})
+      ON CONFLICT(robot_id) DO UPDATE SET
+        ${assignments},
+        updated_at = CURRENT_TIMESTAMP
+      `
+    )
+    .bind(
+      robotId,
+      ...fields.map((field) =>
+        getNullableSpecValue(
+          field,
+          field === "reference_price"
+            ? specs?.reference_price ?? specs?.referencePrice
+            : specs?.[field]
+        )
+      )
+    );
 }
 
 function getDriveRobotImages(allItems) {
@@ -455,6 +593,133 @@ return await verifySessionToken(
 env,
 token
 );
+}
+
+function validateErrorLookupRecord(body, existingRecordId = "") {
+  const text = (field, maximum, required = true) => {
+    const value = String(body?.[field] ?? "")
+      .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, " ")
+      .trim();
+
+    if ((required && !value) || value.length > maximum) {
+      return null;
+    }
+
+    return value;
+  };
+
+  const recordType = text("record_type", 32);
+  const recordId = existingRecordId || text("record_id", 120);
+  const manufacturer = text("manufacturer", 100);
+  const deviceType = text("device_type", 60);
+  const modelScope = text("model_scope", 160);
+  const confidenceLabel = text("confidence_label", 20, false) || "";
+  const modelScopeNote = text("model_scope_note_vi", 1000);
+  const sourceName = text("source_name", 250, false) || "";
+  const sourceUrl = text("source_url", 2048, false) || "";
+  const sourceAccessedAt = text("source_accessed_at", 10, false) || "";
+  const publicationStatus = text("publication_status", 100);
+  const scoreInput = String(body?.confidence_score ?? "").trim();
+  const confidenceScore = scoreInput === "" ? null : Number(scoreInput);
+
+  if (
+    !["error_code", "symptom_reference"].includes(recordType) ||
+    !recordId ||
+    !manufacturer ||
+    !deviceType ||
+    !modelScope ||
+    !modelScopeNote ||
+    !publicationStatus ||
+    !/^[A-Za-z0-9][A-Za-z0-9_-]{1,119}$/.test(recordId) ||
+    !/^[a-z][a-z0-9_]{2,59}$/.test(deviceType) ||
+    !["", "cao", "trung bình", "thấp"].includes(confidenceLabel) ||
+    (confidenceScore !== null && (
+      !Number.isFinite(confidenceScore) ||
+      confidenceScore < 0 ||
+      confidenceScore > 1
+    )) ||
+    (sourceAccessedAt && !/^\d{4}-\d{2}-\d{2}$/.test(sourceAccessedAt)) ||
+    !/^[a-z0-9][a-z0-9-]{1,99}$/i.test(publicationStatus)
+  ) {
+    return { ok: false, error: "Thông tin chung của mục tra cứu không hợp lệ." };
+  }
+
+  if (sourceUrl) {
+    try {
+      const parsedSourceUrl = new URL(sourceUrl);
+      if (!["http:", "https:"].includes(parsedSourceUrl.protocol)) {
+        throw new Error("Unsupported protocol");
+      }
+    } catch {
+      return { ok: false, error: "URL nguồn phải là đường dẫn http hoặc https hợp lệ." };
+    }
+  }
+
+  if (existingRecordId && body?.record_id && String(body.record_id).trim() !== existingRecordId) {
+    return { ok: false, error: "Không thể thay đổi mã định danh của bản ghi." };
+  }
+
+  const common = {
+    record_id: recordId,
+    manufacturer,
+    device_type: deviceType,
+    model_scope: modelScope,
+    confidence_score: confidenceScore,
+    confidence_label: confidenceLabel,
+    model_scope_note_vi: modelScopeNote,
+    source_name: sourceName,
+    source_url: sourceUrl,
+    source_accessed_at: sourceAccessedAt,
+    publication_status: publicationStatus
+  };
+
+  if (recordType === "error_code") {
+    const errorCode = text("error_code", 80);
+    const errorTitle = text("error_title_vi", 250);
+    const description = text("description_vi", 5000);
+    const firstAction = text("first_action_vi", 3000);
+
+    if (!errorCode || !errorTitle || !description || !firstAction) {
+      return { ok: false, error: "Mã lỗi chính thức cần đủ mã, tiêu đề, mô tả và bước xử lý đầu tiên." };
+    }
+
+    return {
+      ok: true,
+      recordType,
+      record: {
+        ...common,
+        error_code: errorCode,
+        error_title_vi: errorTitle,
+        description_vi: description,
+        first_action_vi: firstAction
+      }
+    };
+  }
+
+  const reportedCode = text("reported_code", 80, false);
+  const symptomKey = text("symptom_key", 120);
+  const title = text("title_vi", 250);
+  const summary = text("summary_vi", 5000);
+  const firstAction = text("first_action_vi", 3000);
+  const safetyStop = text("safety_stop_vi", 3000, false);
+
+  if (!symptomKey || !title || !summary || !firstAction) {
+    return { ok: false, error: "Triệu chứng tham khảo cần đủ khóa triệu chứng, tiêu đề, mô tả và bước xử lý đầu tiên." };
+  }
+
+  return {
+    ok: true,
+    recordType,
+    record: {
+      ...common,
+      reported_code: reportedCode || "",
+      symptom_key: symptomKey,
+      title_vi: title,
+      summary_vi: summary,
+      first_action_vi: firstAction,
+      safety_stop_vi: safetyStop || ""
+    }
+  };
 }
 export default {
   async fetch(request, env) {
@@ -1247,7 +1512,32 @@ if (
               }))
           : [];
 
-        const robotsResult = await env.trung_tu_te_robot_db
+        // FAQ-V2 chỉ được bật rõ ràng trong cấu hình local. Nó dùng 8 tệp
+        // nguồn đã thống nhất, không đọc hoặc ghi D1 và không gọi dịch vụ AI.
+        if (env.FAQ_V2_ENABLED === "true") {
+          const faqV2Result = handleFaqV2Message({
+            message,
+            session: body?.faqSession
+          });
+
+          if (faqV2Result) {
+            return Response.json({
+              ok: true,
+              reply: faqV2Result.reply,
+              source: "faq-v2",
+              faqV2ScenarioId: faqV2Result.scenarioId,
+              faqV2MatchScore: faqV2Result.score,
+              faqSession: faqV2Result.session
+            });
+          }
+        }
+
+        // A local D1 created before migration 0004 lacks the floor-washer
+        // schema. Keep chat available on its original catalogue until the
+        // local migration is applied.
+        let robotsResult;
+        try {
+          robotsResult = await env.trung_tu_te_robot_db
           .prepare(`
             SELECT
               r.brand,
@@ -1255,7 +1545,8 @@ if (
               r.slug,
               r.year,
               r.category,
-              s.suction_power,
+              r.product_type,
+              COALESCE(s.suction_power, f.suction_power) AS suction_power,
               s.obstacle_recognition,
               s.mopping_technology,
               s.mop_extension,
@@ -1268,11 +1559,38 @@ if (
               s.carpet_mop_lift,
               s.dust_bag_capacity,
               s.clean_dirty_water_capacity,
-              s.battery_capacity,
+              COALESCE(s.battery_capacity, f.battery_capacity) AS battery_capacity,
               s.cleaning_area,
               s.robot_dimensions,
               s.dock_dimensions,
-              s.reference_price,
+              COALESCE(s.reference_price, f.reference_price) AS reference_price,
+              f.rated_power,
+              f.motor_type,
+              f.cleaning_modes,
+              f.charging_time,
+              f.runtime_modes,
+              f.hot_water_temperature,
+              f.steam_temperature,
+              f.self_clean_temperature,
+              f.drying_temperature,
+              f.clean_water_capacity,
+              f.dirty_water_capacity,
+              f.dirty_water_capacity_flat,
+              f.self_cleaning_technology,
+              f.drying_modes,
+              f.flat_recline,
+              f.flat_height,
+              f.swivel_angle,
+              f.drive_assist,
+              f.anti_tangle,
+              f.dirt_detection,
+              f.detergent_dispensing,
+              f.app_control,
+              f.display_type,
+              f.voice_alerts,
+              f.noise_level,
+              f.product_dimensions,
+              f.product_weight,
               c.intro,
               c.highlights,
               c.pros,
@@ -1282,13 +1600,45 @@ if (
             FROM robots r
             LEFT JOIN robot_specs s
               ON s.robot_id = r.id
+            LEFT JOIN floor_washer_specs f
+              ON f.robot_id = r.id
             LEFT JOIN robot_content c
               ON c.robot_id = r.id
             WHERE r.status = 'active'
             ORDER BY r.brand, r.model
             LIMIT 50
           `)
-          .all();
+            .all();
+        } catch (error) {
+          const catalogSchemaError = String(error?.message || "");
+
+          if (!/no such table:\s*floor_washer_specs|no such column:\s*product_type/i.test(catalogSchemaError)) {
+            throw error;
+          }
+
+          console.warn("CHATBOT CATALOG LEGACY FALLBACK:", catalogSchemaError);
+          robotsResult = await env.trung_tu_te_robot_db
+            .prepare(`
+              SELECT
+                r.brand, r.model, r.slug, r.year, r.category,
+                'robot-lau-nha' AS product_type,
+                s.suction_power, s.obstacle_recognition, s.mopping_technology,
+                s.mop_extension, s.side_brush_extension, s.automatic_mop_washing,
+                s.mop_drying, s.wash_tray_self_cleaning, s.automatic_dust_emptying,
+                s.automatic_detergent_dispensing, s.carpet_mop_lift,
+                s.dust_bag_capacity, s.clean_dirty_water_capacity,
+                s.battery_capacity, s.cleaning_area, s.robot_dimensions,
+                s.dock_dimensions, s.reference_price,
+                c.intro, c.highlights, c.pros, c.notes, c.suitable_for, c.ai_content
+              FROM robots r
+              LEFT JOIN robot_specs s ON s.robot_id = r.id
+              LEFT JOIN robot_content c ON c.robot_id = r.id
+              WHERE r.status = 'active'
+              ORDER BY r.brand, r.model
+              LIMIT 50
+            `)
+            .all();
+        }
 
         const robots = robotsResult.results || [];
         const parseSuctionPowerPa = (value) => {
@@ -1924,6 +2274,7 @@ const robot =
         slug,
         year,
         category,
+        product_type,
         status
       FROM robots
       WHERE id = ?
@@ -1955,26 +2306,8 @@ const specs =
     .trung_tu_te_robot_db
     .prepare(
       `
-      SELECT
-        suction_power,
-        obstacle_recognition,
-        mopping_technology,
-        mop_extension,
-        side_brush_extension,
-        automatic_mop_washing,
-        mop_drying,
-        wash_tray_self_cleaning,
-        automatic_dust_emptying,
-        automatic_detergent_dispensing,
-        carpet_mop_lift,
-        dust_bag_capacity,
-        clean_dirty_water_capacity,
-        battery_capacity,
-        cleaning_area,
-        robot_dimensions,
-        dock_dimensions,
-        reference_price
-      FROM robot_specs
+      SELECT *
+      FROM ${getSpecsTable(robot.product_type)}
       WHERE robot_id = ?
       LIMIT 1
       `
@@ -2024,8 +2357,15 @@ const sourceData = {
     content || {}
 };
 
+const productLabel =
+  normalizeProductType(robot.product_type) === PRODUCT_TYPES.FLOOR_WASHER
+    ? "máy lau sàn"
+    : "robot lau nhà";
+
 const prompt = `
 Bạn là biên tập viên kỹ thuật cho website "Trung Tử Tế - Robot lau nhà".
+
+Loại sản phẩm đang biên tập là ${productLabel}. Hãy dùng đúng tên loại sản phẩm này trong nội dung; không gọi máy lau sàn là robot.
 
 NHIỆM VỤ
 
@@ -3343,6 +3683,7 @@ if (
                 slug,
                 year,
                 category,
+                product_type,
                 status,
                 created_at,
                 updated_at
@@ -3372,29 +3713,10 @@ if (
             .trung_tu_te_robot_db
             .prepare(
               `
-              SELECT
-              suction_power,
-              obstacle_recognition,
-              mopping_technology,
-              mop_extension,
-              side_brush_extension,
-              automatic_mop_washing,
-              mop_drying,
-              wash_tray_self_cleaning,
-              automatic_dust_emptying,
-              automatic_detergent_dispensing,
-              carpet_mop_lift,
-              dust_bag_capacity,
-              clean_dirty_water_capacity,
-              battery_capacity,
-              cleaning_area,
-              robot_dimensions,
-              dock_dimensions,
-              reference_price,
-              updated_at
-            FROM robot_specs
-            WHERE robot_id = ?
-            LIMIT 1
+              SELECT *
+              FROM ${getSpecsTable(robot.product_type)}
+              WHERE robot_id = ?
+              LIMIT 1
               `
             )
             .bind(robot.id)
@@ -3560,7 +3882,542 @@ if (
       }
     }
 
-     // =========================================================
+    // =========================================================
+    // ERROR-CODE LOOKUP - PUBLIC D1 API
+    // =========================================================
+
+    if (
+      url.pathname === "/api/error-lookup/filters" &&
+      request.method === "GET"
+    ) {
+      try {
+        const db = env.trung_tu_te_robot_db;
+        const manufacturer = String(
+          url.searchParams.get("manufacturer") || ""
+        ).trim().slice(0, 100);
+
+        const manufacturersResult = await db.prepare(`
+          SELECT manufacturer
+          FROM (
+            SELECT manufacturer FROM error_codes
+            UNION
+            SELECT manufacturer FROM symptom_references
+          )
+          ORDER BY manufacturer COLLATE NOCASE ASC
+        `).all();
+
+        const modelQuery = manufacturer
+          ? `
+            SELECT model_scope
+            FROM (
+              SELECT model_scope FROM error_codes WHERE manufacturer = ?
+              UNION
+              SELECT model_scope FROM symptom_references WHERE manufacturer = ?
+            )
+            ORDER BY model_scope COLLATE NOCASE ASC
+          `
+          : `
+            SELECT model_scope
+            FROM (
+              SELECT model_scope FROM error_codes
+              UNION
+              SELECT model_scope FROM symptom_references
+            )
+            ORDER BY model_scope COLLATE NOCASE ASC
+          `;
+
+        const modelsResult = manufacturer
+          ? await db.prepare(modelQuery)
+            .bind(manufacturer, manufacturer)
+            .all()
+          : await db.prepare(modelQuery).all();
+
+        return Response.json(
+          {
+            ok: true,
+            manufacturers: (manufacturersResult.results || [])
+              .map((row) => row.manufacturer),
+            model_scopes: (modelsResult.results || [])
+              .map((row) => row.model_scope)
+          },
+          {
+            headers: {
+              "Cache-Control": "no-store"
+            }
+          }
+        );
+      } catch (error) {
+        console.error("ERROR LOOKUP FILTERS ERROR:", error);
+
+        return Response.json(
+          {
+            ok: false,
+            error: "Không thể tải bộ lọc tra cứu."
+          },
+          { status: 500 }
+        );
+      }
+    }
+
+    if (
+      url.pathname === "/api/error-lookup" &&
+      request.method === "GET"
+    ) {
+      try {
+        const db = env.trung_tu_te_robot_db;
+        const manufacturer = String(
+          url.searchParams.get("manufacturer") || ""
+        ).trim().slice(0, 100);
+        const modelScope = String(
+          url.searchParams.get("model_scope") || ""
+        ).trim().slice(0, 160);
+        const query = String(
+          url.searchParams.get("q") || ""
+        ).trim().replace(/[\u0000-\u001F\u007F]/g, " ").slice(0, 120);
+        const requestedLimit = Number(
+          url.searchParams.get("limit") || 50
+        );
+        const limit = Number.isInteger(requestedLimit)
+          ? Math.min(Math.max(requestedLimit, 1), 50)
+          : 50;
+
+        const buildWhere = (searchColumns) => {
+          const clauses = [];
+          const values = [];
+
+          if (manufacturer) {
+            clauses.push("manufacturer = ?");
+            values.push(manufacturer);
+          }
+
+          if (modelScope) {
+            clauses.push("model_scope = ?");
+            values.push(modelScope);
+          }
+
+          if (query) {
+            const pattern = `%${query}%`;
+            clauses.push(
+              `(${searchColumns.map((column) => `${column} LIKE ?`).join(" OR ")})`
+            );
+            values.push(...searchColumns.map(() => pattern));
+          }
+
+          return {
+            where: clauses.length
+              ? `WHERE ${clauses.join(" AND ")}`
+              : "",
+            values
+          };
+        };
+
+        const codeFilters = buildWhere([
+          "error_code",
+          "error_title_vi",
+          "description_vi"
+        ]);
+        const symptomFilters = buildWhere([
+          "reported_code",
+          "symptom_key",
+          "title_vi",
+          "summary_vi"
+        ]);
+
+        const [codesResult, symptomsResult] = await Promise.all([
+          db.prepare(`
+            SELECT
+              'error_code' AS record_type,
+              record_id,
+              manufacturer,
+              device_type,
+              model_scope,
+              error_code AS display_code,
+              error_title_vi AS title_vi,
+              description_vi,
+              first_action_vi,
+              '' AS safety_stop_vi,
+              confidence_score,
+              confidence_label,
+              model_scope_note_vi,
+              source_name,
+              source_url,
+              source_accessed_at,
+              publication_status
+            FROM error_codes
+            ${codeFilters.where}
+            ORDER BY confidence_score DESC, error_code ASC
+            LIMIT ?
+          `).bind(...codeFilters.values, limit).all(),
+          db.prepare(`
+            SELECT
+              'symptom_reference' AS record_type,
+              record_id,
+              manufacturer,
+              device_type,
+              model_scope,
+              reported_code AS display_code,
+              title_vi,
+              summary_vi AS description_vi,
+              first_action_vi,
+              safety_stop_vi,
+              confidence_score,
+              confidence_label,
+              model_scope_note_vi,
+              source_name,
+              source_url,
+              source_accessed_at,
+              publication_status
+            FROM symptom_references
+            ${symptomFilters.where}
+            ORDER BY confidence_score DESC, title_vi COLLATE NOCASE ASC
+            LIMIT ?
+          `).bind(...symptomFilters.values, limit).all()
+        ]);
+
+        const results = [
+          ...(codesResult.results || []),
+          ...(symptomsResult.results || [])
+        ].sort((first, second) => {
+          const confidenceDifference =
+            Number(second.confidence_score) -
+            Number(first.confidence_score);
+
+          if (confidenceDifference !== 0) {
+            return confidenceDifference;
+          }
+
+          if (first.record_type !== second.record_type) {
+            return first.record_type === "error_code" ? -1 : 1;
+          }
+
+          return first.title_vi.localeCompare(
+            second.title_vi,
+            "vi"
+          );
+        });
+
+        return Response.json(
+          {
+            ok: true,
+            filters: {
+              manufacturer,
+              model_scope: modelScope,
+              q: query
+            },
+            total: results.length,
+            results
+          },
+          {
+            headers: {
+              "Cache-Control": "no-store"
+            }
+          }
+        );
+      } catch (error) {
+        console.error("ERROR LOOKUP ERROR:", error);
+
+        return Response.json(
+          {
+            ok: false,
+            error: "Không thể tra cứu dữ liệu lỗi lúc này."
+          },
+          { status: 500 }
+        );
+      }
+    }
+
+    // =========================================================
+    // ERROR-CODE LOOKUP - ADMIN D1 API
+    // =========================================================
+
+    if (
+      url.pathname === "/api/admin/error-lookup-records" &&
+      ["GET", "POST"].includes(request.method)
+    ) {
+      const isAdmin = await requireAdminSession(request, env);
+
+      if (!isAdmin) {
+        return Response.json(
+          { ok: false, error: "Unauthorized" },
+          { status: 401 }
+        );
+      }
+
+      try {
+        const db = env.trung_tu_te_robot_db;
+
+        if (request.method === "POST") {
+          const validation = validateErrorLookupRecord(await request.json());
+
+          if (!validation.ok) {
+            return Response.json(validation, { status: 400 });
+          }
+
+          const record = validation.record;
+
+          if (validation.recordType === "error_code") {
+            await db.prepare(`
+              INSERT INTO error_codes (
+                record_id, manufacturer, device_type, model_scope, error_code,
+                error_title_vi, description_vi, first_action_vi,
+                confidence_score, confidence_label, model_scope_note_vi,
+                source_name, source_url, source_accessed_at, publication_status
+              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `).bind(
+              record.record_id, record.manufacturer, record.device_type,
+              record.model_scope, record.error_code, record.error_title_vi,
+              record.description_vi, record.first_action_vi,
+              record.confidence_score, record.confidence_label,
+              record.model_scope_note_vi, record.source_name,
+              record.source_url, record.source_accessed_at,
+              record.publication_status
+            ).run();
+          } else {
+            await db.prepare(`
+              INSERT INTO symptom_references (
+                record_id, manufacturer, device_type, model_scope, reported_code,
+                symptom_key, title_vi, summary_vi, first_action_vi, safety_stop_vi,
+                confidence_score, confidence_label, model_scope_note_vi,
+                source_name, source_url, source_accessed_at, publication_status
+              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `).bind(
+              record.record_id, record.manufacturer, record.device_type,
+              record.model_scope, record.reported_code, record.symptom_key,
+              record.title_vi, record.summary_vi, record.first_action_vi,
+              record.safety_stop_vi, record.confidence_score,
+              record.confidence_label, record.model_scope_note_vi,
+              record.source_name, record.source_url, record.source_accessed_at,
+              record.publication_status
+            ).run();
+          }
+
+          return Response.json(
+            { ok: true, record_id: record.record_id, record_type: validation.recordType },
+            { status: 201 }
+          );
+        }
+
+        const requestedType = String(url.searchParams.get("record_type") || "all");
+        const manufacturer = String(url.searchParams.get("manufacturer") || "")
+          .trim()
+          .slice(0, 100);
+        const query = String(url.searchParams.get("q") || "")
+          .trim()
+          .replace(/[\u0000-\u001F\u007F]/g, " ")
+          .slice(0, 120);
+        const requestedLimit = Number(url.searchParams.get("limit") || 200);
+        const limit = Number.isInteger(requestedLimit)
+          ? Math.min(Math.max(requestedLimit, 1), 500)
+          : 200;
+
+        if (!["all", "error_code", "symptom_reference"].includes(requestedType)) {
+          return Response.json(
+            { ok: false, error: "Loại bản ghi không hợp lệ." },
+            { status: 400 }
+          );
+        }
+
+        const buildFilters = (columns) => {
+          const clauses = [];
+          const values = [];
+
+          if (manufacturer) {
+            clauses.push("manufacturer = ?");
+            values.push(manufacturer);
+          }
+
+          if (query) {
+            const pattern = `%${query}%`;
+            clauses.push(`(${columns.map((column) => `${column} LIKE ?`).join(" OR ")})`);
+            values.push(...columns.map(() => pattern));
+          }
+
+          return {
+            where: clauses.length ? `WHERE ${clauses.join(" AND ")}` : "",
+            values
+          };
+        };
+
+        const codeFilters = buildFilters([
+          "error_code", "error_title_vi", "description_vi", "model_scope"
+        ]);
+        const symptomFilters = buildFilters([
+          "reported_code", "symptom_key", "title_vi", "summary_vi", "model_scope"
+        ]);
+
+        const codeRows = requestedType === "symptom_reference"
+          ? []
+          : (await db.prepare(`
+              SELECT
+                'error_code' AS record_type,
+                record_id, manufacturer, device_type, model_scope,
+                error_code, error_title_vi, description_vi, first_action_vi,
+                confidence_score, confidence_label, model_scope_note_vi,
+                source_name, source_url, source_accessed_at, publication_status
+              FROM error_codes
+              ${codeFilters.where}
+              ORDER BY manufacturer COLLATE NOCASE, model_scope COLLATE NOCASE, error_code
+              LIMIT ?
+            `).bind(...codeFilters.values, limit).all()).results || [];
+
+        const symptomRows = requestedType === "error_code"
+          ? []
+          : (await db.prepare(`
+              SELECT
+                'symptom_reference' AS record_type,
+                record_id, manufacturer, device_type, model_scope,
+                reported_code, symptom_key, title_vi, summary_vi, first_action_vi,
+                safety_stop_vi, confidence_score, confidence_label,
+                model_scope_note_vi, source_name, source_url, source_accessed_at,
+                publication_status
+              FROM symptom_references
+              ${symptomFilters.where}
+              ORDER BY manufacturer COLLATE NOCASE, model_scope COLLATE NOCASE, title_vi COLLATE NOCASE
+              LIMIT ?
+            `).bind(...symptomFilters.values, limit).all()).results || [];
+
+        return Response.json({
+          ok: true,
+          total: codeRows.length + symptomRows.length,
+          records: [...codeRows, ...symptomRows]
+        });
+      } catch (error) {
+        const duplicate = /unique constraint/i.test(error.message || "");
+        console.error("ERROR LOOKUP ADMIN ERROR:", error);
+
+        return Response.json(
+          {
+            ok: false,
+            error: duplicate
+              ? "Bản ghi đã tồn tại hoặc trùng mã lỗi trong phạm vi model này."
+              : "Không thể xử lý dữ liệu tra cứu."
+          },
+          { status: duplicate ? 409 : 500 }
+        );
+      }
+    }
+
+    if (
+      url.pathname.startsWith("/api/admin/error-lookup-records/") &&
+      ["PUT", "DELETE"].includes(request.method)
+    ) {
+      const isAdmin = await requireAdminSession(request, env);
+
+      if (!isAdmin) {
+        return Response.json(
+          { ok: false, error: "Unauthorized" },
+          { status: 401 }
+        );
+      }
+
+      const recordId = url.pathname.split("/").pop() || "";
+
+      if (!/^[A-Za-z0-9][A-Za-z0-9_-]{1,119}$/.test(recordId)) {
+        return Response.json(
+          { ok: false, error: "Mã định danh bản ghi không hợp lệ." },
+          { status: 400 }
+        );
+      }
+
+      try {
+        const db = env.trung_tu_te_robot_db;
+
+        if (request.method === "DELETE") {
+          const errorCodeResult = await db.prepare(`
+            DELETE FROM error_codes
+            WHERE record_id = ?
+          `).bind(recordId).run();
+
+          const result = errorCodeResult.meta?.changes
+            ? errorCodeResult
+            : await db.prepare(`
+                DELETE FROM symptom_references
+                WHERE record_id = ?
+              `).bind(recordId).run();
+
+          if (!result.meta?.changes) {
+            return Response.json(
+              { ok: false, error: "Không tìm thấy bản ghi để xóa." },
+              { status: 404 }
+            );
+          }
+
+          return Response.json({ ok: true, record_id: recordId });
+        }
+
+        const validation = validateErrorLookupRecord(
+          await request.json(),
+          recordId
+        );
+
+        if (!validation.ok) {
+          return Response.json(validation, { status: 400 });
+        }
+
+        const record = validation.record;
+        let result;
+
+        if (validation.recordType === "error_code") {
+          result = await db.prepare(`
+            UPDATE error_codes
+            SET manufacturer = ?, device_type = ?, model_scope = ?,
+                error_code = ?, error_title_vi = ?, description_vi = ?,
+                first_action_vi = ?, confidence_score = ?, confidence_label = ?,
+                model_scope_note_vi = ?, source_name = ?, source_url = ?,
+                source_accessed_at = ?, publication_status = ?
+            WHERE record_id = ?
+          `).bind(
+            record.manufacturer, record.device_type, record.model_scope,
+            record.error_code, record.error_title_vi, record.description_vi,
+            record.first_action_vi, record.confidence_score,
+            record.confidence_label, record.model_scope_note_vi,
+            record.source_name, record.source_url, record.source_accessed_at,
+            record.publication_status, recordId
+          ).run();
+        } else {
+          result = await db.prepare(`
+            UPDATE symptom_references
+            SET manufacturer = ?, device_type = ?, model_scope = ?,
+                reported_code = ?, symptom_key = ?, title_vi = ?, summary_vi = ?,
+                first_action_vi = ?, safety_stop_vi = ?, confidence_score = ?,
+                confidence_label = ?, model_scope_note_vi = ?, source_name = ?,
+                source_url = ?, source_accessed_at = ?, publication_status = ?
+            WHERE record_id = ?
+          `).bind(
+            record.manufacturer, record.device_type, record.model_scope,
+            record.reported_code, record.symptom_key, record.title_vi,
+            record.summary_vi, record.first_action_vi, record.safety_stop_vi,
+            record.confidence_score, record.confidence_label,
+            record.model_scope_note_vi, record.source_name, record.source_url,
+            record.source_accessed_at, record.publication_status, recordId
+          ).run();
+        }
+
+        if (!result.meta?.changes) {
+          return Response.json(
+            { ok: false, error: "Không tìm thấy bản ghi để cập nhật." },
+            { status: 404 }
+          );
+        }
+
+        return Response.json({ ok: true, record_id: recordId });
+      } catch (error) {
+        const duplicate = /unique constraint/i.test(error.message || "");
+        console.error("ERROR LOOKUP ADMIN UPDATE ERROR:", error);
+
+        return Response.json(
+          {
+            ok: false,
+            error: duplicate
+              ? "Dữ liệu cập nhật bị trùng với một bản ghi đã có."
+              : "Không thể cập nhật dữ liệu tra cứu."
+          },
+          { status: duplicate ? 409 : 500 }
+        );
+      }
+    }
+
+    // =========================================================
     // ROBOTS API - D1
     // =========================================================
 
@@ -3581,6 +4438,8 @@ if (
   r.model,
   r.slug,
   r.year,
+  r.category,
+  r.product_type,
   CASE
     WHEN rc.ai_content IS NOT NULL
       AND TRIM(rc.ai_content) != ''
@@ -4103,7 +4962,8 @@ robot.images =
               `
               SELECT
                 id,
-                slug
+                slug,
+                product_type
               FROM robots
               WHERE id = ?
               LIMIT 1
@@ -4130,6 +4990,29 @@ robot.images =
         }
 
 
+        const requestedProductType = robot.product_type;
+
+        if (
+          requestedProductType !== undefined &&
+          !isSupportedProductType(requestedProductType)
+        ) {
+          return Response.json(
+            {
+              ok: false,
+              error: "Loại sản phẩm không hợp lệ"
+            },
+            {
+              status: 400
+            }
+          );
+        }
+
+        const productType =
+          requestedProductType === undefined
+            ? normalizeProductType(existingRobot.product_type)
+            : requestedProductType;
+
+
         const statements = [];
 
 
@@ -4144,6 +5027,7 @@ robot.images =
                 model = ?,
                 year = ?,
                 category = ?,
+                product_type = ?,
                 status = ?,
                 updated_at = CURRENT_TIMESTAMP
               WHERE id = ?
@@ -4158,6 +5042,7 @@ robot.images =
                 ? null
                 : Number(robot.year),
               robot.category || "",
+              productType,
               robot.status || "active",
               robotId
             )
@@ -4165,57 +5050,28 @@ robot.images =
 
 
         statements.push(
+          prepareSpecsUpsert(
+            env.trung_tu_te_robot_db,
+            productType,
+            robotId,
+            specs
+          )
+        );
+
+        statements.push(
           env
             .trung_tu_te_robot_db
             .prepare(
               `
-              UPDATE robot_specs
-              SET
-              suction_power = ?,
-              obstacle_recognition = ?,
-              mopping_technology = ?,
-              mop_extension = ?,
-              side_brush_extension = ?,
-              automatic_mop_washing = ?,
-              mop_drying = ?,
-              wash_tray_self_cleaning = ?,
-              automatic_dust_emptying = ?,
-              automatic_detergent_dispensing = ?,
-              carpet_mop_lift = ?,
-              dust_bag_capacity = ?,
-              clean_dirty_water_capacity = ?,
-              battery_capacity = ?,
-              cleaning_area = ?,
-              robot_dimensions = ?,
-              dock_dimensions = ?,
-              reference_price = ?,
-              updated_at = CURRENT_TIMESTAMP
+              DELETE FROM ${
+                productType === PRODUCT_TYPES.FLOOR_WASHER
+                  ? "robot_specs"
+                  : "floor_washer_specs"
+              }
               WHERE robot_id = ?
               `
             )
-            .bind(
-              specs.suction_power || null,
-              specs.obstacle_recognition || null,
-              specs.mopping_technology || null,
-              specs.mop_extension || null,
-              specs.side_brush_extension || null,
-              specs.automatic_mop_washing || null,
-              specs.mop_drying || null,
-              specs.wash_tray_self_cleaning || null,
-              specs.automatic_dust_emptying || null,
-              specs.automatic_detergent_dispensing || null,
-              specs.carpet_mop_lift || null,
-              specs.dust_bag_capacity || null,
-              specs.clean_dirty_water_capacity || null,
-              specs.battery_capacity || null,
-              specs.cleaning_area || null,
-              specs.robot_dimensions || null,
-              specs.dock_dimensions || null,
-              specs.reference_price === "" || specs.reference_price === undefined || specs.reference_price === null
-                ? null
-                : (Number(specs.reference_price) > 0 ? Number(specs.reference_price) : null),
-              robotId
-            )
+            .bind(robotId)
         );
 
 
@@ -4580,6 +5436,18 @@ robot.images =
                   .trung_tu_te_robot_db
                   .prepare(
                     `
+                    DELETE FROM floor_washer_specs
+                    WHERE robot_id = ?
+                    `
+                  )
+                  .bind(
+                    robotId
+                  ),
+
+                env
+                  .trung_tu_te_robot_db
+                  .prepare(
+                    `
                     DELETE FROM robots
                     WHERE id = ?
                     `
@@ -4786,6 +5654,23 @@ robot.images =
         const robot =
           body.robot || {};
 
+        const productType =
+          robot.product_type === undefined
+            ? PRODUCT_TYPES.ROBOT
+            : robot.product_type;
+
+        if (!isSupportedProductType(productType)) {
+          return Response.json(
+            {
+              ok: false,
+              error: "Loại sản phẩm không hợp lệ"
+            },
+            {
+              status: 400
+            }
+          );
+        }
+
         const specs =
           body.specs || {};
 
@@ -4940,9 +5825,10 @@ robot.images =
                 slug,
                 year,
                 category,
+                product_type,
                 status
               )
-              VALUES (?, ?, ?, ?, ?, ?)
+              VALUES (?, ?, ?, ?, ?, ?, ?)
               RETURNING id
               `
             )
@@ -4952,6 +5838,7 @@ robot.images =
               slug,
               year,
               robot.category || "",
+              productType,
               robot.status || "active"
             )
             .first();
@@ -4987,68 +5874,12 @@ robot.images =
         // =================================================
 
         statements.push(
-          env
-            .trung_tu_te_robot_db
-            .prepare(
-              `
-              INSERT INTO robot_specs
-              (
-                robot_id,
-                suction_power,
-                obstacle_recognition,
-                mopping_technology,
-                mop_extension,
-                side_brush_extension,
-                automatic_mop_washing,
-                mop_drying,
-                wash_tray_self_cleaning,
-                automatic_dust_emptying,
-                automatic_detergent_dispensing,
-                carpet_mop_lift,
-                dust_bag_capacity,
-                clean_dirty_water_capacity,
-                battery_capacity,
-                cleaning_area,
-                robot_dimensions,
-                dock_dimensions,
-                reference_price
-              )
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-              `
-            )
-            .bind(
-              robotId,
-              specs.suction_power || null,
-              specs.obstacle_recognition || null,
-              specs.mopping_technology || null,
-              specs.mop_extension || null,
-              specs.side_brush_extension || null,
-              specs.automatic_mop_washing || null,
-              specs.mop_drying || null,
-              specs.wash_tray_self_cleaning || null,
-              specs.automatic_dust_emptying || null,
-              specs.automatic_detergent_dispensing || null,
-              specs.carpet_mop_lift || null,
-              specs.dust_bag_capacity || null,
-              specs.clean_dirty_water_capacity || null,
-              specs.battery_capacity || null,
-              specs.cleaning_area || null,
-              specs.robot_dimensions || null,
-              specs.dock_dimensions || null,
-              specs.reference_price === "" ||
-              specs.reference_price === undefined ||
-              specs.reference_price === null
-                ? (
-                    Number(specs.referencePrice) > 0
-                      ? Number(specs.referencePrice)
-                      : null
-                  )
-                : (
-                    Number(specs.reference_price) > 0
-                      ? Number(specs.reference_price)
-                      : null
-                  )
-            )
+          prepareSpecsUpsert(
+            env.trung_tu_te_robot_db,
+            productType,
+            robotId,
+            specs
+          )
         );
 
         // =================================================
@@ -5270,7 +6101,7 @@ robot.images =
           ok: true,
 
           message:
-            "Đã tạo Robot",
+            "Đã tạo sản phẩm",
 
           robotId,
 
@@ -5290,6 +6121,9 @@ robot.images =
 
             category:
               robot.category || "",
+
+            product_type:
+              productType,
 
             status:
               robot.status ||
