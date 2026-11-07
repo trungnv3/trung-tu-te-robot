@@ -583,6 +583,11 @@ let html = "";
 
             '<p>' +
 
+              getAdminProductTypeLabel(
+                robot.product_type
+              ) +
+              ' · ' +
+
               images.length +
 
               ' hình ảnh' +
@@ -845,6 +850,14 @@ function showSection(sectionName) {
   ) {
 
     loadChatbotFaqs();
+
+  }
+
+  if (
+    sectionName === "error-lookup"
+  ) {
+
+    loadErrorLookupRecords();
 
   }
 }
@@ -1434,13 +1447,30 @@ document.addEventListener("click", async function (event) {
     ).value =
       selectedRobot.category || "";
 
+    const specs =
+      selectedRobot.specs || {};
+
+    const productType = normalizeAdminProductType(
+      selectedRobot.product_type
+    );
+
+    const productTypeInput = document.querySelector(
+      "#edit-product-type"
+    );
+
+    if (productTypeInput) {
+      productTypeInput.value = productType;
+    }
+
+    syncEditProductTypeFields(
+      productType,
+      specs
+    );
+
     document.querySelector(
       "#edit-status"
     ).value =
       selectedRobot.status || "active";
-
-      const specs =
-      selectedRobot.specs || {};
 
     document.querySelector("#edit-suction-power").value =
       specs.suction_power || "";
@@ -1775,6 +1805,21 @@ currentRobotImages =
   }
 
 });
+document.addEventListener("change", function (event) {
+
+  if (event.target.id !== "edit-product-type") {
+    return;
+  }
+
+  const floorWasherSpecs =
+    collectFloorWasherEditSpecs();
+
+  syncEditProductTypeFields(
+    event.target.value,
+    floorWasherSpecs
+  );
+
+});
 document.addEventListener("click", function (event) {
 
   const cancelButton =
@@ -1865,6 +1910,11 @@ document.addEventListener("click", async function (event) {
       category:
         getValue("#edit-category"),
 
+      product_type:
+        normalizeAdminProductType(
+          getValue("#edit-product-type")
+        ),
+
       status:
         getValue("#edit-status")
 
@@ -1928,6 +1978,13 @@ document.addEventListener("click", async function (event) {
         getValue("#edit-reference-price")
 
     };
+
+    if (robot.product_type === PRODUCT_TYPE_FLOOR_WASHER) {
+      Object.assign(
+        specs,
+        collectFloorWasherEditSpecs()
+      );
+    }
 
 
     const content = {
@@ -2091,8 +2148,10 @@ document.addEventListener("click", async function (event) {
 function loadInitialSection() {
   const hash = window.location.hash.replace("#", "");
 
-  if (hash === "robots") {
-    showSection("robots");
+  if (
+    ["robots", "ai-models", "articles", "chatbot-faqs", "error-lookup"].includes(hash)
+  ) {
+    showSection(hash);
     return;
   }
 
@@ -2709,6 +2768,161 @@ document.addEventListener("click", function (event) {
 // THÊM ROBOT - HỆ THỐNG FORM 5 BƯỚC
 // ============================================================
 
+const PRODUCT_TYPE_ROBOT = "robot-lau-nha";
+const PRODUCT_TYPE_FLOOR_WASHER = "may-lau-san";
+
+const robotSpecFieldConfig = [
+  ["suction_power", "Lực hút", "Ví dụ: 30.000 Pa"],
+  ["obstacle_recognition", "Nhận diện vật cản", "Ví dụ: Camera AI + ánh sáng cấu trúc"],
+  ["mopping_technology", "Công nghệ lau", "Ví dụ: Giẻ lau xoay kép"],
+  ["mop_extension", "Mở rộng cây lau", "Ví dụ: Có"],
+  ["side_brush_extension", "Chổi cạnh mở rộng", "Ví dụ: Có"],
+  ["automatic_mop_washing", "Tự động giặt giẻ", "Ví dụ: Nước nóng 75°C"],
+  ["mop_drying", "Sấy khô giẻ lau", "Ví dụ: Khí nóng"],
+  ["wash_tray_self_cleaning", "Tự làm sạch khay giặt", "Ví dụ: Có"],
+  ["automatic_dust_emptying", "Tự động đổ rác", "Ví dụ: Có"],
+  ["automatic_detergent_dispensing", "Tự pha nước lau sàn", "Ví dụ: Có"],
+  ["carpet_mop_lift", "Nâng giẻ khi gặp thảm", "Ví dụ: 10 mm"],
+  ["dust_bag_capacity", "Dung tích túi bụi", "Ví dụ: 3,2 L"],
+  ["clean_dirty_water_capacity", "Dung tích bình nước sạch/bẩn", "Ví dụ: Sạch 4 L / bẩn 3,5 L"],
+  ["battery_capacity", "Dung lượng pin", "Ví dụ: 6.400 mAh"],
+  ["cleaning_area", "Diện tích làm sạch", "Ví dụ: Tối đa 200 m²"],
+  ["robot_dimensions", "Kích thước robot", "Ví dụ: 350 × 350 × 97 mm"],
+  ["dock_dimensions", "Kích thước trạm sạc", "Ví dụ: 340 × 457 × 590 mm"],
+  ["reference_price", "Giá tham khảo (VNĐ)", "Ví dụ: 9200000"]
+];
+
+const floorWasherSpecFieldConfig = [
+  ["color", "Màu sắc", "Ví dụ: Đen"],
+  ["origin", "Xuất xứ", "Ví dụ: Trung Quốc"],
+  ["rated_power", "Công suất định mức", "Ví dụ: 300 W"],
+  ["suction_power", "Lực hút", "Ví dụ: 20.000 Pa"],
+  ["motor_type", "Loại động cơ", "Ví dụ: Không chổi than"],
+  ["cleaning_modes", "Chế độ làm sạch", "Ví dụ: Hút, lau, hút + lau"],
+  ["battery_capacity", "Dung lượng pin", "Ví dụ: 4.000 mAh"],
+  ["charging_time", "Thời gian sạc", "Ví dụ: 4 giờ"],
+  ["runtime_modes", "Thời gian hoạt động", "Ví dụ: 30–45 phút"],
+  ["hot_water_temperature", "Nhiệt độ nước nóng", "Ví dụ: 60°C"],
+  ["steam_temperature", "Nhiệt độ hơi nước", "Ví dụ: 100°C"],
+  ["self_clean_temperature", "Nhiệt độ tự làm sạch", "Ví dụ: 60°C"],
+  ["drying_temperature", "Nhiệt độ sấy", "Ví dụ: 60°C"],
+  ["clean_water_capacity", "Dung tích bình nước sạch", "Ví dụ: 0,9 L"],
+  ["dirty_water_capacity", "Dung tích bình nước bẩn", "Ví dụ: 0,7 L"],
+  ["dirty_water_capacity_flat", "Dung tích nước bẩn khi nằm phẳng", "Ví dụ: 0,45 L"],
+  ["self_cleaning_technology", "Công nghệ tự làm sạch", "Ví dụ: Con lăn tự giặt"],
+  ["drying_modes", "Chế độ sấy", "Ví dụ: Sấy khí nóng"],
+  ["flat_recline", "Khả năng nằm phẳng", "Ví dụ: 180°"],
+  ["flat_height", "Chiều cao khi nằm phẳng", "Ví dụ: 12 cm"],
+  ["swivel_angle", "Góc xoay", "Ví dụ: 180°"],
+  ["drive_assist", "Trợ lực di chuyển", "Ví dụ: Có"],
+  ["anti_tangle", "Chống rối tóc", "Ví dụ: Có"],
+  ["dirt_detection", "Cảm biến nhận diện vết bẩn", "Ví dụ: Có"],
+  ["detergent_dispensing", "Tự động pha dung dịch", "Ví dụ: Có"],
+  ["app_control", "Điều khiển bằng ứng dụng", "Ví dụ: Có"],
+  ["display_type", "Loại màn hình", "Ví dụ: LED"],
+  ["voice_alerts", "Cảnh báo bằng giọng nói", "Ví dụ: Có"],
+  ["noise_level", "Độ ồn", "Ví dụ: 78 dB"],
+  ["product_dimensions", "Kích thước sản phẩm", "Ví dụ: 320 × 300 × 110 mm"],
+  ["package_dimensions", "Kích thước hộp", "Ví dụ: 400 × 360 × 180 mm"],
+  ["product_weight", "Khối lượng sản phẩm", "Ví dụ: 4,5 kg"],
+  ["package_weight", "Khối lượng cả hộp", "Ví dụ: 6 kg"],
+  ["included_accessories", "Phụ kiện đi kèm", "Ví dụ: Đế sạc, dung dịch vệ sinh"],
+  ["reference_price", "Giá tham khảo (VNĐ)", "Ví dụ: 8900000"]
+];
+
+function normalizeAdminProductType(value) {
+  return value === PRODUCT_TYPE_FLOOR_WASHER
+    ? PRODUCT_TYPE_FLOOR_WASHER
+    : PRODUCT_TYPE_ROBOT;
+}
+
+function getProductSpecFieldConfig(productType) {
+  return normalizeAdminProductType(productType) === PRODUCT_TYPE_FLOOR_WASHER
+    ? floorWasherSpecFieldConfig
+    : robotSpecFieldConfig;
+}
+
+function getAdminProductTypeLabel(productType) {
+  return normalizeAdminProductType(productType) === PRODUCT_TYPE_FLOOR_WASHER
+    ? "Máy lau sàn"
+    : "Robot lau nhà";
+}
+
+function createProductTypeOptions(productType) {
+  const normalized = normalizeAdminProductType(productType);
+
+  return (
+    '<option value="robot-lau-nha" ' +
+      (normalized === PRODUCT_TYPE_ROBOT ? "selected" : "") +
+    '>Robot lau nhà</option>' +
+    '<option value="may-lau-san" ' +
+      (normalized === PRODUCT_TYPE_FLOOR_WASHER ? "selected" : "") +
+    '>Máy lau sàn</option>'
+  );
+}
+
+function renderFloorWasherEditSpecs(specs) {
+  const container = document.querySelector(
+    "#edit-floor-washer-spec-fields"
+  );
+
+  if (!container) return;
+
+  const values = specs || {};
+
+  container.innerHTML = floorWasherSpecFieldConfig.map(function (field) {
+    const key = field[0];
+    const label = field[1];
+    const placeholder = field[2];
+    const type = key === "reference_price" ? "number" : "text";
+    const numericAttributes = key === "reference_price"
+      ? ' min="0" step="1000"'
+      : "";
+
+    return (
+      '<label>' +
+        '<span>' + escapeAddRobotHtml(label) + '</span>' +
+        '<input type="' + type + '"' + numericAttributes +
+          ' data-floor-washer-spec-field="' + key + '"' +
+          ' value="' + escapeAddRobotHtml(values[key] ?? "") + '"' +
+          ' placeholder="' + escapeAddRobotHtml(placeholder) + '">' +
+      '</label>'
+    );
+  }).join("");
+}
+
+function collectFloorWasherEditSpecs() {
+  const specs = {};
+
+  document.querySelectorAll("[data-floor-washer-spec-field]").forEach(
+    function (input) {
+      specs[input.dataset.floorWasherSpecField] = input.value.trim();
+    }
+  );
+
+  return specs;
+}
+
+function syncEditProductTypeFields(productType, specs) {
+  const normalized = normalizeAdminProductType(productType);
+  const robotFields = document.querySelector("#edit-robot-spec-fields");
+  const floorWasherFields = document.querySelector(
+    "#edit-floor-washer-spec-fields"
+  );
+
+  if (robotFields) {
+    robotFields.hidden = normalized === PRODUCT_TYPE_FLOOR_WASHER;
+  }
+
+  if (floorWasherFields) {
+    floorWasherFields.hidden = normalized !== PRODUCT_TYPE_FLOOR_WASHER;
+  }
+
+  if (normalized === PRODUCT_TYPE_FLOOR_WASHER) {
+    renderFloorWasherEditSpecs(specs);
+  }
+}
+
 const addRobotState = {
   step: 1,
 
@@ -2716,7 +2930,8 @@ const addRobotState = {
     brand: "",
     model: "",
     year: "",
-    category: "robot-lau-nha",
+    category: "",
+    product_type: PRODUCT_TYPE_ROBOT,
     status: "active"
   },
 
@@ -2797,7 +3012,8 @@ function resetAddRobotState() {
     brand: "",
     model: "",
     year: "",
-    category: "robot-lau-nha",
+    category: "",
+    product_type: PRODUCT_TYPE_ROBOT,
     status: "active"
   };
 
@@ -2845,9 +3061,10 @@ function saveAddRobotStep1() {
   const modelInput = document.querySelector("#add-model");
   const yearInput = document.querySelector("#add-year");
   const categoryInput = document.querySelector("#add-category");
+  const productTypeInput = document.querySelector("#add-product-type");
   const statusInput = document.querySelector("#add-status");
 
-  if (!brandInput || !modelInput || !yearInput || !categoryInput || !statusInput) {
+  if (!brandInput || !modelInput || !yearInput || !categoryInput || !productTypeInput || !statusInput) {
     return false;
   }
 
@@ -2855,6 +3072,7 @@ function saveAddRobotStep1() {
   const model = modelInput.value.trim();
   const year = yearInput.value.trim();
   const category = categoryInput.value.trim();
+  const productType = normalizeAdminProductType(productTypeInput.value);
   const status = statusInput.value;
 
   if (!brand) {
@@ -2887,6 +3105,7 @@ function saveAddRobotStep1() {
   addRobotState.robot.model = model;
   addRobotState.robot.year = year;
   addRobotState.robot.category = category;
+  addRobotState.robot.product_type = productType;
   addRobotState.robot.status = status;
 
   return true;
@@ -2898,35 +3117,19 @@ function saveAddRobotStep1() {
 // ============================================================
 
 function saveAddRobotStep2() {
-  const fields = [
-    ["suction-power", "suction_power"],
-    ["obstacle-recognition", "obstacle_recognition"],
-    ["mopping-technology", "mopping_technology"],
-    ["mop-extension", "mop_extension"],
-    ["side-brush-extension", "side_brush_extension"],
-    ["automatic-mop-washing", "automatic_mop_washing"],
-    ["mop-drying", "mop_drying"],
-    ["wash-tray-self-cleaning", "wash_tray_self_cleaning"],
-    ["automatic-dust-emptying", "automatic_dust_emptying"],
-    ["automatic-detergent-dispensing", "automatic_detergent_dispensing"],
-    ["carpet-mop-lift", "carpet_mop_lift"],
-    ["dust-bag-capacity", "dust_bag_capacity"],
-    ["clean-dirty-water-capacity", "clean_dirty_water_capacity"],
-    ["battery-capacity", "battery_capacity"],
-    ["cleaning-area", "cleaning_area"],
-    ["robot-dimensions", "robot_dimensions"],
-    ["dock-dimensions", "dock_dimensions"],
-    ["reference-price", "reference_price"]
-  ];
-
-  fields.forEach(function (field) {
-    const input = document.querySelector("#add-" + field[0]);
+  getProductSpecFieldConfig(
+    addRobotState.robot.product_type
+  ).forEach(function (field) {
+    const key = field[0];
+    const input = document.querySelector(
+      "#add-" + key.replace(/_/g, "-")
+    );
 
     if (!input) {
       return;
     }
 
-    addRobotState.specs[field[1]] = input.value.trim();
+    addRobotState.specs[key] = input.value.trim();
   });
 
   return true;
@@ -3080,7 +3283,8 @@ function autoFillParseProductText(rawText) {
       brand: "",
       model: "",
       year: "",
-      category: "robot-lau-nha",
+      category: "",
+      product_type: PRODUCT_TYPE_ROBOT,
       status: "active"
     },
 
@@ -3708,7 +3912,14 @@ function renderAddRobotStep1() {
           '<span>Danh mục</span>' +
           '<input id="add-category" type="text" value="' +
             escapeAddRobotHtml(robot.category) +
-            '" placeholder="Robot lau nhà & hút bụi">' +
+            '" placeholder="Ví dụ: Thiết bị chăm sóc sàn">' +
+        '</label>' +
+
+        '<label>' +
+          '<span>Loại sản phẩm</span>' +
+          '<select id="add-product-type">' +
+            createProductTypeOptions(robot.product_type) +
+          '</select>' +
         '</label>' +
 
         '<label>' +
@@ -3763,26 +3974,16 @@ function renderAddRobotStep2() {
 
   const specs = addRobotState.specs;
 
-  const fields = [
-    ["suction-power", "Lực hút", "Ví dụ: 30.000 Pa", "suction_power"],
-    ["obstacle-recognition", "Nhận diện vật cản", "Ví dụ: Camera AI + ánh sáng cấu trúc", "obstacle_recognition"],
-    ["mopping-technology", "Công nghệ lau", "Ví dụ: Giẻ lau xoay kép", "mopping_technology"],
-    ["mop-extension", "Mở rộng cây lau", "Ví dụ: Có", "mop_extension"],
-    ["side-brush-extension", "Chổi cạnh mở rộng", "Ví dụ: Có", "side_brush_extension"],
-    ["automatic-mop-washing", "Tự động giặt giẻ", "Ví dụ: Nước nóng 75°C", "automatic_mop_washing"],
-    ["mop-drying", "Sấy khô giẻ lau", "Ví dụ: Khí nóng", "mop_drying"],
-    ["wash-tray-self-cleaning", "Tự làm sạch khay giặt", "Ví dụ: Có", "wash_tray_self_cleaning"],
-    ["automatic-dust-emptying", "Tự động đổ rác", "Ví dụ: Có", "automatic_dust_emptying"],
-    ["automatic-detergent-dispensing", "Tự pha nước lau sàn", "Ví dụ: Có", "automatic_detergent_dispensing"],
-    ["carpet-mop-lift", "Nâng giẻ khi gặp thảm", "Ví dụ: 10 mm", "carpet_mop_lift"],
-    ["dust-bag-capacity", "Dung tích túi bụi", "Ví dụ: 3,2 L", "dust_bag_capacity"],
-    ["clean-dirty-water-capacity", "Dung tích bình nước sạch/bẩn", "Ví dụ: Sạch 4 L / bẩn 3,5 L", "clean_dirty_water_capacity"],
-    ["battery-capacity", "Dung lượng pin", "Ví dụ: 6.400 mAh", "battery_capacity"],
-    ["cleaning-area", "Diện tích làm sạch", "Ví dụ: Tối đa 200 m²", "cleaning_area"],
-    ["robot-dimensions", "Kích thước robot", "Ví dụ: 350 × 350 × 97 mm", "robot_dimensions"],
-    ["dock-dimensions", "Kích thước trạm sạc", "Ví dụ: 340 × 457 × 590 mm", "dock_dimensions"],
-    ["reference-price", "Giá tham khảo (VNĐ)", "Ví dụ: 9200000", "reference_price"]
-  ];
+  const fields = getProductSpecFieldConfig(
+    addRobotState.robot.product_type
+  ).map(function (field) {
+    return [
+      field[0].replace(/_/g, "-"),
+      field[1],
+      field[2],
+      field[0]
+    ];
+  });
 
   panel.innerHTML =
     '<div class="panel-header">' +
@@ -3793,7 +3994,11 @@ function renderAddRobotStep2() {
       '<button type="button" id="robot-add-close" class="button-secondary">Đóng</button>' +
     '</div>' +
     '<div class="admin-form-section">' +
-      '<h3>Thông số robot</h3>' +
+      '<h3>' +
+        (normalizeAdminProductType(addRobotState.robot.product_type) === PRODUCT_TYPE_FLOOR_WASHER
+          ? "Thông số máy lau sàn"
+          : "Thông số robot") +
+      '</h3>' +
       '<div class="admin-form-grid">' +
         fields.map(function (field) {
           const value =
@@ -10621,6 +10826,482 @@ document.addEventListener("submit", async function (event) {
     await loadChatbotFaqs();
   } catch (error) {
     chatbotFaqMessage(error.message || "Không thể lưu FAQ.", true);
+  } finally {
+    saveButton.disabled = false;
+  }
+});
+
+// =========================================================
+// QUẢN LÝ TRA CỨU MÃ LỖI
+// =========================================================
+
+let errorLookupRecords = [];
+
+function errorLookupEscape(value) {
+  return String(value ?? "").replace(/[&<>"']/g, function (char) {
+    return {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    }[char];
+  });
+}
+
+function errorLookupMessage(message, isError = false) {
+  const element = document.getElementById("error-lookup-message");
+  if (!element) return;
+
+  element.textContent = message;
+  element.classList.toggle("is-error", Boolean(isError));
+  element.classList.toggle("has-message", Boolean(message));
+}
+
+function errorLookupRecordTitle(record) {
+  return record.record_type === "error_code"
+    ? record.error_title_vi
+    : record.title_vi;
+}
+
+function errorLookupRecordDescription(record) {
+  return record.record_type === "error_code"
+    ? record.description_vi
+    : record.summary_vi;
+}
+
+function errorLookupRenderList() {
+  const list = document.getElementById("error-lookup-list");
+  if (!list) return;
+
+  if (!errorLookupRecords.length) {
+    list.innerHTML = '<p class="robot-loading">Không tìm thấy dữ liệu phù hợp. Bấm “Thêm mục” để tạo bản ghi mới.</p>';
+    return;
+  }
+
+  list.innerHTML = errorLookupRecords.map(function (record) {
+    const official = record.record_type === "error_code";
+    const displayCode = official
+      ? record.error_code
+      : (record.reported_code || record.symptom_key);
+    const label = official ? "Mã lỗi chính hãng" : "Triệu chứng tham khảo";
+    const hasConfidenceScore = record.confidence_score !== null &&
+      record.confidence_score !== undefined &&
+      record.confidence_score !== "";
+    const confidence = hasConfidenceScore
+      ? Number(record.confidence_score).toFixed(2)
+      : "";
+    const confidenceText = confidence
+      ? `Tin cậy ${confidence}${record.confidence_label ? ` (${errorLookupEscape(record.confidence_label)})` : ""}`
+      : record.confidence_label
+        ? `Mức tin cậy: ${errorLookupEscape(record.confidence_label)}`
+        : "Chưa đánh giá độ tin cậy";
+    const sourceUrl = errorLookupEscape(record.source_url);
+    const sourceName = errorLookupEscape(record.source_name);
+    const sourceParts = [];
+
+    if (record.source_url) {
+      sourceParts.push(
+        `<a href="${sourceUrl}" target="_blank" rel="noopener">${sourceName || "Mở nguồn tham khảo"}</a>`
+      );
+    } else if (record.source_name) {
+      sourceParts.push(sourceName);
+    }
+
+    if (record.source_accessed_at) {
+      sourceParts.push(`kiểm tra ${errorLookupEscape(record.source_accessed_at)}`);
+    }
+
+    const sourceText = sourceParts.length
+      ? `Nguồn: ${sourceParts.join(" · ")}`
+      : "Chưa bổ sung nguồn tham khảo.";
+
+    return `
+      <article class="error-lookup-item">
+        <div class="error-lookup-item-content">
+          <div class="error-lookup-item-heading">
+            <span class="error-lookup-kind ${official ? "is-official" : "is-reference"}">${label}</span>
+            <code>${errorLookupEscape(displayCode)}</code>
+          </div>
+          <strong>${errorLookupEscape(errorLookupRecordTitle(record))}</strong>
+          <p class="error-lookup-item-meta">
+            ${errorLookupEscape(record.manufacturer)} · ${errorLookupEscape(record.model_scope)}
+            · ${confidenceText}
+          </p>
+          <p class="error-lookup-item-description">${errorLookupEscape(errorLookupRecordDescription(record))}</p>
+          <p class="error-lookup-item-source">${sourceText}</p>
+        </div>
+        <div class="error-lookup-item-actions">
+          <button type="button" data-error-lookup-edit="${errorLookupEscape(record.record_id)}">Sửa</button>
+          <button type="button" class="error-lookup-delete" data-error-lookup-delete="${errorLookupEscape(record.record_id)}">Xóa</button>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+async function loadErrorLookupRecords() {
+  const list = document.getElementById("error-lookup-list");
+  if (!list) return;
+
+  const recordType = document.getElementById("error-lookup-type-filter")?.value || "all";
+  const manufacturer = document.getElementById("error-lookup-manufacturer-filter")?.value.trim() || "";
+  const query = document.getElementById("error-lookup-query-filter")?.value.trim() || "";
+  const params = new URLSearchParams({ record_type: recordType, limit: "200" });
+
+  if (manufacturer) params.set("manufacturer", manufacturer);
+  if (query) params.set("q", query);
+
+  list.innerHTML = '<p class="robot-loading">Đang tải dữ liệu mã lỗi...</p>';
+
+  try {
+    const response = await fetch(
+      "/api/admin/error-lookup-records?" + params.toString(),
+      { method: "GET", credentials: "same-origin" }
+    );
+    const data = await response.json();
+
+    if (!response.ok || !data.ok) {
+      throw new Error(data.error || "Không thể tải dữ liệu mã lỗi.");
+    }
+
+    errorLookupRecords = Array.isArray(data.records) ? data.records : [];
+    errorLookupRenderList();
+    errorLookupMessage(`Đã tải ${data.total || 0} mục dữ liệu.`);
+  } catch (error) {
+    errorLookupRecords = [];
+    list.textContent = error.message || "Không thể tải dữ liệu mã lỗi.";
+    errorLookupMessage("Lỗi tải dữ liệu. Hãy kiểm tra phiên đăng nhập và kết nối API.", true);
+  }
+}
+
+function errorLookupTypeOptions(selected) {
+  return [
+    ["error_code", "Mã lỗi chính hãng"],
+    ["symptom_reference", "Triệu chứng tham khảo"]
+  ].map(function (option) {
+    return `<option value="${option[0]}" ${option[0] === selected ? "selected" : ""}>${option[1]}</option>`;
+  }).join("");
+}
+
+function errorLookupConfidenceOptions(selected) {
+  return [
+    ["", "Chưa đánh giá"],
+    ["cao", "Cao"],
+    ["trung bình", "Trung bình"],
+    ["thấp", "Thấp"]
+  ].map(function (option) {
+    return `<option value="${option[0]}" ${option[0] === selected ? "selected" : ""}>${option[1]}</option>`;
+  }).join("");
+}
+
+function errorLookupSetFormType(form, recordType) {
+  const codeGroup = form.querySelector('[data-error-lookup-type-group="error_code"]');
+  const symptomGroup = form.querySelector('[data-error-lookup-type-group="symptom_reference"]');
+
+  form.dataset.recordType = recordType;
+
+  [[codeGroup, "error_code"], [symptomGroup, "symptom_reference"]].forEach(function (entry) {
+    const group = entry[0];
+    const active = entry[1] === recordType;
+    if (!group) return;
+
+    group.hidden = !active;
+    group.querySelectorAll("input, textarea, select").forEach(function (field) {
+      field.disabled = !active;
+    });
+  });
+}
+
+function errorLookupShowForm(record = null) {
+  const panel = document.getElementById("error-lookup-form-panel");
+  if (!panel) return;
+
+  const editing = Boolean(record);
+  const recordType = record?.record_type || "error_code";
+  const isOfficial = recordType === "error_code";
+  const value = function (field, fallback = "") {
+    return errorLookupEscape(record?.[field] ?? fallback);
+  };
+
+  panel.style.display = "block";
+  panel.innerHTML = `
+    <form id="error-lookup-form" class="error-lookup-form" data-record-type="${recordType}">
+      <div class="error-lookup-form-heading">
+        <div>
+          <p class="eyebrow">${editing ? "CHỈNH SỬA BẢN GHI" : "THÊM BẢN GHI"}</p>
+          <h3>${editing ? "Cập nhật dữ liệu mã lỗi" : "Thêm dữ liệu mã lỗi mới"}</h3>
+        </div>
+        <p>${editing ? "Mã định danh giữ nguyên để bảo toàn liên kết dữ liệu." : "Chọn đúng loại dữ liệu và phạm vi model. Nguồn cùng độ tin cậy là tùy chọn."}</p>
+      </div>
+
+      <div class="error-lookup-form-grid">
+        <label>Loại dữ liệu
+          <select name="record_type" ${editing ? "disabled" : ""}>
+            ${errorLookupTypeOptions(recordType)}
+          </select>
+        </label>
+        <label>Mã định danh nội bộ
+          <input name="record_id" required maxlength="120"
+                 pattern="[A-Za-z0-9][A-Za-z0-9_-]{1,119}"
+                 placeholder="VD: DRM-L10S-001"
+                 value="${value("record_id")}" ${editing ? "readonly" : ""}>
+        </label>
+        <label>Hãng
+          <input name="manufacturer" required maxlength="100" placeholder="VD: Dreame"
+                 value="${value("manufacturer")}">
+        </label>
+        <label>Loại thiết bị
+          <input name="device_type" required maxlength="60" pattern="[a-z][a-z0-9_]{2,59}"
+                 value="${value("device_type", "robot_vacuum_mop")}">
+        </label>
+        <label>Phạm vi model
+          <input name="model_scope" required maxlength="160" placeholder="VD: L10s Ultra"
+                 value="${value("model_scope")}">
+        </label>
+        <label>Điểm tin cậy (0–1, không bắt buộc)
+          <input name="confidence_score" type="number" min="0" max="1" step="0.01"
+                 value="${value("confidence_score")}">
+        </label>
+        <label>Mức tin cậy (không bắt buộc)
+          <select name="confidence_label">${errorLookupConfidenceOptions(record?.confidence_label || "")}</select>
+        </label>
+        <label>Trạng thái xuất bản
+          <input name="publication_status" required maxlength="100" pattern="[A-Za-z0-9][A-Za-z0-9-]{1,99}"
+                 placeholder="official-model-manual"
+                 value="${value("publication_status", "community-reference")}">
+        </label>
+      </div>
+
+      <div data-error-lookup-type-group="error_code" ${isOfficial ? "" : "hidden"}>
+        <div class="error-lookup-form-grid">
+          <label>Mã lỗi hiển thị
+            <input name="error_code" maxlength="80" required placeholder="VD: E1"
+                   value="${value("error_code")}">
+          </label>
+          <label>Tiêu đề lỗi
+            <input name="error_title_vi" maxlength="250" required
+                   value="${value("error_title_vi")}">
+          </label>
+          <label class="error-lookup-form-full">Mô tả lỗi
+            <textarea name="description_vi" rows="4" maxlength="5000" required>${value("description_vi")}</textarea>
+          </label>
+          <label class="error-lookup-form-full">Bước xử lý đầu tiên
+            <textarea name="first_action_vi" rows="3" maxlength="3000" required>${value("first_action_vi")}</textarea>
+          </label>
+        </div>
+      </div>
+
+      <div data-error-lookup-type-group="symptom_reference" ${isOfficial ? "hidden" : ""}>
+        <div class="error-lookup-form-grid">
+          <label>Mã báo cáo (nếu có)
+            <input name="reported_code" maxlength="80" value="${value("reported_code")}">
+          </label>
+          <label>Khóa triệu chứng
+            <input name="symptom_key" maxlength="120" required placeholder="VD: brush-not-rotating"
+                   value="${value("symptom_key")}">
+          </label>
+          <label class="error-lookup-form-full">Tiêu đề triệu chứng
+            <input name="title_vi" maxlength="250" required value="${value("title_vi")}">
+          </label>
+          <label class="error-lookup-form-full">Mô tả / dấu hiệu nhận biết
+            <textarea name="summary_vi" rows="4" maxlength="5000" required>${value("summary_vi")}</textarea>
+          </label>
+          <label class="error-lookup-form-full">Bước xử lý đầu tiên
+            <textarea name="first_action_vi" rows="3" maxlength="3000" required>${value("first_action_vi")}</textarea>
+          </label>
+          <label class="error-lookup-form-full">Khi nào cần dừng máy / liên hệ kỹ thuật (không bắt buộc)
+            <textarea name="safety_stop_vi" rows="3" maxlength="3000">${value("safety_stop_vi")}</textarea>
+          </label>
+        </div>
+      </div>
+
+      <div class="error-lookup-form-grid error-lookup-source-grid">
+        <label class="error-lookup-form-full">Ghi chú phạm vi model
+          <textarea name="model_scope_note_vi" rows="2" maxlength="1000" required>${value("model_scope_note_vi")}</textarea>
+        </label>
+        <label>Nguồn (không bắt buộc)
+          <input name="source_name" maxlength="250" placeholder="Tên tài liệu / trang hỗ trợ"
+                 value="${value("source_name")}">
+        </label>
+        <label>Ngày kiểm tra nguồn (không bắt buộc)
+          <input name="source_accessed_at" type="date" value="${value("source_accessed_at")}">
+        </label>
+        <label class="error-lookup-form-full">URL nguồn (không bắt buộc)
+          <input name="source_url" type="url" maxlength="2048" placeholder="https://..."
+                 value="${value("source_url")}">
+        </label>
+      </div>
+
+      <div class="error-lookup-form-actions">
+        <button type="submit" class="button-primary">${editing ? "Lưu cập nhật" : "Thêm bản ghi"}</button>
+        <button type="button" data-error-lookup-cancel>Hủy</button>
+      </div>
+    </form>
+  `;
+
+  const form = panel.querySelector("#error-lookup-form");
+  if (form) {
+    if (editing) form.dataset.recordId = record.record_id;
+    errorLookupSetFormType(form, recordType);
+  }
+
+  panel.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+document.addEventListener("click", function (event) {
+  if (event.target.closest("#error-lookup-add")) {
+    errorLookupMessage("");
+    errorLookupShowForm();
+    return;
+  }
+
+  if (event.target.closest("#error-lookup-filter-apply")) {
+    errorLookupMessage("");
+    loadErrorLookupRecords();
+    return;
+  }
+
+  if (event.target.closest("[data-error-lookup-cancel]")) {
+    const panel = document.getElementById("error-lookup-form-panel");
+    if (panel) {
+      panel.style.display = "none";
+      panel.replaceChildren();
+    }
+    return;
+  }
+
+  const editButton = event.target.closest("[data-error-lookup-edit]");
+  if (editButton) {
+    const record = errorLookupRecords.find(function (item) {
+      return item.record_id === editButton.dataset.errorLookupEdit;
+    });
+
+    if (record) {
+      errorLookupMessage("");
+      errorLookupShowForm(record);
+    }
+    return;
+  }
+
+  const deleteButton = event.target.closest("[data-error-lookup-delete]");
+  if (deleteButton) {
+    const recordId = deleteButton.dataset.errorLookupDelete;
+    const record = errorLookupRecords.find(function (item) {
+      return item.record_id === recordId;
+    });
+
+    if (!recordId || !record) return;
+
+    const confirmed = window.confirm(
+      `Xóa “${errorLookupRecordTitle(record)}” khỏi dữ liệu tra cứu?\n\nThao tác này không thể hoàn tác.`
+    );
+
+    if (!confirmed) return;
+
+    deleteButton.disabled = true;
+
+    fetch("/api/admin/error-lookup-records/" + encodeURIComponent(recordId), {
+      method: "DELETE",
+      credentials: "same-origin"
+    }).then(async function (response) {
+      const data = await response.json();
+
+      if (!response.ok || !data.ok) {
+        throw new Error(data.error || "Không thể xóa bản ghi.");
+      }
+
+      const panel = document.getElementById("error-lookup-form-panel");
+      if (panel) {
+        panel.style.display = "none";
+        panel.replaceChildren();
+      }
+
+      errorLookupMessage("Đã xóa bản ghi.");
+      return loadErrorLookupRecords();
+    }).catch(function (error) {
+      errorLookupMessage(error.message || "Không thể xóa bản ghi.", true);
+      deleteButton.disabled = false;
+    });
+  }
+});
+
+document.addEventListener("change", function (event) {
+  const typeControl = event.target.closest('#error-lookup-form [name="record_type"]');
+  if (!typeControl) return;
+
+  const form = typeControl.closest("#error-lookup-form");
+  if (form) errorLookupSetFormType(form, typeControl.value);
+});
+
+document.addEventListener("submit", async function (event) {
+  const form = event.target.closest("#error-lookup-form");
+  if (!form) return;
+
+  event.preventDefault();
+
+  const formData = new FormData(form);
+  const recordType = form.dataset.recordType || String(formData.get("record_type") || "");
+  const body = {
+    record_type: recordType,
+    record_id: String(formData.get("record_id") || "").trim(),
+    manufacturer: String(formData.get("manufacturer") || "").trim(),
+    device_type: String(formData.get("device_type") || "").trim(),
+    model_scope: String(formData.get("model_scope") || "").trim(),
+    confidence_score: String(formData.get("confidence_score") || "").trim(),
+    confidence_label: String(formData.get("confidence_label") || "").trim(),
+    publication_status: String(formData.get("publication_status") || "").trim(),
+    model_scope_note_vi: String(formData.get("model_scope_note_vi") || "").trim(),
+    source_name: String(formData.get("source_name") || "").trim(),
+    source_url: String(formData.get("source_url") || "").trim(),
+    source_accessed_at: String(formData.get("source_accessed_at") || "").trim(),
+    first_action_vi: String(formData.get("first_action_vi") || "").trim()
+  };
+
+  if (recordType === "error_code") {
+    body.error_code = String(formData.get("error_code") || "").trim();
+    body.error_title_vi = String(formData.get("error_title_vi") || "").trim();
+    body.description_vi = String(formData.get("description_vi") || "").trim();
+  } else {
+    body.reported_code = String(formData.get("reported_code") || "").trim();
+    body.symptom_key = String(formData.get("symptom_key") || "").trim();
+    body.title_vi = String(formData.get("title_vi") || "").trim();
+    body.summary_vi = String(formData.get("summary_vi") || "").trim();
+    body.safety_stop_vi = String(formData.get("safety_stop_vi") || "").trim();
+  }
+
+  const saveButton = form.querySelector('button[type="submit"]');
+  const recordId = form.dataset.recordId;
+  saveButton.disabled = true;
+
+  try {
+    const response = await fetch(
+      recordId
+        ? "/api/admin/error-lookup-records/" + encodeURIComponent(recordId)
+        : "/api/admin/error-lookup-records",
+      {
+        method: recordId ? "PUT" : "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      }
+    );
+    const data = await response.json();
+
+    if (!response.ok || !data.ok) {
+      throw new Error(data.error || "Không thể lưu dữ liệu tra cứu.");
+    }
+
+    const panel = document.getElementById("error-lookup-form-panel");
+    if (panel) {
+      panel.style.display = "none";
+      panel.replaceChildren();
+    }
+
+    errorLookupMessage(recordId ? "Đã cập nhật bản ghi." : "Đã thêm bản ghi mới.");
+    await loadErrorLookupRecords();
+  } catch (error) {
+    errorLookupMessage(error.message || "Không thể lưu dữ liệu tra cứu.", true);
   } finally {
     saveButton.disabled = false;
   }

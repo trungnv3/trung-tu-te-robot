@@ -106,6 +106,15 @@
   </a>
 
   <a
+    href="#error-lookup"
+    data-section="error-lookup">
+
+    <span>🔎</span>
+    Mã lỗi robot
+
+  </a>
+
+  <a
     href="#">
 
     <span>🖼</span>
@@ -998,6 +1007,68 @@
       </div>
     </section>
   <!-- =====================================================
+       TRA CỨU MÃ LỖI
+       ===================================================== -->
+    <section id="error-lookup-section" class="admin-section">
+      <header class="admin-header">
+        <div>
+          <p class="eyebrow">DỮ LIỆU TRA CỨU</p>
+          <h1>Quản lý mã lỗi robot</h1>
+          <p class="admin-header-description">
+            Thêm và cập nhật mã lỗi chính hãng hoặc triệu chứng tham khảo. Dữ liệu đã lưu sẽ xuất hiện ở tab tra cứu công khai.
+          </p>
+        </div>
+        <a class="button-secondary error-lookup-public-link"
+           href="/tra-cuu-ma-loi/"
+           target="_blank"
+           rel="noopener">↗ Xem tab tra cứu</a>
+      </header>
+
+      <section class="panel error-lookup-panel">
+        <div class="panel-header error-lookup-panel-header">
+          <div>
+            <p class="eyebrow">DANH SÁCH DỮ LIỆU</p>
+            <h2>Mã lỗi và triệu chứng</h2>
+            <p class="panel-description">
+              Chọn đúng phạm vi model; nguồn và mức độ tin cậy có thể bổ sung sau.
+            </p>
+          </div>
+          <button type="button" id="error-lookup-add" class="button-primary">+ Thêm mục</button>
+        </div>
+
+        <div class="error-lookup-filter-bar" aria-label="Bộ lọc mã lỗi">
+          <label>Loại dữ liệu
+            <select id="error-lookup-type-filter">
+              <option value="all">Tất cả</option>
+              <option value="error_code">Mã lỗi chính hãng</option>
+              <option value="symptom_reference">Triệu chứng tham khảo</option>
+            </select>
+          </label>
+          <label>Hãng
+            <input id="error-lookup-manufacturer-filter"
+                   type="search"
+                   maxlength="100"
+                   placeholder="VD: Dreame">
+          </label>
+          <label>Tìm kiếm
+            <input id="error-lookup-query-filter"
+                   type="search"
+                   maxlength="120"
+                   placeholder="Mã lỗi, model, triệu chứng">
+          </label>
+          <button type="button" id="error-lookup-filter-apply">Lọc dữ liệu</button>
+        </div>
+
+        <p id="error-lookup-message" role="status" aria-live="polite"></p>
+        <div id="error-lookup-list" class="error-lookup-list">
+          <p class="robot-loading">Chọn mục “Mã lỗi robot” để tải dữ liệu.</p>
+        </div>
+        <div id="error-lookup-form-panel"
+             class="error-lookup-form-panel"
+             style="display:none;"></div>
+      </section>
+    </section>
+  <!-- =====================================================
        FORM CHỈNH SỬA ROBOT
        ===================================================== -->
 
@@ -1089,6 +1160,27 @@
         <label>
 
           <span>
+            Loại sản phẩm
+          </span>
+
+          <select id="edit-product-type">
+
+            <option value="robot-lau-nha">
+              Robot lau nhà
+            </option>
+
+            <option value="may-lau-san">
+              Máy lau sàn
+            </option>
+
+          </select>
+
+        </label>
+
+
+        <label>
+
+          <span>
             Trạng thái
           </span>
 
@@ -1120,7 +1212,7 @@
       </h3>
 
 
-      <div class="admin-form-grid">
+      <div id="edit-robot-spec-fields" class="admin-form-grid">
 
         <label>
           <span>Lực hút</span>
@@ -1218,6 +1310,12 @@
         </label>
 
 
+      </div>
+
+      <div
+        id="edit-floor-washer-spec-fields"
+        class="admin-form-grid"
+        hidden>
       </div>
 
     </div>

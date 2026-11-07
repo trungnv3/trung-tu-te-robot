@@ -3888,3 +3888,309 @@ body {
     flex: 1;
   }
 }
+
+/* ===== Error-code lookup management ===== */
+
+.error-lookup-panel-header,
+.error-lookup-form-heading,
+.error-lookup-item,
+.error-lookup-item-content,
+.error-lookup-item-heading,
+.error-lookup-item-actions,
+.error-lookup-form-actions {
+  display: flex;
+}
+
+.error-lookup-panel-header,
+.error-lookup-form-heading,
+.error-lookup-item {
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.error-lookup-panel-header,
+.error-lookup-form-heading {
+  align-items: flex-start;
+}
+
+.error-lookup-public-link,
+#error-lookup-add,
+#error-lookup-filter-apply,
+.error-lookup-item-actions button,
+.error-lookup-form-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 9px 14px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  background: #fff;
+  color: #344054;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+
+#error-lookup-add,
+.error-lookup-form-actions .button-primary {
+  border-color: #16805d;
+  background: #16805d;
+  color: #fff;
+}
+
+#error-lookup-add:hover,
+.error-lookup-form-actions .button-primary:hover {
+  border-color: #116749;
+  background: #116749;
+}
+
+.error-lookup-public-link:hover,
+#error-lookup-filter-apply:hover,
+.error-lookup-item-actions button:hover,
+.error-lookup-form-actions button:not(.button-primary):hover {
+  border-color: #98a2b3;
+  background: #f2f4f7;
+}
+
+.error-lookup-item-actions .error-lookup-delete {
+  border-color: #fecdca;
+  color: #b42318;
+}
+
+.error-lookup-item-actions .error-lookup-delete:hover {
+  border-color: #f97066;
+  background: #fff1f0;
+}
+
+.error-lookup-filter-bar,
+.error-lookup-form-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.error-lookup-filter-bar {
+  grid-template-columns: minmax(160px, .8fr) minmax(160px, 1fr) minmax(220px, 1.4fr) auto;
+  align-items: end;
+  margin: 18px 0;
+  padding: 16px;
+  border: 1px solid #e4e7ec;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.error-lookup-filter-bar label,
+.error-lookup-form label {
+  display: grid;
+  gap: 6px;
+  color: #344054;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.error-lookup-filter-bar input,
+.error-lookup-filter-bar select,
+.error-lookup-form input,
+.error-lookup-form select,
+.error-lookup-form textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color, #cbd5e1);
+  border-radius: 8px;
+  background: var(--input-bg, #fff);
+  color: inherit;
+  font: inherit;
+  font-weight: 400;
+}
+
+.error-lookup-filter-bar input:focus,
+.error-lookup-filter-bar select:focus,
+.error-lookup-form input:focus,
+.error-lookup-form select:focus,
+.error-lookup-form textarea:focus {
+  outline: 2px solid #16805d;
+  outline-offset: 1px;
+}
+
+.error-lookup-form textarea {
+  resize: vertical;
+  line-height: 1.55;
+}
+
+#error-lookup-message {
+  display: none;
+  margin: 12px 0;
+  color: #167647;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+#error-lookup-message.has-message {
+  display: block;
+}
+
+#error-lookup-message.is-error {
+  color: #b42318;
+}
+
+.error-lookup-list {
+  display: grid;
+  gap: 10px;
+}
+
+.error-lookup-item {
+  align-items: flex-start;
+  padding: 16px;
+  border: 1px solid #e4e7ec;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.error-lookup-item-content {
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.error-lookup-item-heading {
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.error-lookup-item-heading code {
+  padding: 3px 7px;
+  border-radius: 5px;
+  background: #f2f4f7;
+  color: #344054;
+  font-size: 13px;
+}
+
+.error-lookup-kind {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.error-lookup-kind.is-official {
+  background: #e8f5ef;
+  color: #167647;
+}
+
+.error-lookup-kind.is-reference {
+  background: #fff7e6;
+  color: #9b5c00;
+}
+
+.error-lookup-item-content strong {
+  color: #101828;
+  font-size: 16px;
+}
+
+.error-lookup-item-meta,
+.error-lookup-item-description,
+.error-lookup-item-source {
+  margin: 0;
+  color: #667085;
+  line-height: 1.55;
+}
+
+.error-lookup-item-description {
+  color: #475467;
+}
+
+.error-lookup-item-source {
+  font-size: 13px;
+}
+
+.error-lookup-item-source a {
+  color: #126f54;
+}
+
+.error-lookup-item-actions {
+  flex: none;
+  gap: 8px;
+}
+
+.error-lookup-form-panel {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #cfe9df;
+  border-radius: 12px;
+  background: #fbfefd;
+}
+
+.error-lookup-form {
+  display: grid;
+  gap: 18px;
+}
+
+.error-lookup-form-heading h3,
+.error-lookup-form-heading p {
+  margin: 0;
+}
+
+.error-lookup-form-heading > p {
+  max-width: 340px;
+  color: #667085;
+  line-height: 1.5;
+}
+
+.error-lookup-form-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.error-lookup-form-full {
+  grid-column: 1 / -1;
+}
+
+.error-lookup-source-grid {
+  padding-top: 18px;
+  border-top: 1px solid #e4e7ec;
+}
+
+.error-lookup-form-actions {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (max-width: 900px) {
+  .error-lookup-filter-bar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .error-lookup-panel-header,
+  .error-lookup-form-heading,
+  .error-lookup-item {
+    flex-direction: column;
+  }
+
+  .error-lookup-panel-header > *,
+  .error-lookup-item-actions,
+  .error-lookup-public-link,
+  #error-lookup-add {
+    width: 100%;
+  }
+
+  .error-lookup-filter-bar,
+  .error-lookup-form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .error-lookup-form-full {
+    grid-column: auto;
+  }
+}
