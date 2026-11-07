@@ -1,12 +1,11 @@
 (() => {
   const form = document.querySelector("#error-lookup-form");
 
-  if (!form) {
-    return;
-  }
+  if (!form) return;
 
   const manufacturerSelect = document.querySelector("#lookup-manufacturer");
   const modelSelect = document.querySelector("#lookup-model");
+  const symptomSelect = document.querySelector("#lookup-symptom");
   const queryInput = document.querySelector("#lookup-query");
   const resetButton = document.querySelector("#lookup-reset");
   const status = document.querySelector("#lookup-status");
@@ -16,15 +15,8 @@
 
   function createElement(tagName, className, text) {
     const element = document.createElement(tagName);
-
-    if (className) {
-      element.className = className;
-    }
-
-    if (text !== undefined && text !== null) {
-      element.textContent = text;
-    }
-
+    if (className) element.className = className;
+    if (text !== undefined && text !== null) element.textContent = text;
     return element;
   }
 
@@ -63,24 +55,17 @@
   }
 
   async function fetchJson(path) {
-    const response = await fetch(path, {
-      headers: {
-        Accept: "application/json"
-      }
-    });
-
-    let body;
+    const response = await fetch(path, { headers: { Accept: "application/json" } });
+    let body = null;
 
     try {
       body = await response.json();
-    } catch (error) {
+    } catch (_) {
       body = null;
     }
 
     if (!response.ok || !body?.ok) {
-      throw new Error(
-        body?.error || "Không thể tải dữ liệu tra cứu."
-      );
+      throw new Error(body?.error || "Không thể tải dữ liệu tra cứu.");
     }
 
     return body;
@@ -99,19 +84,39 @@
     setOptions(modelSelect, "Đang tải model...", []);
 
     try {
-      const params = new URLSearchParams({ manufacturer });
-      const data = await fetchJson(`/api/error-lookup/filters?${params}`);
-
-      setOptions(
-        modelSelect,
-        "Tất cả model/phạm vi",
-        data.model_scopes || [],
-        selectedValue
+      const data = await fetchJson(
+        `/api/error-lookup/filters?${new URLSearchParams({ manufacturer })}`
       );
+      setOptions(modelSelect, "Tất cả model", data.model_scopes || [], selectedValue);
       modelSelect.disabled = false;
     } catch (error) {
       setOptions(modelSelect, "Không tải được model", []);
       modelSelect.disabled = true;
+      setStatus(error.message, true);
+    }
+  }
+
+  async function loadSymptoms(selectedValue = "") {
+    const manufacturer = manufacturerSelect.value;
+
+    if (!manufacturer) {
+      setOptions(symptomSelect, "Chọn hãng trước", []);
+      symptomSelect.disabled = true;
+      return;
+    }
+
+    symptomSelect.disabled = true;
+    setOptions(symptomSelect, "Đang tải triệu chứng...", []);
+
+    try {
+      const params = new URLSearchParams({ manufacturer });
+      if (modelSelect.value) params.set("model_scope", modelSelect.value);
+      const data = await fetchJson(`/api/error-lookup/filters?${params}`);
+      setOptions(symptomSelect, "Tất cả triệu chứng", data.symptoms || [], selectedValue);
+      symptomSelect.disabled = false;
+    } catch (error) {
+      setOptions(symptomSelect, "Không tải được triệu chứng", []);
+      symptomSelect.disabled = true;
       setStatus(error.message, true);
     }
   }
@@ -124,17 +129,42 @@
     return createElement("span", className, text);
   }
 
+  function parseSteps(value) {
+    return String(value || "")
+      .split(/\r?\n/)
+      .map((step) => step.replace(/^\s*\d+[.)\-:]\s*/, "").trim())
+      .filter(Boolean);
+  }
+
+  function makeChecklist(steps) {
+    if (!steps.length) return null;
+
+    const section = createElement("section", "lookup-checklist");
+    const list = document.createElement("ol");
+    steps.forEach((step) => list.appendChild(createElement("li", "", step)));
+    section.append(createElement("h4", "", "Tự kiểm tra tại nhà"), list);
+    return section;
+  }
+
+  function makeServiceGuide(message) {
+    if (!message) return null;
+
+    const section = createElement("section", "lookup-service-guide");
+    section.append(
+      createElement("h4", "", "Khi nào nên dừng và mang máy đi kiểm tra"),
+      createElement("p", "", message)
+    );
+    return section;
+  }
+
   function makeResultCard(record) {
     const card = createElement("article", "lookup-card");
     const top = createElement("div", "lookup-card-top");
     const meta = createElement("div", "lookup-meta");
-    const tags = createElement("div", "lookup-tags");
     const official = isOfficial(record);
     const typeLabel = record.record_type === "error_code"
-      ? "Mã lỗi"
-      : official
-        ? "Triệu chứng chính hãng"
-        : "Triệu chứng tham khảo";
+      ? "Mã lỗi theo model"
+      : official ? "Triệu chứng chính hãng" : "Hướng dẫn tự kiểm tra";
 
     if (record.display_code) {
       meta.appendChild(makeBadge("lookup-code", `Mã ${record.display_code}`));
@@ -146,87 +176,26 @@
         typeLabel
       )
     );
-
-    const hasConfidenceScore = record.confidence_score !== null &&
-        record.confidence_score !== undefined &&
-        record.confidence_score !== "";
-
-    if (record.confidence_label || hasConfidenceScore) {
-      const confidenceText = hasConfidenceScore
-        ? `Độ tin cậy: ${record.confidence_label || "chưa đánh giá"} (${Number(record.confidence_score).toFixed(2)})`
-        : `Độ tin cậy: ${record.confidence_label}`;
-
-      tags.appendChild(
-        makeBadge("lookup-confidence", confidenceText)
-      );
-    }
-
-    top.append(meta, tags);
+    top.append(meta);
 
     const title = createElement("h3", "", record.title_vi);
-    const model = createElement(
-      "p",
-      "lookup-model",
-      `${record.manufacturer} · ${record.model_scope}`
-    );
-    const description = createElement(
-      "p",
-      "lookup-description",
-      record.description_vi
-    );
+    const model = createElement("p", "lookup-model", `${record.manufacturer} · ${record.model_scope}`);
+    const description = createElement("p", "lookup-description", record.description_vi);
     const nextStep = createElement("p", "lookup-next-step");
     nextStep.append(
-      createElement("strong", "", "Bước đầu tiên: "),
+      createElement("strong", "", "Bắt đầu từ đây: "),
       document.createTextNode(record.first_action_vi)
     );
 
     card.append(top, title, model, description, nextStep);
 
-    if (record.safety_stop_vi) {
-      const safety = createElement("p", "lookup-safety");
-      safety.append(
-        createElement("strong", "", "Dừng và kiểm tra kỹ hơn: "),
-        document.createTextNode(record.safety_stop_vi)
-      );
-      card.appendChild(safety);
-    }
+    const checklist = makeChecklist(parseSteps(record.diagnostic_steps_vi));
+    if (checklist) card.appendChild(checklist);
 
-    if (record.source_name || record.source_url || record.source_accessed_at) {
-      const source = createElement("div", "lookup-source");
-
-      if (record.source_name) {
-        source.appendChild(
-          createElement("span", "", `Nguồn: ${record.source_name}`)
-        );
-      }
-
-      if (record.source_url) {
-        const sourceLink = document.createElement("a");
-        sourceLink.href = record.source_url;
-        sourceLink.target = "_blank";
-        sourceLink.rel = "noopener noreferrer";
-        sourceLink.textContent = record.source_name ? "Mở nguồn" : "Nguồn tham khảo";
-        source.appendChild(sourceLink);
-      }
-
-      if (record.source_accessed_at) {
-        source.appendChild(
-          createElement("span", "", `Đối chiếu: ${record.source_accessed_at}`)
-        );
-      }
-
-      card.appendChild(source);
-    }
-
-    if (record.model_scope_note_vi) {
-      card.appendChild(
-        createElement(
-          "p",
-          "lookup-source-note",
-          record.model_scope_note_vi
-        )
-      );
-    }
+    const serviceGuide = makeServiceGuide(
+      record.service_handoff_vi || record.safety_stop_vi
+    );
+    if (serviceGuide) card.appendChild(serviceGuide);
 
     return card;
   }
@@ -234,12 +203,12 @@
   function renderResults(data) {
     const records = Array.isArray(data.results) ? data.results : [];
 
-    if (records.length === 0) {
+    if (!records.length) {
       resultsTitle.textContent = "Không tìm thấy kết quả phù hợp";
       setEmpty(
         "–",
         "Chưa có mục khớp với tra cứu này",
-        "Hãy thử đổi model, nhập mã khác hoặc tìm bằng một triệu chứng ngắn hơn."
+        "Hãy thử đổi model, chọn một triệu chứng khác hoặc nhập mã lỗi hiển thị trên máy."
       );
       setStatus("Không tìm thấy kết quả phù hợp.");
       return;
@@ -247,52 +216,38 @@
 
     resultsTitle.textContent = `${records.length} kết quả tra cứu`;
     const fragment = document.createDocumentFragment();
-
-    records.forEach((record) => {
-      fragment.appendChild(makeResultCard(record));
-    });
-
+    records.forEach((record) => fragment.appendChild(makeResultCard(record)));
     results.replaceChildren(fragment);
     results.hidden = false;
     empty.hidden = true;
-    setStatus(`Đã tìm thấy ${records.length} kết quả. Hãy đối chiếu đúng model trước khi thao tác.`);
+    setStatus(`Đã tìm thấy ${records.length} kết quả. Chỉ thực hiện các bước an toàn, dễ tiếp cận.`);
   }
 
   async function runLookup() {
     const manufacturer = manufacturerSelect.value;
     const modelScope = modelSelect.value;
-    const query = queryInput.value.trim();
+    const query = queryInput.value.trim() || symptomSelect.value;
 
     if (!manufacturer && !modelScope && !query) {
       resultsTitle.textContent = "Chưa có truy vấn";
       setEmpty(
         "⌕",
-        "Chọn robot hoặc nhập mã lỗi",
-        "Ví dụ chọn Roborock → S4 → nhập “10”, hoặc nhập “không sạc”."
+        "Chọn robot hoặc triệu chứng",
+        "Ví dụ chọn Dreame → L10s Ultra → “Không sạc, không về trạm”."
       );
       setStatus("Chọn ít nhất một điều kiện để tra cứu.");
       return;
     }
 
     const params = new URLSearchParams({ limit: "50" });
-
-    if (manufacturer) {
-      params.set("manufacturer", manufacturer);
-    }
-
-    if (modelScope) {
-      params.set("model_scope", modelScope);
-    }
-
-    if (query) {
-      params.set("q", query);
-    }
+    if (manufacturer) params.set("manufacturer", manufacturer);
+    if (modelScope) params.set("model_scope", modelScope);
+    if (query) params.set("q", query);
 
     setStatus("Đang tra cứu dữ liệu...");
 
     try {
-      const data = await fetchJson(`/api/error-lookup?${params}`);
-      renderResults(data);
+      renderResults(await fetchJson(`/api/error-lookup?${params}`));
     } catch (error) {
       resultsTitle.textContent = "Không thể tải kết quả";
       setEmpty(
@@ -307,12 +262,8 @@
   async function initialise() {
     try {
       const data = await fetchJson("/api/error-lookup/filters");
-      setOptions(
-        manufacturerSelect,
-        "Tất cả hãng",
-        data.manufacturers || []
-      );
-      setStatus("Sẵn sàng tra cứu. Hãy chọn hãng/model hoặc nhập mã lỗi.");
+      setOptions(manufacturerSelect, "Tất cả hãng", data.manufacturers || []);
+      setStatus("Sẵn sàng tra cứu. Hãy chọn hãng, model hoặc triệu chứng.");
     } catch (error) {
       setStatus(error.message, true);
       setEmpty(
@@ -325,6 +276,11 @@
 
   manufacturerSelect.addEventListener("change", async () => {
     await loadModels();
+    await loadSymptoms();
+  });
+
+  modelSelect.addEventListener("change", async () => {
+    await loadSymptoms();
   });
 
   form.addEventListener("submit", (event) => {
@@ -336,11 +292,12 @@
     manufacturerSelect.value = "";
     queryInput.value = "";
     await loadModels();
+    await loadSymptoms();
     resultsTitle.textContent = "Chưa có truy vấn";
     setEmpty(
       "⌕",
-      "Chọn robot hoặc nhập mã lỗi",
-      "Ví dụ chọn Roborock → S4 → nhập “10”, hoặc nhập “không sạc”."
+      "Chọn robot hoặc triệu chứng",
+      "Ví dụ chọn Dreame → L10s Ultra → “Không sạc, không về trạm”."
     );
     setStatus("Đã xóa bộ lọc.");
   });
