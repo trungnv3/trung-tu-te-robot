@@ -11089,6 +11089,12 @@ function errorLookupShowForm(record = null) {
           <label class="error-lookup-form-full">Bước xử lý đầu tiên
             <textarea name="first_action_vi" rows="3" maxlength="3000" required>${value("first_action_vi")}</textarea>
           </label>
+          <label class="error-lookup-form-full">Các bước tự kiểm tra tại nhà (mỗi dòng là một bước, không bắt buộc)
+            <textarea name="diagnostic_steps_vi" rows="6" maxlength="6000" placeholder="Kiểm tra nguồn điện của trạm...&#10;Lau khô tiếp điểm sạc...">${value("diagnostic_steps_vi")}</textarea>
+          </label>
+          <label class="error-lookup-form-full">Khi cần dừng máy và liên hệ kỹ thuật (không bắt buộc)
+            <textarea name="service_handoff_vi" rows="3" maxlength="3000">${value("service_handoff_vi")}</textarea>
+          </label>
         </div>
       </div>
 
@@ -11110,8 +11116,14 @@ function errorLookupShowForm(record = null) {
           <label class="error-lookup-form-full">Bước xử lý đầu tiên
             <textarea name="first_action_vi" rows="3" maxlength="3000" required>${value("first_action_vi")}</textarea>
           </label>
+          <label class="error-lookup-form-full">Các bước tự kiểm tra tại nhà (mỗi dòng là một bước, không bắt buộc)
+            <textarea name="diagnostic_steps_vi" rows="6" maxlength="6000" placeholder="Kiểm tra nguồn điện của trạm...&#10;Lau khô tiếp điểm sạc...">${value("diagnostic_steps_vi")}</textarea>
+          </label>
           <label class="error-lookup-form-full">Khi nào cần dừng máy / liên hệ kỹ thuật (không bắt buộc)
             <textarea name="safety_stop_vi" rows="3" maxlength="3000">${value("safety_stop_vi")}</textarea>
+          </label>
+          <label class="error-lookup-form-full">Gợi ý khi mang máy đi kiểm tra (không bắt buộc)
+            <textarea name="service_handoff_vi" rows="3" maxlength="3000">${value("service_handoff_vi")}</textarea>
           </label>
         </div>
       </div>
@@ -11255,7 +11267,9 @@ document.addEventListener("submit", async function (event) {
     source_name: String(formData.get("source_name") || "").trim(),
     source_url: String(formData.get("source_url") || "").trim(),
     source_accessed_at: String(formData.get("source_accessed_at") || "").trim(),
-    first_action_vi: String(formData.get("first_action_vi") || "").trim()
+    first_action_vi: String(formData.get("first_action_vi") || "").trim(),
+    diagnostic_steps_vi: String(formData.get("diagnostic_steps_vi") || "").trim(),
+    service_handoff_vi: String(formData.get("service_handoff_vi") || "").trim()
   };
 
   if (recordType === "error_code") {
