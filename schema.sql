@@ -176,5 +176,76 @@ CREATE INDEX IF NOT EXISTS idx_robot_images_sort
   ON robot_images(robot_id, sort_order);
 
 -- ============================================================
+-- 6. ERROR-CODE LOOKUP
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS error_codes (
+  record_id TEXT PRIMARY KEY,
+  manufacturer TEXT NOT NULL,
+  device_type TEXT NOT NULL,
+  model_scope TEXT NOT NULL,
+  error_code TEXT NOT NULL,
+  error_title_vi TEXT NOT NULL,
+  description_vi TEXT NOT NULL,
+  first_action_vi TEXT NOT NULL,
+  diagnostic_steps_vi TEXT NOT NULL DEFAULT '',
+  service_handoff_vi TEXT NOT NULL DEFAULT '',
+  confidence_score REAL NOT NULL
+    CHECK (confidence_score >= 0 AND confidence_score <= 1),
+  confidence_label TEXT NOT NULL
+    CHECK (confidence_label IN ('cao', 'trung bình', 'thấp')),
+  model_scope_note_vi TEXT NOT NULL,
+  source_name TEXT NOT NULL,
+  source_url TEXT NOT NULL,
+  source_accessed_at TEXT NOT NULL,
+  publication_status TEXT NOT NULL,
+  UNIQUE (manufacturer, model_scope, error_code)
+);
+
+CREATE TABLE IF NOT EXISTS symptom_references (
+  record_id TEXT PRIMARY KEY,
+  manufacturer TEXT NOT NULL,
+  device_type TEXT NOT NULL,
+  model_scope TEXT NOT NULL,
+  reported_code TEXT NOT NULL DEFAULT '',
+  symptom_key TEXT NOT NULL,
+  title_vi TEXT NOT NULL,
+  summary_vi TEXT NOT NULL,
+  first_action_vi TEXT NOT NULL,
+  safety_stop_vi TEXT NOT NULL,
+  diagnostic_steps_vi TEXT NOT NULL DEFAULT '',
+  service_handoff_vi TEXT NOT NULL DEFAULT '',
+  confidence_score REAL NOT NULL
+    CHECK (confidence_score >= 0 AND confidence_score <= 1),
+  confidence_label TEXT NOT NULL
+    CHECK (confidence_label IN ('cao', 'trung bình', 'thấp')),
+  model_scope_note_vi TEXT NOT NULL,
+  source_name TEXT NOT NULL,
+  source_url TEXT NOT NULL,
+  source_accessed_at TEXT NOT NULL,
+  publication_status TEXT NOT NULL,
+  UNIQUE (manufacturer, model_scope, reported_code, symptom_key, source_url)
+);
+
+CREATE INDEX IF NOT EXISTS idx_error_codes_lookup
+  ON error_codes (manufacturer, model_scope, error_code);
+
+CREATE INDEX IF NOT EXISTS idx_symptom_references_lookup
+  ON symptom_references (manufacturer, model_scope, symptom_key);
+
+CREATE TABLE IF NOT EXISTS lookup_models (
+  model_id TEXT PRIMARY KEY,
+  manufacturer TEXT NOT NULL,
+  device_type TEXT NOT NULL,
+  model_name TEXT NOT NULL,
+  guide_group TEXT NOT NULL DEFAULT '',
+  is_active INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
+  UNIQUE (manufacturer, device_type, model_name)
+);
+
+CREATE INDEX IF NOT EXISTS idx_lookup_models_manufacturer
+  ON lookup_models (manufacturer, is_active, model_name);
+
+-- ============================================================
 -- HOÀN TẤT
 -- ============================================================
