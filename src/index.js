@@ -619,6 +619,8 @@ function validateErrorLookupRecord(body, existingRecordId = "") {
   const sourceUrl = text("source_url", 2048, false) || "";
   const sourceAccessedAt = text("source_accessed_at", 10, false) || "";
   const publicationStatus = text("publication_status", 100);
+  const diagnosticSteps = text("diagnostic_steps_vi", 6000, false) || "";
+  const serviceHandoff = text("service_handoff_vi", 3000, false) || "";
   const scoreInput = String(body?.confidence_score ?? "").trim();
   const confidenceScore = scoreInput === "" ? null : Number(scoreInput);
 
@@ -670,7 +672,9 @@ function validateErrorLookupRecord(body, existingRecordId = "") {
     source_name: sourceName,
     source_url: sourceUrl,
     source_accessed_at: sourceAccessedAt,
-    publication_status: publicationStatus
+    publication_status: publicationStatus,
+    diagnostic_steps_vi: diagnosticSteps,
+    service_handoff_vi: serviceHandoff
   };
 
   if (recordType === "error_code") {
@@ -3895,10 +3899,15 @@ if (
         const manufacturer = String(
           url.searchParams.get("manufacturer") || ""
         ).trim().slice(0, 100);
+        const modelScope = String(
+          url.searchParams.get("model_scope") || ""
+        ).trim().slice(0, 160);
 
         const manufacturersResult = await db.prepare(`
           SELECT manufacturer
           FROM (
+            SELECT manufacturer FROM lookup_models WHERE is_active = 1
+            UNION
             SELECT manufacturer FROM error_codes
             UNION
             SELECT manufacturer FROM symptom_references
@@ -3910,27 +3919,58 @@ if (
           ? `
             SELECT model_scope
             FROM (
-              SELECT model_scope FROM error_codes WHERE manufacturer = ?
+              SELECT model_name AS model_scope
+              FROM lookup_models
+              WHERE manufacturer = ? AND is_active = 1
               UNION
-              SELECT model_scope FROM symptom_references WHERE manufacturer = ?
+              SELECT model_scope FROM error_codes
+              WHERE manufacturer = ? AND model_scope <> 'Tất cả model'
+              UNION
+              SELECT model_scope FROM symptom_references
+              WHERE manufacturer = ? AND model_scope <> 'Tất cả model'
             )
             ORDER BY model_scope COLLATE NOCASE ASC
           `
           : `
             SELECT model_scope
             FROM (
-              SELECT model_scope FROM error_codes
+              SELECT model_name AS model_scope FROM lookup_models WHERE is_active = 1
               UNION
-              SELECT model_scope FROM symptom_references
+              SELECT model_scope FROM error_codes WHERE model_scope <> 'Tất cả model'
+              UNION
+              SELECT model_scope FROM symptom_references WHERE model_scope <> 'Tất cả model'
             )
             ORDER BY model_scope COLLATE NOCASE ASC
           `;
 
         const modelsResult = manufacturer
           ? await db.prepare(modelQuery)
-            .bind(manufacturer, manufacturer)
+            .bind(manufacturer, manufacturer, manufacturer)
             .all()
           : await db.prepare(modelQuery).all();
+
+        const symptomQuery = !manufacturer
+          ? null
+          : modelScope
+            ? `
+              SELECT title_vi
+              FROM symptom_references
+              WHERE manufacturer = ?
+                AND (model_scope = ? OR model_scope = 'Tất cả model')
+              ORDER BY title_vi COLLATE NOCASE ASC
+            `
+            : `
+              SELECT DISTINCT title_vi
+              FROM symptom_references
+              WHERE manufacturer = ?
+              ORDER BY title_vi COLLATE NOCASE ASC
+            `;
+
+        const symptomsResult = !symptomQuery
+          ? { results: [] }
+          : modelScope
+            ? await db.prepare(symptomQuery).bind(manufacturer, modelScope).all()
+            : await db.prepare(symptomQuery).bind(manufacturer).all();
 
         return Response.json(
           {
@@ -3938,7 +3978,9 @@ if (
             manufacturers: (manufacturersResult.results || [])
               .map((row) => row.manufacturer),
             model_scopes: (modelsResult.results || [])
-              .map((row) => row.model_scope)
+              .map((row) => row.model_scope),
+            symptoms: (symptomsResult.results || [])
+              .map((row) => row.title_vi)
           },
           {
             headers: {
@@ -3991,7 +4033,7 @@ if (
           }
 
           if (modelScope) {
-            clauses.push("model_scope = ?");
+            clauses.push("(model_scope = ? OR model_scope = 'Tất cả model')");
             values.push(modelScope);
           }
 
@@ -4014,13 +4056,15 @@ if (
         const codeFilters = buildWhere([
           "error_code",
           "error_title_vi",
-          "description_vi"
+          "description_vi",
+          "diagnostic_steps_vi"
         ]);
         const symptomFilters = buildWhere([
           "reported_code",
           "symptom_key",
           "title_vi",
-          "summary_vi"
+          "summary_vi",
+          "diagnostic_steps_vi"
         ]);
 
         const [codesResult, symptomsResult] = await Promise.all([
@@ -4036,6 +4080,8 @@ if (
               description_vi,
               first_action_vi,
               '' AS safety_stop_vi,
+              diagnostic_steps_vi,
+              service_handoff_vi,
               confidence_score,
               confidence_label,
               model_scope_note_vi,
@@ -4060,6 +4106,8 @@ if (
               summary_vi AS description_vi,
               first_action_vi,
               safety_stop_vi,
+              diagnostic_steps_vi,
+              service_handoff_vi,
               confidence_score,
               confidence_label,
               model_scope_note_vi,
@@ -4160,13 +4208,15 @@ if (
               INSERT INTO error_codes (
                 record_id, manufacturer, device_type, model_scope, error_code,
                 error_title_vi, description_vi, first_action_vi,
+                diagnostic_steps_vi, service_handoff_vi,
                 confidence_score, confidence_label, model_scope_note_vi,
                 source_name, source_url, source_accessed_at, publication_status
-              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             `).bind(
               record.record_id, record.manufacturer, record.device_type,
               record.model_scope, record.error_code, record.error_title_vi,
               record.description_vi, record.first_action_vi,
+              record.diagnostic_steps_vi, record.service_handoff_vi,
               record.confidence_score, record.confidence_label,
               record.model_scope_note_vi, record.source_name,
               record.source_url, record.source_accessed_at,
@@ -4177,14 +4227,16 @@ if (
               INSERT INTO symptom_references (
                 record_id, manufacturer, device_type, model_scope, reported_code,
                 symptom_key, title_vi, summary_vi, first_action_vi, safety_stop_vi,
+                diagnostic_steps_vi, service_handoff_vi,
                 confidence_score, confidence_label, model_scope_note_vi,
                 source_name, source_url, source_accessed_at, publication_status
-              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             `).bind(
               record.record_id, record.manufacturer, record.device_type,
               record.model_scope, record.reported_code, record.symptom_key,
               record.title_vi, record.summary_vi, record.first_action_vi,
-              record.safety_stop_vi, record.confidence_score,
+              record.safety_stop_vi, record.diagnostic_steps_vi,
+              record.service_handoff_vi, record.confidence_score,
               record.confidence_label, record.model_scope_note_vi,
               record.source_name, record.source_url, record.source_accessed_at,
               record.publication_status
@@ -4252,6 +4304,7 @@ if (
                 'error_code' AS record_type,
                 record_id, manufacturer, device_type, model_scope,
                 error_code, error_title_vi, description_vi, first_action_vi,
+                diagnostic_steps_vi, service_handoff_vi,
                 confidence_score, confidence_label, model_scope_note_vi,
                 source_name, source_url, source_accessed_at, publication_status
               FROM error_codes
@@ -4267,7 +4320,8 @@ if (
                 'symptom_reference' AS record_type,
                 record_id, manufacturer, device_type, model_scope,
                 reported_code, symptom_key, title_vi, summary_vi, first_action_vi,
-                safety_stop_vi, confidence_score, confidence_label,
+                safety_stop_vi, diagnostic_steps_vi, service_handoff_vi,
+                confidence_score, confidence_label,
                 model_scope_note_vi, source_name, source_url, source_accessed_at,
                 publication_status
               FROM symptom_references
@@ -4362,14 +4416,16 @@ if (
             UPDATE error_codes
             SET manufacturer = ?, device_type = ?, model_scope = ?,
                 error_code = ?, error_title_vi = ?, description_vi = ?,
-                first_action_vi = ?, confidence_score = ?, confidence_label = ?,
+                first_action_vi = ?, diagnostic_steps_vi = ?, service_handoff_vi = ?,
+                confidence_score = ?, confidence_label = ?,
                 model_scope_note_vi = ?, source_name = ?, source_url = ?,
                 source_accessed_at = ?, publication_status = ?
             WHERE record_id = ?
           `).bind(
             record.manufacturer, record.device_type, record.model_scope,
             record.error_code, record.error_title_vi, record.description_vi,
-            record.first_action_vi, record.confidence_score,
+            record.first_action_vi, record.diagnostic_steps_vi,
+            record.service_handoff_vi, record.confidence_score,
             record.confidence_label, record.model_scope_note_vi,
             record.source_name, record.source_url, record.source_accessed_at,
             record.publication_status, recordId
@@ -4379,7 +4435,8 @@ if (
             UPDATE symptom_references
             SET manufacturer = ?, device_type = ?, model_scope = ?,
                 reported_code = ?, symptom_key = ?, title_vi = ?, summary_vi = ?,
-                first_action_vi = ?, safety_stop_vi = ?, confidence_score = ?,
+                first_action_vi = ?, safety_stop_vi = ?, diagnostic_steps_vi = ?,
+                service_handoff_vi = ?, confidence_score = ?,
                 confidence_label = ?, model_scope_note_vi = ?, source_name = ?,
                 source_url = ?, source_accessed_at = ?, publication_status = ?
             WHERE record_id = ?
@@ -4387,6 +4444,7 @@ if (
             record.manufacturer, record.device_type, record.model_scope,
             record.reported_code, record.symptom_key, record.title_vi,
             record.summary_vi, record.first_action_vi, record.safety_stop_vi,
+            record.diagnostic_steps_vi, record.service_handoff_vi,
             record.confidence_score, record.confidence_label,
             record.model_scope_note_vi, record.source_name, record.source_url,
             record.source_accessed_at, record.publication_status, recordId
