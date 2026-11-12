@@ -595,6 +595,27 @@ token
 );
 }
 
+const LOOKUP_DEVICE_TYPES = {
+  robot: ["robot", "robot_vacuum", "robot_vacuum_mop"],
+  floor_washer: ["floor_washer"],
+  stick_vacuum: ["stick_vacuum"]
+};
+
+function getLookupDeviceTypes(value) {
+  return LOOKUP_DEVICE_TYPES[value] || [];
+}
+
+function buildLookupDeviceTypeFilter(deviceTypes, column = "device_type") {
+  if (!deviceTypes.length) {
+    return { sql: "", values: [] };
+  }
+
+  return {
+    sql: ` AND ${column} IN (${deviceTypes.map(() => "?").join(", ")})`,
+    values: deviceTypes
+  };
+}
+
 function validateErrorLookupRecord(body, existingRecordId = "") {
   const text = (field, maximum, required = true) => {
     const value = String(body?.[field] ?? "")
@@ -3902,18 +3923,32 @@ if (
         const modelScope = String(
           url.searchParams.get("model_scope") || ""
         ).trim().slice(0, 160);
+        const deviceType = String(
+          url.searchParams.get("device_type") || ""
+        ).trim();
+        const deviceTypes = getLookupDeviceTypes(deviceType);
+        const modelTypeFilter = buildLookupDeviceTypeFilter(deviceTypes);
+        const codeTypeFilter = buildLookupDeviceTypeFilter(deviceTypes);
+        const symptomTypeFilter = buildLookupDeviceTypeFilter(deviceTypes);
 
         const manufacturersResult = await db.prepare(`
           SELECT manufacturer
           FROM (
-            SELECT manufacturer FROM lookup_models WHERE is_active = 1
+            SELECT manufacturer FROM lookup_models
+            WHERE is_active = 1${modelTypeFilter.sql}
             UNION
             SELECT manufacturer FROM error_codes
+            WHERE 1 = 1${codeTypeFilter.sql}
             UNION
             SELECT manufacturer FROM symptom_references
+            WHERE 1 = 1${symptomTypeFilter.sql}
           )
           ORDER BY manufacturer COLLATE NOCASE ASC
-        `).all();
+        `).bind(
+          ...modelTypeFilter.values,
+          ...codeTypeFilter.values,
+          ...symptomTypeFilter.values
+        ).all();
 
         const modelQuery = manufacturer
           ? `
@@ -3921,56 +3956,80 @@ if (
             FROM (
               SELECT model_name AS model_scope
               FROM lookup_models
-              WHERE manufacturer = ? AND is_active = 1
+              WHERE manufacturer = ? AND is_active = 1${modelTypeFilter.sql}
               UNION
               SELECT model_scope FROM error_codes
-              WHERE manufacturer = ? AND model_scope <> 'Tất cả model'
+              WHERE manufacturer = ? AND model_scope <> 'Tất cả model'${codeTypeFilter.sql}
               UNION
               SELECT model_scope FROM symptom_references
-              WHERE manufacturer = ? AND model_scope <> 'Tất cả model'
+              WHERE manufacturer = ? AND model_scope <> 'Tất cả model'${symptomTypeFilter.sql}
             )
             ORDER BY model_scope COLLATE NOCASE ASC
           `
           : `
             SELECT model_scope
             FROM (
-              SELECT model_name AS model_scope FROM lookup_models WHERE is_active = 1
+              SELECT model_name AS model_scope FROM lookup_models
+              WHERE is_active = 1${modelTypeFilter.sql}
               UNION
-              SELECT model_scope FROM error_codes WHERE model_scope <> 'Tất cả model'
+              SELECT model_scope FROM error_codes
+              WHERE model_scope <> 'Tất cả model'${codeTypeFilter.sql}
               UNION
-              SELECT model_scope FROM symptom_references WHERE model_scope <> 'Tất cả model'
+              SELECT model_scope FROM symptom_references
+              WHERE model_scope <> 'Tất cả model'${symptomTypeFilter.sql}
             )
             ORDER BY model_scope COLLATE NOCASE ASC
           `;
 
-        const modelsResult = manufacturer
-          ? await db.prepare(modelQuery)
-            .bind(manufacturer, manufacturer, manufacturer)
-            .all()
-          : await db.prepare(modelQuery).all();
+        const modelValues = manufacturer
+          ? [
+              manufacturer, ...modelTypeFilter.values,
+              manufacturer, ...codeTypeFilter.values,
+              manufacturer, ...symptomTypeFilter.values
+            ]
+          : [
+              ...modelTypeFilter.values,
+              ...codeTypeFilter.values,
+              ...symptomTypeFilter.values
+            ];
+        const modelsResult = await db.prepare(modelQuery).bind(...modelValues).all();
 
+        const modelScopeClause = modelScope
+          ? " AND (model_scope = ? OR model_scope = 'Tất cả model')"
+          : "";
         const symptomQuery = !manufacturer
           ? null
-          : modelScope
-            ? `
-              SELECT title_vi
+          : `
+            SELECT value, label
+            FROM (
+              SELECT
+                'symptom:' || title_vi AS value,
+                title_vi AS label
               FROM symptom_references
-              WHERE manufacturer = ?
-                AND (model_scope = ? OR model_scope = 'Tất cả model')
-              ORDER BY title_vi COLLATE NOCASE ASC
-            `
-            : `
-              SELECT DISTINCT title_vi
-              FROM symptom_references
-              WHERE manufacturer = ?
-              ORDER BY title_vi COLLATE NOCASE ASC
-            `;
+              WHERE manufacturer = ?${symptomTypeFilter.sql}${modelScopeClause}
+              UNION
+              SELECT
+                'code:' || error_code AS value,
+                error_code || ' — ' || error_title_vi AS label
+              FROM error_codes
+              WHERE manufacturer = ?${codeTypeFilter.sql}${modelScopeClause}
+            )
+            ORDER BY label COLLATE NOCASE ASC
+          `;
 
+        const symptomValues = !symptomQuery
+          ? []
+          : [
+              manufacturer,
+              ...symptomTypeFilter.values,
+              ...(modelScope ? [modelScope] : []),
+              manufacturer,
+              ...codeTypeFilter.values,
+              ...(modelScope ? [modelScope] : [])
+            ];
         const symptomsResult = !symptomQuery
           ? { results: [] }
-          : modelScope
-            ? await db.prepare(symptomQuery).bind(manufacturer, modelScope).all()
-            : await db.prepare(symptomQuery).bind(manufacturer).all();
+          : await db.prepare(symptomQuery).bind(...symptomValues).all();
 
         return Response.json(
           {
@@ -3980,7 +4039,7 @@ if (
             model_scopes: (modelsResult.results || [])
               .map((row) => row.model_scope),
             symptoms: (symptomsResult.results || [])
-              .map((row) => row.title_vi)
+              .map((row) => ({ value: row.value, label: row.label }))
           },
           {
             headers: {
@@ -4013,9 +4072,16 @@ if (
         const modelScope = String(
           url.searchParams.get("model_scope") || ""
         ).trim().slice(0, 160);
+        const deviceType = String(
+          url.searchParams.get("device_type") || ""
+        ).trim();
+        const deviceTypes = getLookupDeviceTypes(deviceType);
         const query = String(
           url.searchParams.get("q") || ""
         ).trim().replace(/[\u0000-\u001F\u007F]/g, " ").slice(0, 120);
+        const errorCode = String(
+          url.searchParams.get("error_code") || ""
+        ).trim().slice(0, 80);
         const requestedLimit = Number(
           url.searchParams.get("limit") || 50
         );
@@ -4023,7 +4089,7 @@ if (
           ? Math.min(Math.max(requestedLimit, 1), 50)
           : 50;
 
-        const buildWhere = (searchColumns) => {
+        const buildWhere = (searchColumns, supportsExactErrorCode = false) => {
           const clauses = [];
           const values = [];
 
@@ -4032,9 +4098,19 @@ if (
             values.push(manufacturer);
           }
 
+          if (deviceTypes.length) {
+            clauses.push(`device_type IN (${deviceTypes.map(() => "?").join(", ")})`);
+            values.push(...deviceTypes);
+          }
+
           if (modelScope) {
             clauses.push("(model_scope = ? OR model_scope = 'Tất cả model')");
             values.push(modelScope);
+          }
+
+          if (supportsExactErrorCode && errorCode) {
+            clauses.push("error_code = ?");
+            values.push(errorCode);
           }
 
           if (query) {
@@ -4058,7 +4134,7 @@ if (
           "error_title_vi",
           "description_vi",
           "diagnostic_steps_vi"
-        ]);
+        ], true);
         const symptomFilters = buildWhere([
           "reported_code",
           "symptom_key",
@@ -4094,7 +4170,9 @@ if (
             ORDER BY confidence_score DESC, error_code ASC
             LIMIT ?
           `).bind(...codeFilters.values, limit).all(),
-          db.prepare(`
+          errorCode
+            ? Promise.resolve({ results: [] })
+            : db.prepare(`
             SELECT
               'symptom_reference' AS record_type,
               record_id,
@@ -4150,7 +4228,9 @@ if (
             filters: {
               manufacturer,
               model_scope: modelScope,
-              q: query
+              device_type: deviceType,
+              q: query,
+              error_code: errorCode
             },
             total: results.length,
             results
